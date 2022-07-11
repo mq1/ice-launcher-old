@@ -1,7 +1,7 @@
 import PyInstaller.__main__
 
 PyInstaller.__main__.run([
-    'ice_launcher/app.py',
+    'ice_launcher/__main__.py',
     '--name=ice_launcher',
     '--noconfirm',
     '--onedir',
