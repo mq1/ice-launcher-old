@@ -1,5 +1,5 @@
 from customtkinter import CTkFrame, CTkLabel
-from __init__ import __version__
+from ice_launcher import __version__
 
 
 class About(CTkFrame):

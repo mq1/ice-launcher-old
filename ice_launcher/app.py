@@ -1,7 +1,7 @@
 from customtkinter import CTk, CTkButton, CTkFrame
-from news import News
-from settings import Settings
-from about import About
+from ice_launcher.news import News
+from ice_launcher.settings import Settings
+from ice_launcher.about import About
 
 
 class App(CTk):
