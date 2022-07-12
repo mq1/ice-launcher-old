@@ -113,7 +113,7 @@ altgraph = ">=0.15"
 
 [[package]]
 name = "minecraft-launcher-lib"
-version = "4.6"
+version = "5.0"
 description = "A library for creating a custom Minecraft launcher"
 category = "main"
 optional = false
@@ -125,9 +125,9 @@ requests = "*"
 
 [package.source]
 type = "git"
-url = "https://gitlab.com/mq-1/minecraft-launcher-lib.git"
+url = "https://gitlab.com/JakobDev/minecraft-launcher-lib.git"
 reference = "master"
-resolved_reference = "e6ae5df70869ee6cc92b483d7837b946ddee8ea9"
+resolved_reference = "6c65d1437b39da7f13448a3fabe40484c7050f43"
 
 [[package]]
 name = "mypy-extensions"
@@ -257,7 +257,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "49bbe1eadbadcae27be8fddab9465f360214509e72b9ec0385e4e4570ca0f75e"
+content-hash = "e67792522fe1a2676a8e8f138657c66dcf5139c5530071dd9a5fae2be559dc6c"
 
 [metadata.files]
 altgraph = [
