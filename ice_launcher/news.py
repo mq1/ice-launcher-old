@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from io import BytesIO
 import requests
 
+
 class News(CTkFrame):
     articles = get_minecraft_news()
 
@@ -47,10 +48,12 @@ class News(CTkFrame):
         self.update_article()
 
     def update_image(self, index):
-        image_url = self.articles["article_grid"][index - 1]["default_tile"]["image"]["imageURL"]
+        image_url = self.articles["article_grid"][index - 1]["default_tile"]["image"][
+            "imageURL"
+        ]
         image_url = f"https://www.minecraft.net{image_url}"
-        content = requests.get(image_url, headers={ "User-Agent": "ice-launcher" }).content
-        image = Image.open(BytesIO(content))
+        response = requests.get(image_url, headers={"User-Agent": "ice-launcher"})
+        image = Image.open(BytesIO(response.content))
         self.photo = ImageTk.PhotoImage(image.resize((200, 200), Image.ANTIALIAS))
         self.image.configure(image=self.photo)
 
@@ -60,7 +63,7 @@ class News(CTkFrame):
         self.article.set_text(tile["title"])
         self.article_subheader.set_text(tile["sub_header"])
         self.update_image(index)
-        
+
     def decrement_article_index(self):
         if int(self.current_article_index.text) == 1:
             return
