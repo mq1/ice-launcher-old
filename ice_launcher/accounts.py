@@ -1,3 +1,4 @@
+import json
 from typing import Any, List, TypedDict, cast
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 from ice_launcher import __version__
@@ -7,8 +8,6 @@ from os import path
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from minecraft_launcher_lib import microsoft_account as msa
 from minecraft_launcher_lib.microsoft_types import CompleteLoginResponse
-import tomli
-import tomli_w
 
 
 __client_id__ = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
@@ -23,25 +22,24 @@ class Document(TypedDict):
 def new_document():
     doc: Document = {"version": 1, "accounts": []}
 
-    with open("accounts.toml", "wb") as f:
-        tomli_w.dump(cast(dict[str, Any], doc), f)
+    write_document(doc)
 
     return doc
 
 
 def read_document():
-    if not path.exists("accounts.toml"):
+    if not path.exists("accounts.json"):
         doc = new_document()
 
-    with open("accounts.toml", "rb") as f:
-        doc: Document = cast(Document, tomli.load(f))
+    with open("accounts.json", "r") as f:
+        doc: Document = json.load(f)
 
     return doc
 
 
 def write_document(doc: Document):
-    with open("accounts.toml", "wb") as f:
-        tomli_w.dump(cast(dict[str, Any], doc), f)
+    with open("accounts.json", "w") as f:
+        json.dump(doc, f)
 
 
 class CallbackHandler(BaseHTTPRequestHandler):

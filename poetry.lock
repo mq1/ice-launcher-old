@@ -237,15 +237,7 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
-name = "tomli-w"
-version = "1.0.0"
-description = "A lil' TOML writer"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -265,7 +257,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "71b0a69ca2382c4a1afd01c8fd0ad80fd42f4fd1cbe518a53c1bad5649e2cbfc"
+content-hash = "ecc5d66a4e772cea93b273c62dcf0e46e82d2c1cb137cfa8751ee158c040df78"
 
 [metadata.files]
 altgraph = [
@@ -416,5 +408,4 @@ tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
-tomli-w = []
 urllib3 = []
