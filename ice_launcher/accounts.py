@@ -11,8 +11,8 @@ import tomli
 import tomli_w
 
 
-__client_id__ = '0018ddff-bd2f-4cc6-b220-66f6a4462a5c'
-__redirect_uri__ = 'http://localhost:3003'
+__client_id__ = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
+__redirect_uri__ = "http://localhost:3003"
 
 
 class Document(TypedDict):
@@ -25,7 +25,7 @@ def new_document():
 
     with open("accounts.toml", "wb") as f:
         tomli_w.dump(cast(dict[str, Any], doc), f)
-    
+
     return doc
 
 
@@ -35,7 +35,7 @@ def read_document():
 
     with open("accounts.toml", "rb") as f:
         doc: Document = cast(Document, tomli.load(f))
-    
+
     return doc
 
 
@@ -49,8 +49,10 @@ class CallbackHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         auth_code = msa.get_auth_code_from_url(self.path)
-        assert(auth_code is not None)
-        login_data = msa.complete_login(__client_id__, __redirect_uri__, auth_code, self.code_verifier)
+        assert auth_code is not None
+        login_data = msa.complete_login(
+            __client_id__, __redirect_uri__, auth_code, self.code_verifier
+        )
 
         doc = read_document()
         doc["accounts"].append(login_data)
@@ -101,7 +103,13 @@ class Accounts(CTkFrame):
     def add_account(self):
         state = msa.generate_state()
         code_verifier, code_challenge, code_challenge_method = msa.generate_pkce()
-        login_url = msa.get_login_url(__client_id__, __redirect_uri__, state, code_challenge, code_challenge_method)
+        login_url = msa.get_login_url(
+            __client_id__,
+            __redirect_uri__,
+            state,
+            code_challenge,
+            code_challenge_method,
+        )
 
         webbrowser.open(login_url)
         handler = CallbackHandler
