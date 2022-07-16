@@ -67,7 +67,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "customtkinter"
-version = "4.5.4"
+version = "4.5.5"
 description = "Create modern looking GUIs with Python"
 category = "main"
 optional = false
@@ -78,7 +78,7 @@ darkdetect = "*"
 
 [[package]]
 name = "darkdetect"
-version = "0.6.0"
+version = "0.7.0"
 description = "Detect OS Dark Mode from Python"
 category = "main"
 optional = false
@@ -113,7 +113,7 @@ altgraph = ">=0.15"
 
 [[package]]
 name = "minecraft-launcher-lib"
-version = "5.0"
+version = "5.1"
 description = "A library for creating a custom Minecraft launcher"
 category = "main"
 optional = false
@@ -125,9 +125,9 @@ requests = "*"
 
 [package.source]
 type = "git"
-url = "https://gitlab.com/JakobDev/minecraft-launcher-lib.git"
-reference = "master"
-resolved_reference = "6c65d1437b39da7f13448a3fabe40484c7050f43"
+url = "https://gitlab.com/mq-1/minecraft-launcher-lib.git"
+reference = "secure-oauth2"
+resolved_reference = "b6d4c2486ff0db9976f9115abf1dbf3c5614541c"
 
 [[package]]
 name = "mypy-extensions"
@@ -237,7 +237,15 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
+name = "tomli-w"
+version = "1.0.0"
+description = "A lil' TOML writer"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -257,7 +265,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "e67792522fe1a2676a8e8f138657c66dcf5139c5530071dd9a5fae2be559dc6c"
+content-hash = "71b0a69ca2382c4a1afd01c8fd0ad80fd42f4fd1cbe518a53c1bad5649e2cbfc"
 
 [metadata.files]
 altgraph = [
@@ -306,10 +314,7 @@ colorama = [
     {file = "colorama-0.4.5.tar.gz", hash = "sha256:e6c6b4334fc50988a639d9b98aa429a0b57da6e17b9a44f0451f930b6967b7a4"},
 ]
 customtkinter = []
-darkdetect = [
-    {file = "darkdetect-0.6.0-py3-none-any.whl", hash = "sha256:9984327f5f0deeb4f02de01a18976825bc079befe7496b60c8d1fb0a06904d8e"},
-    {file = "darkdetect-0.6.0.tar.gz", hash = "sha256:7993275b537b4579ba2eee7673b0b95783f99c7ddb82a9f90dc077a379b427f1"},
-]
+darkdetect = []
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
 ]
@@ -411,4 +416,5 @@ tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
+tomli-w = []
 urllib3 = []

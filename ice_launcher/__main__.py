@@ -2,6 +2,7 @@ from customtkinter import CTk, CTkButton, CTkFrame
 from ice_launcher.news import News
 from ice_launcher.settings import Settings
 from ice_launcher.about import About
+from ice_launcher.accounts import Accounts
 
 
 class App(CTk):
@@ -23,6 +24,11 @@ class App(CTk):
         )
         self.news_button.pack(pady=(20, 10), padx=20, side="top")
 
+        self.accounts_button = CTkButton(
+            master=self.navigator, text="Accounts", command=self.open_accounts
+        )
+        self.accounts_button.pack(pady=10, padx=20, side="top")
+
         self.settings_button = CTkButton(
             master=self.navigator, text="Settings", command=self.open_settings
         )
@@ -42,6 +48,11 @@ class App(CTk):
     def open_news(self):
         self.main_frame.destroy()
         self.main_frame = News(master=self)
+        self.main_frame.pack(fill="both", expand=True, pady=20, padx=20)
+
+    def open_accounts(self):
+        self.main_frame.destroy()
+        self.main_frame = Accounts(master=self)
         self.main_frame.pack(fill="both", expand=True, pady=20, padx=20)
 
     def open_settings(self):
