@@ -6,7 +6,7 @@ authors = ["Manuel Quarneti <manuelquarneti@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-customtkinter = "^4.5.2"
+customtkinter = "^4.5.5"
 Pillow = "^9.2.0"
 requests = "^2.28.1"
 minecraft-launcher-lib = {git = "https://gitlab.com/mq-1/minecraft-launcher-lib.git", branch = "secure-oauth2"}
