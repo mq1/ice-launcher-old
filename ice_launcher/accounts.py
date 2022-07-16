@@ -114,6 +114,7 @@ class Accounts(CTkFrame):
         handler.code_verifier = code_verifier
         httpd = HTTPServer(("127.0.0.1", 3003), handler)
         httpd.serve_forever()
+        self.update_accounts_list()
 
     def update_accounts_list(self):
         self.accounts_list.destroy()
