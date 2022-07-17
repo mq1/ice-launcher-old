@@ -27,7 +27,7 @@ class App(CTk):
         self.instances_button = CTkButton(
             master=self.navigator, text="Instances", command=self.open_instances
         )
-        self.instances_button.grid(row=0, column=0, pady=(20, 10), sticky="nswe")
+        self.instances_button.grid(row=0, column=0, pady=(20, 10), padx=20, sticky="nswe")
 
         self.news_button = CTkButton(
             master=self.navigator, text="News", command=self.open_news
