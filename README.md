@@ -1,6 +1,6 @@
-# ice-launcher
+# 🧊 ice-launcher
 
-An unofficial WIP Minecraft Launcher using [minecraft-launcher-lib](https://pypi.org/project/minecraft-launcher-lib)
+An unofficial WIP Minecraft Launcher using [minecraft-launcher-lib](https://gitlab.com/JakobDev/minecraft-launcher-lib)
 
 Copyright (c) 2022 Manuel Quarneti
 
