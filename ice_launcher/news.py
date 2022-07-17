@@ -11,39 +11,45 @@ class News(CTkFrame):
     def __init__(self, master):
         super().__init__(master=master)
 
+        self.grid_columnconfigure(0, weight=1)
+
         self.article = CTkLabel(
             master=self,
             height=100,
             fg_color=("white", "gray38"),  # <- custom tuple-color
             text_font=("Roboto Medium", -20),  # font name and size in px
         )
-        self.article.pack(pady=20, padx=20, fill="x")
+        self.article.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
         self.article_subheader = CTkLabel(master=self)
-        self.article_subheader.pack()
+        self.article_subheader.grid(row=1, column=0, pady=10, padx=10, sticky="nswe")
 
         self.image = CTkLabel(master=self)
-        self.image.pack()
+        self.image.grid(row=2, column=0, pady=10, padx=10, sticky="nswe")
+
+        # empty row as spacing
+        self.grid_rowconfigure(3, weight=1)
 
         self.navbar = CTkFrame(master=self)
-        self.navbar.pack(side="bottom", fill="x", pady=10, padx=10)
+        self.navbar.grid(row=4, column=0, pady=10, padx=10, sticky="nswe")
 
         self.prev_button = CTkButton(
             master=self.navbar,
             text="<",
             command=self.decrement_article_index,
         )
-        self.prev_button.pack(side="left")
+        self.prev_button.grid(row=0, column=0, sticky="nswe")
 
         self.current_article_index = CTkLabel(master=self.navbar, text="1")
-        self.current_article_index.pack(expand=True, fill="x", side="left")
+        self.current_article_index.grid(row=0, column=1, sticky="nswe")
+        self.navbar.grid_columnconfigure(1, weight=1)
 
         self.next_button = CTkButton(
             master=self.navbar,
             text=">",
             command=self.increment_article_index,
         )
-        self.next_button.pack(side="right")
+        self.next_button.grid(row=0, column=2, sticky="nswe")
 
         self.update_article()
 
