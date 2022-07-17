@@ -1,12 +1,14 @@
+from threading import Thread
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 from minecraft_launcher_lib.utils import get_minecraft_news
+from minecraft_launcher_lib.types import Articles
 from PIL import Image, ImageTk
 from io import BytesIO
 import requests
 
 
 class News(CTkFrame):
-    articles = get_minecraft_news()
+    articles: Articles
 
     def __init__(self, master):
         super().__init__(master=master)
@@ -18,13 +20,14 @@ class News(CTkFrame):
             height=100,
             fg_color=("white", "gray38"),  # <- custom tuple-color
             text_font=("Roboto Medium", -20),  # font name and size in px
+            text="Loading",
         )
         self.article.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
-        self.article_subheader = CTkLabel(master=self)
+        self.article_subheader = CTkLabel(master=self, text="Loading")
         self.article_subheader.grid(row=1, column=0, pady=10, padx=10, sticky="nswe")
 
-        self.image = CTkLabel(master=self)
+        self.image = CTkLabel(master=self, text="Loading")
         self.image.grid(row=2, column=0, pady=10, padx=10, sticky="nswe")
 
         # empty row as spacing
@@ -51,7 +54,19 @@ class News(CTkFrame):
         )
         self.next_button.grid(row=0, column=2, sticky="nswe")
 
+        updater = Thread(target=self.update_news)
+        updater.start()
+
+    def update_news(self):
+        self.articles = get_minecraft_news()
         self.update_article()
+
+    def update_article(self):
+        index = int(self.current_article_index.text)
+        tile = self.articles["article_grid"][index - 1]["default_tile"]
+        self.article.set_text(tile["title"])
+        self.article_subheader.set_text(tile["sub_header"])
+        self.update_image(index)
 
     def update_image(self, index):
         image_url = self.articles["article_grid"][index - 1]["default_tile"]["image"][
@@ -62,13 +77,6 @@ class News(CTkFrame):
         image = Image.open(BytesIO(response.content))
         self.photo = ImageTk.PhotoImage(image.resize((200, 200), Image.ANTIALIAS))
         self.image.configure(image=self.photo)
-
-    def update_article(self):
-        index = int(self.current_article_index.text)
-        tile = self.articles["article_grid"][index - 1]["default_tile"]
-        self.article.set_text(tile["title"])
-        self.article_subheader.set_text(tile["sub_header"])
-        self.update_image(index)
 
     def decrement_article_index(self):
         if int(self.current_article_index.text) == 1:
