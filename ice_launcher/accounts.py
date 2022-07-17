@@ -91,6 +91,7 @@ class Accounts(CTkFrame):
 
         self.accounts_list = CTkFrame(master=self)
         self.accounts_list.grid(row=1, column=0, pady=10, padx=10, sticky="nswe")
+        self.accounts_list.grid_columnconfigure(1, weight=1)
 
         # empty row as spacing
         self.grid_rowconfigure(2, weight=1)
@@ -117,10 +118,21 @@ class Accounts(CTkFrame):
         httpd.serve_forever()
         self.update_accounts_list()
 
+    def delete_account(self, index):
+        del self.doc["accounts"][index]
+        write_document(self.doc)
+        self.update_accounts_list()
+
     def update_accounts_list(self):
         for account in self.accounts_list.winfo_children():
             account.destroy()
 
         for index, account in enumerate(self.doc["accounts"]):
             account_label = CTkLabel(master=self.accounts_list, text=account["name"])
-            account_label.grid(row=index, column=0, pady=10, padx=10, sticky="nswe")
+            account_label.grid(row=index, column=0, pady=10, padx=10, sticky="w")
+            delete_button = CTkButton(
+                master=self.accounts_list,
+                text="Delete",
+                command=lambda index=index: self.delete_account(index),
+            )
+            delete_button.grid(row=index, column=2, pady=10, padx=10, sticky="e")
