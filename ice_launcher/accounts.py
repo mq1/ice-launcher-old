@@ -76,6 +76,8 @@ class Accounts(CTkFrame):
     def __init__(self, master):
         super().__init__(master=master)
 
+        self.grid_columnconfigure(0, weight=1)
+
         self.doc = read_document()
 
         self.heading = CTkLabel(
@@ -85,17 +87,20 @@ class Accounts(CTkFrame):
             text_font=("Roboto Medium", -20),  # font name and size in px
             text="Accounts",
         )
-        self.heading.pack(pady=20, padx=20, fill="x")
+        self.heading.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
         self.accounts_list = CTkFrame(master=self)
-        self.accounts_list.pack(pady=10, padx=20, fill="x")
+        self.accounts_list.grid(row=1, column=0, pady=10, padx=10, sticky="nswe")
+
+        # empty row as spacing
+        self.grid_rowconfigure(2, weight=1)
 
         self.add_account_button = CTkButton(
             master=self,
             text="Add Account",
             command=self.add_account,
         )
-        self.add_account_button.pack(pady=10, padx=20, fill="x")
+        self.add_account_button.grid(row=3, column=0, pady=20, padx=20)
 
         self.update_accounts_list()
 
@@ -113,10 +118,9 @@ class Accounts(CTkFrame):
         self.update_accounts_list()
 
     def update_accounts_list(self):
-        self.accounts_list.destroy()
-        self.accounts_list = CTkFrame(master=self)
-        self.accounts_list.pack(pady=10, padx=20, fill="x")
+        for account in self.accounts_list.winfo_children():
+            account.destroy()
 
-        for account in self.doc["accounts"]:
+        for index, account in enumerate(self.doc["accounts"]):
             account_label = CTkLabel(master=self.accounts_list, text=account["name"])
-            account_label.pack(pady=10, padx=20, fill="x")
+            account_label.grid(row=index, column=0, pady=10, padx=10, sticky="nswe")
