@@ -127,7 +127,7 @@ requests = "*"
 type = "git"
 url = "https://gitlab.com/mq-1/minecraft-launcher-lib.git"
 reference = "secure-oauth2"
-resolved_reference = "b6d4c2486ff0db9976f9115abf1dbf3c5614541c"
+resolved_reference = "3411b385d8b26074437453baa82f8a0cef672b7f"
 
 [[package]]
 name = "mypy-extensions"
