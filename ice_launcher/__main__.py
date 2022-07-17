@@ -68,9 +68,6 @@ class App(CTk):
         self.main_frame = About(master=self)
         self.main_frame.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
 
-    def button_event(self):
-        print("Button pressed")
-
 
 if __name__ == "__main__":
     app = App()
