@@ -5,6 +5,8 @@ class Settings(CTkFrame):
     def __init__(self, master):
         super().__init__(master=master)
 
+        self.grid_columnconfigure(0, weight=1)
+
         self.app_name = CTkLabel(
             master=self,
             height=100,
@@ -12,4 +14,4 @@ class Settings(CTkFrame):
             text_font=("Roboto Medium", -20),  # font name and size in px
             text="Settings",
         )
-        self.app_name.pack(pady=20, padx=20, fill="x")
+        self.app_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
