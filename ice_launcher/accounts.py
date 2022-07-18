@@ -106,7 +106,7 @@ class Accounts(CTkFrame):
         self.update_accounts_list()
 
     def add_account(self):
-        login_url, state, code_verifier = msa.get_login_data(
+        login_url, state, code_verifier = msa.get_secure_login_data(
             __client_id__, __redirect_uri__
         )
 
