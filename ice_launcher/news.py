@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022-present Manuel Quarneti <manuelquarneti@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 from threading import Thread
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 from minecraft_launcher_lib.utils import get_minecraft_news

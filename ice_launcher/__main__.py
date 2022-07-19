@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022-present Manuel Quarneti <manuelquarneti@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 from customtkinter import CTk, CTkButton, CTkFrame
 from ice_launcher.instances import Instances
 from ice_launcher.news import News

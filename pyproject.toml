@@ -1,21 +1,68 @@
-[tool.poetry]
-name = "ice-launcher"
-version = "0.1.0"
-description = ""
-authors = ["Manuel Quarneti <manuelquarneti@gmail.com>"]
-
-[tool.poetry.dependencies]
-python = ">=3.10,<3.11"
-customtkinter = "^4.5.5"
-Pillow = "^9.2.0"
-requests = "^2.28.1"
-minecraft-launcher-lib = {git = "https://gitlab.com/mq-1/minecraft-launcher-lib.git", branch = "secure-oauth2"}
-
-[tool.poetry.dev-dependencies]
-black = "^22.6.0"
-pyinstaller = "^5.2"
-mypy = "^0.961"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ice-launcher"
+description = 'An unofficial WIP Minecraft Launcher'
+readme = "README.md"
+requires-python = ">=3.10"
+license = "GPL-3.0-only"
+keywords = []
+authors = [
+  { name = "Manuel Quarneti", email = "manuelquarneti@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = [
+  "customtkinter~=4.5.5",
+  "Pillow~=9.2.0",
+  "requests~=2.28.1",
+  "minecraft-launcher-lib @ git+https://gitlab.com/mq-1/minecraft-launcher-lib.git@secure-oauth2",
+]
+dynamic = ["version"]
+
+[project.urls]
+Documentation = "https://github.com/mq1/ice-launcher#readme"
+Issues = "https://github.com/mq1/ice-launcher/issues"
+Source = "https://github.com/mq1/ice-launcher"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+path = "ice_launcher/__about__.py"
+
+[tool.hatch.build.targets.sdist]
+[tool.hatch.build.targets.wheel]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "pytest",
+  "pytest-cov",
+  "pytype"
+]
+[tool.hatch.envs.default.scripts]
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ice_launcher --cov=tests"
+no-cov = "cov --no-cov"
+
+[[tool.hatch.envs.test.matrix]]
+python = ["310"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = [
+  "ice_launcher/__about__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]

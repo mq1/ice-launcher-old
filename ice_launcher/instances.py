@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022-present Manuel Quarneti <manuelquarneti@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 from customtkinter import CTkFrame, CTkLabel
 from os import listdir, path, makedirs
 from typing import List
