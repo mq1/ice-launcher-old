@@ -7,10 +7,10 @@ from ice_launcher.accounts import Accounts
 
 
 class App(CTk):
-    WIDTH = 780
-    HEIGHT = 520
+    WIDTH: int = 780
+    HEIGHT: int = 520
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.title("PyMinecraftLauncher")
@@ -54,31 +54,31 @@ class App(CTk):
 
         self.open_instances()
 
-    def on_closing(self, event=0):
+    def on_closing(self, event=0) -> None:
         self.destroy()
 
-    def open_instances(self):
+    def open_instances(self) -> None:
         self.main_frame = Instances(master=self)
         self.main_frame.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
 
-    def open_news(self):
+    def open_news(self) -> None:
         self.main_frame = News(master=self)
         self.main_frame.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
 
-    def open_accounts(self):
+    def open_accounts(self) -> None:
         self.main_frame = Accounts(master=self)
         self.main_frame.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
 
-    def open_settings(self):
+    def open_settings(self) -> None:
         self.main_frame = Settings(master=self)
         self.main_frame.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
 
-    def open_about(self):
+    def open_about(self) -> None:
         self.main_frame.destroy()
         self.main_frame = About(master=self)
         self.main_frame.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
 
 
 if __name__ == "__main__":
-    app = App()
+    app: App = App()
     app.mainloop()

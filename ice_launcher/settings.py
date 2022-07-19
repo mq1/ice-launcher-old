@@ -2,7 +2,7 @@ from customtkinter import CTkFrame, CTkLabel
 
 
 class Settings(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master) -> None:
         super().__init__(master=master)
 
         self.grid_columnconfigure(0, weight=1)

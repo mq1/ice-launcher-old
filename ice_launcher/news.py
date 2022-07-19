@@ -10,7 +10,7 @@ import requests
 class News(CTkFrame):
     articles: Articles
 
-    def __init__(self, master):
+    def __init__(self, master) -> None:
         super().__init__(master=master)
 
         self.grid_columnconfigure(0, weight=1)
@@ -57,18 +57,18 @@ class News(CTkFrame):
         updater = Thread(target=self.update_news)
         updater.start()
 
-    def update_news(self):
+    def update_news(self) -> None:
         self.articles = get_minecraft_news()
         self.update_article()
 
-    def update_article(self):
+    def update_article(self) -> None:
         index = int(self.current_article_index.text)
         tile = self.articles["article_grid"][index - 1]["default_tile"]
         self.article.set_text(tile["title"])
         self.article_subheader.set_text(tile["sub_header"])
         self.update_image(index)
 
-    def update_image(self, index):
+    def update_image(self, index) -> None:
         image_url = self.articles["article_grid"][index - 1]["default_tile"]["image"][
             "imageURL"
         ]
@@ -78,7 +78,7 @@ class News(CTkFrame):
         self.photo = ImageTk.PhotoImage(image.resize((200, 200), Image.ANTIALIAS))
         self.image.configure(image=self.photo)
 
-    def decrement_article_index(self):
+    def decrement_article_index(self) -> None:
         if int(self.current_article_index.text) == 1:
             return
 
@@ -87,7 +87,7 @@ class News(CTkFrame):
         )
         self.update_article()
 
-    def increment_article_index(self):
+    def increment_article_index(self) -> None:
         if int(self.current_article_index.text) == len(self.articles["article_grid"]):
             return
 

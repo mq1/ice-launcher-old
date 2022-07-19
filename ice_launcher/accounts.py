@@ -10,8 +10,8 @@ from minecraft_launcher_lib import microsoft_account as msa
 from minecraft_launcher_lib.microsoft_types import CompleteLoginResponse
 
 
-__client_id__ = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
-__redirect_uri__ = "http://localhost:3003"
+__client_id__: str = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
+__redirect_uri__: str = "http://localhost:3003"
 
 
 class Document(TypedDict):
@@ -19,7 +19,7 @@ class Document(TypedDict):
     accounts: List[CompleteLoginResponse]
 
 
-def new_document():
+def new_document() -> Document:
     doc: Document = {"version": 1, "accounts": []}
 
     write_document(doc)
@@ -27,7 +27,7 @@ def new_document():
     return doc
 
 
-def read_document():
+def read_document() -> Document:
     if not path.exists("accounts.json"):
         doc = new_document()
 
@@ -37,7 +37,7 @@ def read_document():
     return doc
 
 
-def write_document(doc: Document):
+def write_document(doc: Document) -> None:
     with open("accounts.json", "w") as f:
         json.dump(doc, f)
 
@@ -46,7 +46,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
     state: str
     code_verifier: str
 
-    def do_GET(self):
+    def do_GET(self) -> None:
         auth_code = msa.parse_auth_code_url(self.path, self.state)
         assert auth_code is not None
         login_data = msa.complete_login(
@@ -73,7 +73,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
 class Accounts(CTkFrame):
     doc: Document
 
-    def __init__(self, master):
+    def __init__(self, master) -> None:
         super().__init__(master=master)
 
         self.grid_columnconfigure(0, weight=1)
@@ -105,7 +105,7 @@ class Accounts(CTkFrame):
 
         self.update_accounts_list()
 
-    def add_account(self):
+    def add_account(self) -> None:
         login_url, state, code_verifier = msa.get_secure_login_data(
             __client_id__, __redirect_uri__
         )
@@ -118,12 +118,12 @@ class Accounts(CTkFrame):
         httpd.serve_forever()
         self.update_accounts_list()
 
-    def delete_account(self, index):
+    def delete_account(self, index) -> None:
         del self.doc["accounts"][index]
         write_document(self.doc)
         self.update_accounts_list()
 
-    def update_accounts_list(self):
+    def update_accounts_list(self) -> None:
         for account in self.accounts_list.winfo_children():
             account.destroy()
 

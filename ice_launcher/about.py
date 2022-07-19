@@ -3,7 +3,7 @@ from ice_launcher import __version__
 
 
 class About(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master) -> None:
         super().__init__(master=master)
 
         self.grid_columnconfigure(0, weight=1)

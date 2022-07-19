@@ -1,8 +1,9 @@
 from customtkinter import CTkFrame, CTkLabel
 from os import listdir, path, makedirs
+from typing import List
 
 
-def get_instance_list():
+def get_instance_list() -> List[str]:
     # check if instances folder exists
     if not path.exists("instances"):
         makedirs("instances")
@@ -11,7 +12,7 @@ def get_instance_list():
 
 
 class Instances(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master) -> None:
         super().__init__(master=master)
 
         self.grid_columnconfigure(0, weight=1)
@@ -30,7 +31,7 @@ class Instances(CTkFrame):
 
         self.update_instance_list()
 
-    def update_instance_list(self):
+    def update_instance_list(self) -> None:
         for instance in self.instances.winfo_children():
             instance.destroy()
 
