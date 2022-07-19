@@ -41,7 +41,8 @@ path = "ice_launcher/__about__.py"
 dependencies = [
   "pytest",
   "pytest-cov",
-  "pytype"
+  "pytype",
+  "pyinstaller",
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ice_launcher --cov=tests"
