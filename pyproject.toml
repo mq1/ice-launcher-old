@@ -22,7 +22,7 @@ dependencies = [
   "customtkinter~=4.5.5",
   "Pillow~=9.2.0",
   "requests~=2.28.1",
-  "minecraft-launcher-lib @ git+https://gitlab.com/mq-1/minecraft-launcher-lib.git@secure-oauth2",
+  "minecraft-launcher-lib~=5.1",
 ]
 dynamic = ["version"]
 
@@ -30,9 +30,6 @@ dynamic = ["version"]
 Documentation = "https://github.com/mq1/ice-launcher#readme"
 Issues = "https://github.com/mq1/ice-launcher/issues"
 Source = "https://github.com/mq1/ice-launcher"
-
-[tool.hatch.metadata]
-allow-direct-references = true
 
 [tool.hatch.version]
 path = "ice_launcher/__about__.py"
