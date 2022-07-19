@@ -5,14 +5,18 @@
 from customtkinter import CTkFrame, CTkLabel
 from os import listdir, path, makedirs
 from typing import List
+from ice_launcher import dirs
+
+
+__instances_dir__: str = path.join(dirs.user_data_dir, "instances")
 
 
 def get_instance_list() -> List[str]:
     # check if instances folder exists
-    if not path.exists("instances"):
-        makedirs("instances")
+    if not path.exists(__instances_dir__):
+        makedirs(__instances_dir__)
 
-    return listdir("instances")
+    return listdir(__instances_dir__)
 
 
 class Instances(CTkFrame):

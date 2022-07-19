@@ -11,8 +11,10 @@ from os import path
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from minecraft_launcher_lib import microsoft_account as msa
 from minecraft_launcher_lib.microsoft_types import CompleteLoginResponse
+from ice_launcher import dirs
 
 
+__accounts_file__: str = path.join(dirs.user_data_dir, "accounts.json")
 __client_id__: str = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
 __redirect_uri__: str = "http://localhost:3003"
 
@@ -31,17 +33,17 @@ def new_document() -> Document:
 
 
 def read_document() -> Document:
-    if not path.exists("accounts.json"):
+    if not path.exists(__accounts_file__):
         doc = new_document()
 
-    with open("accounts.json", "r") as f:
+    with open(__accounts_file__, "r") as f:
         doc: Document = json.load(f)
 
     return doc
 
 
 def write_document(doc: Document) -> None:
-    with open("accounts.json", "w") as f:
+    with open(__accounts_file__, "w") as f:
         json.dump(doc, f)
 
 
