@@ -2,12 +2,17 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
 from ice_launcher.instances import Instances
 from ice_launcher.news import News
 from ice_launcher.settings import Settings
 from ice_launcher.about import About
 from ice_launcher.accounts import Accounts
+
+
+customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
+customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
 
 
 class App(CTk):
