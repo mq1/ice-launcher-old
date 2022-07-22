@@ -4,7 +4,6 @@
 
 from customtkinter import (
     CTkToplevel,
-    CTkLabel,
     CTkComboBox,
     CTkEntry,
     CTkButton,
@@ -14,6 +13,7 @@ from minecraft_launcher_lib.utils import get_available_versions, get_latest_vers
 from minecraft_launcher_lib.install import install_minecraft_version
 from ice_launcher import dirs
 from os import path, makedirs
+import json
 
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
@@ -51,8 +51,15 @@ class NewInstance(CTkToplevel):
 
     def create_instance(self) -> None:
         print("Creating instance")
-        dir = path.join(__instances_dir__, self.instance_name.get())
-        makedirs(dir)
-        install_minecraft_version(dirs.user_data_dir)
+        instance_dir = path.join(__instances_dir__, self.instance_name.get())
+        makedirs(instance_dir)
+        instance_json = {
+            "config-version": 1,
+            "minecraft-version": self.version.get(),
+        }
+        with open(path.join(instance_dir, "instance.json"), "w") as f:
+            json.dump(instance_json, f)
+
+        install_minecraft_version(self.version.get(), dirs.user_data_dir)
         print("Done")
         self.destroy()
