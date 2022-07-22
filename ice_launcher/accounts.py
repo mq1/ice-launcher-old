@@ -37,7 +37,7 @@ def read_document() -> Document:
         doc = new_document()
 
     with open(__accounts_file__, "r") as f:
-        doc: Document = json.load(f)
+        doc = json.load(f)
 
     return doc
 

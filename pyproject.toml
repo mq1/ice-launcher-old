@@ -40,6 +40,8 @@ path = "ice_launcher/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
+  "types-requests",
+  "types-appdirs",
   "pytest",
   "pytest-cov",
   "mypy",
@@ -48,6 +50,7 @@ dependencies = [
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ice_launcher --cov=tests"
 no-cov = "cov --no-cov"
+check-types = "mypy ice_launcher"
 
 [tool.hatch.envs.pyinstaller]
 dependencies = [
