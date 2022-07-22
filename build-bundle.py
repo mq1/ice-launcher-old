@@ -16,6 +16,7 @@ PyInstaller.__main__.run([
     '--windowed',
     '--strip',
     '--noupx',
+    '--icon=ice-launcher.png',
     f'--add-data={version_txt}:minecraft_launcher_lib/',
     f'--add-data={blue_json}:customtkinter/assets/themes/',
 ])
