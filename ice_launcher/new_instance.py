@@ -13,7 +13,7 @@ from customtkinter import (
 from minecraft_launcher_lib.utils import get_available_versions, get_latest_version
 from minecraft_launcher_lib.install import install_minecraft_version
 from ice_launcher import dirs
-from os import path
+from os import path, makedirs
 
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
@@ -52,6 +52,7 @@ class NewInstance(CTkToplevel):
     def create_instance(self) -> None:
         print("Creating instance")
         dir = path.join(__instances_dir__, self.instance_name.get())
-        install_minecraft_version(self.version.get(), dir)
+        makedirs(dir)
+        install_minecraft_version(dirs.user_data_dir)
         print("Done")
         self.destroy()
