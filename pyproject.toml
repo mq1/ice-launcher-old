@@ -42,12 +42,19 @@ path = "ice_launcher/__about__.py"
 dependencies = [
   "pytest",
   "pytest-cov",
+  "mypy",
   "pytype",
-  "pyinstaller",
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ice_launcher --cov=tests"
 no-cov = "cov --no-cov"
+
+[tool.hatch.envs.pyinstaller]
+dependencies = [
+  "pyinstaller",
+]
+[tool.hatch.envs.pyinstaller.scripts]
+build = "python build-bundle.py"
 
 [[tool.hatch.envs.test.matrix]]
 python = ["310"]
