@@ -33,7 +33,7 @@ class App(CTk):
             "about": About(master=self),
         }
 
-        self.title("PyMinecraftLauncher")
+        self.title("Ice Launcher")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
