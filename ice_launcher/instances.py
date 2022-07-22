@@ -2,10 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from customtkinter import CTkFrame, CTkLabel
+from customtkinter import CTkFrame, CTkLabel, CTkButton
 from os import listdir, path, makedirs
 from typing import List
 from ice_launcher import dirs
+from ice_launcher.new_instance import NewInstance
 
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
@@ -34,15 +35,36 @@ class Instances(CTkFrame):
         )
         self.app_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
-        self.instances = CTkFrame(master=self)
-        self.instances.grid(row=1, column=0, pady=10, padx=10, sticky="nswe")
+        self.instances_list = CTkFrame(master=self)
+        self.instances_list.grid(row=1, column=0, pady=10, padx=10, sticky="nswe")
+        self.instances_list.grid_columnconfigure(1, weight=1)
+
+        # empty row as spacing
+        self.grid_rowconfigure(2, weight=1)
+
+        self.add_account_button = CTkButton(
+            master=self,
+            text="New Instance",
+            command=self.add_new_instance,
+        )
+        self.add_account_button.grid(row=3, column=0, pady=20, padx=20)
 
         self.update_instance_list()
 
+    def add_new_instance(self) -> None:
+        self.new_instance_window = NewInstance(master=self)
+        self.new_instance_window.protocol(
+            "WM_DELETE_WINDOW", self.on_closing_new_instance_window
+        )
+
+    def on_closing_new_instance_window(self, event=0) -> None:
+        self.new_instance_window.destroy()
+        self.update_instance_list()
+
     def update_instance_list(self) -> None:
-        for instance in self.instances.winfo_children():
+        for instance in self.instances_list.winfo_children():
             instance.destroy()
 
         for index, instance in enumerate(get_instance_list()):
-            label = CTkLabel(master=self.instances, text=instance)
+            label = CTkLabel(master=self.instances_list, text=instance)
             label.grid(row=index, column=0, sticky="nswe")
