@@ -10,7 +10,7 @@ blue_json = os.path.join(customtkinter_root, 'assets/themes/blue.json')
 
 PyInstaller.__main__.run([
     'ice_launcher/__main__.py',
-    '--name=ice_launcher',
+    '--name=Ice Launcher',
     '--noconfirm',
     '--onedir',
     '--windowed',
