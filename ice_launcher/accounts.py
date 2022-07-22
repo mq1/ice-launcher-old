@@ -52,14 +52,14 @@ class CallbackHandler(BaseHTTPRequestHandler):
     code_verifier: str
 
     def do_GET(self) -> None:
-        auth_code = msa.get_auth_code_from_url(self.path)
-        assert auth_code is not None
+        auth_code = msa.parse_auth_code_url(self.path, self.state)
 
         login_data = msa.complete_login(
             client_id=__client_id__,
             client_secret=None,
             redirect_uri=__redirect_uri__,
             auth_code=auth_code,
+            code_verifier=self.code_verifier
         )
 
         doc = read_document()
@@ -115,10 +115,12 @@ class Accounts(CTkFrame):
         self.update_accounts_list()
 
     def add_account(self) -> None:
-        login_url = msa.get_login_url(__client_id__, __redirect_uri__)
+        login_url, state, code_verifier = msa.get_secure_login_data(__client_id__, __redirect_uri__)
 
         webbrowser.open(login_url)
         handler = CallbackHandler
+        handler.state = state
+        handler.code_verifier = code_verifier
         httpd = HTTPServer(("127.0.0.1", 3003), handler)
         httpd.serve_forever()
         self.update_accounts_list()
