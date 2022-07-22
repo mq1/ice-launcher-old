@@ -1,4 +1,8 @@
-<h1 align="center">🧊 Ice Launcher</h1>
+<p align="center">
+<img src="./ice-launcher.png" alt="Ice Launcher Logo" height="128px">
+</p>
+
+<h1 align="center">Ice Launcher</h1>
 
 <p align="center">
 <a href="https://github.com/mq1/ice-launcher/blob/main/LICENSE"><img alt="License: GPL-3.0" src="https://img.shields.io/github/license/mq1/ice-launcher"></a>
@@ -23,6 +27,7 @@ pip install ice-launcher
 
 ## Thanks
 
+- Aru for the awesome logo!
 - [JakobDev](https://gitlab.com/JakobDev) for building [minecraft-launcher-lib](https://gitlab.com/JakobDev/minecraft-launcher-lib)
 - [TomSchimansky](https://github.com/TomSchimansky) for building [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter)
 
