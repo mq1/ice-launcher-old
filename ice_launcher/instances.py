@@ -76,13 +76,13 @@ class Instances(CTkFrame):
         for instance in self.instances_list.winfo_children():
             instance.destroy()
 
-        for index, instance in enumerate(get_instance_list()):
-            label = CTkLabel(master=self.instances_list, text=instance)
+        for index, instance_name in enumerate(get_instance_list()):
+            label = CTkLabel(master=self.instances_list, text=instance_name)
             label.grid(row=index, column=0, pady=10, padx=10, sticky="nswe")
             launch_button = CTkButton(
                 master=self.instances_list,
                 text="Launch",
-                command=lambda: self.launch_instance(instance),
+                command=lambda: self.launch_instance(instance_name),
             )
             launch_button.grid(row=index, column=1, pady=10, padx=10, sticky="e")
     
