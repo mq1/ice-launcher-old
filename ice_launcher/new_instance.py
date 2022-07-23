@@ -14,9 +14,15 @@ from minecraft_launcher_lib.install import install_minecraft_version
 from ice_launcher import dirs
 from os import path, makedirs
 import json
+from typing import TypedDict
 
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
+
+
+class InstanceJson(TypedDict):
+    "config-version": int
+    "minecraft-version": str
 
 
 class NewInstance(CTkToplevel):
@@ -53,7 +59,7 @@ class NewInstance(CTkToplevel):
         print("Creating instance")
         instance_dir = path.join(__instances_dir__, self.instance_name.get())
         makedirs(instance_dir)
-        instance_json = {
+        instance_json: InstanceJson = {
             "config-version": 1,
             "minecraft-version": self.version.get(),
         }

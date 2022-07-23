@@ -13,6 +13,7 @@ from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.types import MinecraftOptions
 import json
 import subprocess
+from ice_launcher.new_instance import InstanceJson
 
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
@@ -101,7 +102,7 @@ class Instances(CTkFrame):
 
         instance_dir = path.join(__instances_dir__, instance_name)
         with open(path.join(instance_dir, "instance.json"), "r") as f:
-            instance_json = json.load(f)
+            instance_json: InstanceJson = json.load(f)
 
         minecraft_command = get_minecraft_command(instance_json["minecraft-version"], dirs.user_data_dir, options)
         subprocess.call(minecraft_command)
