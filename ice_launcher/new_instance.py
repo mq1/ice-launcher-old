@@ -21,8 +21,8 @@ __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
 
 
 class InstanceJson(TypedDict):
-    "config-version": int
-    "minecraft-version": str
+    config_version: int
+    minecraft_version: str
 
 
 class NewInstance(CTkToplevel):
@@ -60,8 +60,8 @@ class NewInstance(CTkToplevel):
         instance_dir = path.join(__instances_dir__, self.instance_name.get())
         makedirs(instance_dir)
         instance_json: InstanceJson = {
-            "config-version": 1,
-            "minecraft-version": self.version.get(),
+            "config_version": 1,
+            "minecraft_version": self.version.get(),
         }
         with open(path.join(instance_dir, "instance.json"), "w") as f:
             json.dump(instance_json, f)

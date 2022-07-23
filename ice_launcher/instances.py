@@ -104,5 +104,5 @@ class Instances(CTkFrame):
         with open(path.join(instance_dir, "instance.json"), "r") as f:
             instance_json: InstanceJson = json.load(f)
 
-        minecraft_command = get_minecraft_command(instance_json["minecraft-version"], dirs.user_data_dir, options)
+        minecraft_command = get_minecraft_command(instance_json["minecraft_version"], dirs.user_data_dir, options)
         subprocess.call(minecraft_command)
