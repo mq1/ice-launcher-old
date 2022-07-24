@@ -21,7 +21,13 @@ An unofficial WIP Minecraft Launcher
 
 ## Installation
 
-```console
+### Package (recommended)
+
+Just grab the [latest release](https://github.com/mq1/ice-launcher/releases/latest) for your platform
+
+### From pip
+
+```sh
 pip install ice-launcher
 ```
 
