@@ -57,7 +57,7 @@ dependencies = [
   "pyinstaller",
 ]
 [tool.hatch.envs.pyinstaller.scripts]
-build = "python -OO build-bundle.py"
+build = "python -OO -m PyInstaller ice-launcher.spec"
 
 [[tool.hatch.envs.test.matrix]]
 python = ["310"]
