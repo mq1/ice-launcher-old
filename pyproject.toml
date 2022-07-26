@@ -47,12 +47,14 @@ dependencies = [
   "mypy",
   "pytype",
   "black",
+  "isort",
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ice_launcher --cov=tests"
 no-cov = "cov --no-cov"
 check-types = "mypy ice_launcher"
 format = "black ice_launcher"
+sort-imports = "isort ice_launcher"
 
 [tool.hatch.envs.pyinstaller]
 dependencies = [
@@ -77,3 +79,6 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
+
+[tool.isort]
+profile = "black"
