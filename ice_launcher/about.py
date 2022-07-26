@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from customtkinter import CTkFrame, CTkLabel
+
 from .__about__ import __version__
 
 

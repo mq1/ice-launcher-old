@@ -2,13 +2,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from customtkinter import CTkFrame, CTkLabel, CTkButton
-from threading import Thread
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from minecraft_launcher_lib import microsoft_account as msa
-from .lib import accounts
+from threading import Thread
 
+from customtkinter import CTkButton, CTkFrame, CTkLabel
+from minecraft_launcher_lib import microsoft_account as msa
+
+from .lib import accounts
 
 __client_id__: str = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
 __redirect_uri__: str = "http://localhost:3003"

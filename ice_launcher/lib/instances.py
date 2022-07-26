@@ -2,18 +2,19 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import List, TypedDict
-from os import path, makedirs, listdir
-from . import dirs
 import json
+import subprocess
+from os import listdir, makedirs, path
+from typing import List, TypedDict
+
+from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.install import install_minecraft_version
-from . import accounts
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import MinecraftOptions
-from ice_launcher.__about__ import __version__
-from minecraft_launcher_lib.command import get_minecraft_command
-import subprocess
 
+from ice_launcher.__about__ import __version__
+
+from . import accounts, dirs
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
 

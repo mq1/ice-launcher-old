@@ -4,8 +4,8 @@
 
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
-from ice_launcher import About, Accounts, Instances, News, Settings
 
+from ice_launcher import About, Accounts, Instances, News, Settings
 
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("blue")

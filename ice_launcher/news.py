@@ -2,13 +2,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from threading import Thread
-from customtkinter import CTkFrame, CTkLabel, CTkButton
-from minecraft_launcher_lib.utils import get_minecraft_news
-from minecraft_launcher_lib.types import Articles
-from PIL import Image, ImageTk
 from io import BytesIO
+from threading import Thread
+
 import requests
+from customtkinter import CTkButton, CTkFrame, CTkLabel
+from minecraft_launcher_lib.types import Articles
+from minecraft_launcher_lib.utils import get_minecraft_news
+from PIL import Image, ImageTk
 
 
 class News(CTkFrame):

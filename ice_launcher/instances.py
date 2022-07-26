@@ -2,9 +2,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from customtkinter import CTkFrame, CTkLabel, CTkButton
-from .new_instance import NewInstance
+from customtkinter import CTkButton, CTkFrame, CTkLabel
+
 from .lib import instances
+from .new_instance import NewInstance
 
 
 class Instances(CTkFrame):

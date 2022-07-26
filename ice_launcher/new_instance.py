@@ -2,14 +2,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from customtkinter import (
-    CTkToplevel,
-    CTkComboBox,
-    CTkEntry,
-    CTkButton,
-    StringVar,
-)
+from customtkinter import CTkButton, CTkComboBox, CTkEntry, CTkToplevel, StringVar
 from minecraft_launcher_lib.utils import get_latest_version
+
 from .lib import instances, versions
 
 

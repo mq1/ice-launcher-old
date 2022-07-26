@@ -2,9 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from minecraft_launcher_lib.utils import get_available_versions
 from typing import List
+
 from minecraft_launcher_lib.types import MinecraftVersionInfo
+from minecraft_launcher_lib.utils import get_available_versions
+
 from . import dirs
 
 

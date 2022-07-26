@@ -2,12 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import List, TypedDict
-from minecraft_launcher_lib.microsoft_types import CompleteLoginResponse
-from os import path
 import json
-from . import dirs
+from os import path
+from typing import List, TypedDict
 
+from minecraft_launcher_lib.microsoft_types import CompleteLoginResponse
+
+from . import dirs
 
 __accounts_file__: str = path.join(dirs.user_data_dir, "accounts.json")
 
