@@ -3,33 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from customtkinter import CTkFrame, CTkLabel, CTkButton
-from os import listdir, path, makedirs
-from typing import List
-from ice_launcher import dirs
-from ice_launcher.new_instance import NewInstance
-from ice_launcher import accounts
-from ice_launcher.__about__ import __version__
-from minecraft_launcher_lib.command import get_minecraft_command
-from minecraft_launcher_lib.types import MinecraftOptions
-import json
-import subprocess
-from ice_launcher.new_instance import InstanceJson
-from minecraft_launcher_lib.runtime import get_executable_path
-
-
-__instances_dir__: str = path.join(dirs.user_data_dir, "instances")
-
-
-def get_instance_list() -> List[str]:
-    # check if instances folder exists
-    if not path.exists(__instances_dir__):
-        makedirs(__instances_dir__)
-
-    list = listdir(__instances_dir__)
-    if ".DS_Store" in list:
-        list.remove(".DS_Store")
-
-    return list
+from .new_instance import NewInstance
+from .lib import instances
 
 
 class Instances(CTkFrame):
@@ -77,42 +52,12 @@ class Instances(CTkFrame):
         for instance in self.instances_list.winfo_children():
             instance.destroy()
 
-        for index, instance_name in enumerate(get_instance_list()):
+        for index, instance_name in enumerate(instances.list()):
             label = CTkLabel(master=self.instances_list, text=instance_name)
             label.grid(row=index, column=0, pady=10, padx=10, sticky="nswe")
             launch_button = CTkButton(
                 master=self.instances_list,
                 text="Launch",
-                command=lambda: self.launch_instance(instance_name),
+                command=lambda: instances.launch(instance_name),
             )
             launch_button.grid(row=index, column=1, pady=10, padx=10, sticky="e")
-    
-    def launch_instance(self, instance_name: str) -> None:
-        # TODO: account selection
-        account = accounts.read_document()["accounts"][0]
-
-        instance_dir = path.join(__instances_dir__, instance_name)
-        with open(path.join(instance_dir, "instance.json"), "r") as f:
-            instance_json: InstanceJson = json.load(f)
-        
-        with open(path.join(dirs.user_data_dir, "versions", instance_json["minecraft_version"], f"{instance_json['minecraft_version']}.json"), "r") as f:
-            version_json: dict = json.load(f)
-
-        jvm_version = version_json["javaVersion"]["component"]
-        java_executable = get_executable_path(jvm_version, dirs.user_data_dir)
-        if java_executable is None:
-            java_executable = "java"
-
-        options: MinecraftOptions = {
-            "username": account["name"],
-            "uuid": account["id"],
-            "token": account["access_token"],
-            "executablePath": java_executable,
-            "jvmArguments": ["-Xmx2G", "-Xms2G"],
-            "launcherName": "Ice Launcher",
-            "launcherVersion": __version__,
-            "gameDirectory": path.join(__instances_dir__, instance_name),
-        }
-
-        minecraft_command = get_minecraft_command(instance_json["minecraft_version"], dirs.user_data_dir, options)
-        subprocess.call(minecraft_command)

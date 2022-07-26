@@ -9,20 +9,8 @@ from customtkinter import (
     CTkButton,
     StringVar,
 )
-from minecraft_launcher_lib.utils import get_available_versions, get_latest_version
-from minecraft_launcher_lib.install import install_minecraft_version
-from ice_launcher import dirs
-from os import path, makedirs
-import json
-from typing import TypedDict
-
-
-__instances_dir__: str = path.join(dirs.user_data_dir, "instances")
-
-
-class InstanceJson(TypedDict):
-    config_version: int
-    minecraft_version: str
+from minecraft_launcher_lib.utils import get_latest_version
+from .lib import instances, versions
 
 
 class NewInstance(CTkToplevel):
@@ -31,7 +19,7 @@ class NewInstance(CTkToplevel):
         self.title("Add new instance")
         self.geometry("250x200")
 
-        self.versions = get_available_versions(dirs.user_data_dir)
+        self.versions = versions.get_available()
         self.version_ids = [version["id"] for version in self.versions]
 
         self.grid_columnconfigure(0, weight=1)
@@ -56,16 +44,5 @@ class NewInstance(CTkToplevel):
         self.create_button.grid(row=3, column=0, pady=(10, 20), padx=20)
 
     def create_instance(self) -> None:
-        print("Creating instance")
-        instance_dir = path.join(__instances_dir__, self.instance_name.get())
-        makedirs(instance_dir)
-        instance_json: InstanceJson = {
-            "config_version": 1,
-            "minecraft_version": self.version.get(),
-        }
-        with open(path.join(instance_dir, "instance.json"), "w") as f:
-            json.dump(instance_json, f)
-
-        install_minecraft_version(self.version.get(), dirs.user_data_dir)
-        print("Done")
+        instances.new(self.instance_name.get(), self.version.get())
         self.destroy()

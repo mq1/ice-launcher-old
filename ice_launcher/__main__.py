@@ -4,15 +4,11 @@
 
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
-from ice_launcher.instances import Instances
-from ice_launcher.news import News
-from ice_launcher.settings import Settings
-from ice_launcher.about import About
-from ice_launcher.accounts import Accounts
+from ice_launcher import About, Accounts, Instances, News, Settings
 
 
-customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
-customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
+customtkinter.set_appearance_mode("dark")
+customtkinter.set_default_color_theme("blue")
 
 
 class App(CTk):

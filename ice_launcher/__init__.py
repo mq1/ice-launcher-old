@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from appdirs import AppDirs
-from os import makedirs, path
+from .about import About
+from .accounts import Accounts
+from .instances import Instances
+from .news import News
+from .settings import Settings
 
-
-dirs = AppDirs("ice-launcher", "mq1.eu")
-if not path.exists(dirs.user_data_dir):
-    makedirs(dirs.user_data_dir)
+__all__ = ["About", "Accounts", "Instances", "News", "Settings"]

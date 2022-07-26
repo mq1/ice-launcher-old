@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from customtkinter import CTkFrame, CTkLabel
-from ice_launcher.__about__ import __version__
+from .__about__ import __version__
 
 
 class About(CTkFrame):

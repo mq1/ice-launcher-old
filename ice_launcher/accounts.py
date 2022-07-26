@@ -2,49 +2,16 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import json
-from typing import List, TypedDict
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 from threading import Thread
 import webbrowser
-from os import path
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from minecraft_launcher_lib import microsoft_account as msa
-from minecraft_launcher_lib.microsoft_types import CompleteLoginResponse
-from ice_launcher import dirs
+from .lib import accounts
 
 
-__accounts_file__: str = path.join(dirs.user_data_dir, "accounts.json")
 __client_id__: str = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
 __redirect_uri__: str = "http://localhost:3003"
-
-
-class Document(TypedDict):
-    version: int
-    accounts: List[CompleteLoginResponse]
-
-
-def new_document() -> Document:
-    doc: Document = {"version": 1, "accounts": []}
-
-    write_document(doc)
-
-    return doc
-
-
-def read_document() -> Document:
-    if not path.exists(__accounts_file__):
-        doc = new_document()
-
-    with open(__accounts_file__, "r") as f:
-        doc = json.load(f)
-
-    return doc
-
-
-def write_document(doc: Document) -> None:
-    with open(__accounts_file__, "w") as f:
-        json.dump(doc, f)
 
 
 class CallbackHandler(BaseHTTPRequestHandler):
@@ -59,12 +26,12 @@ class CallbackHandler(BaseHTTPRequestHandler):
             client_secret=None,
             redirect_uri=__redirect_uri__,
             auth_code=auth_code,
-            code_verifier=self.code_verifier
+            code_verifier=self.code_verifier,
         )
 
-        doc = read_document()
+        doc = accounts.read_document()
         doc["accounts"].append(login_data)
-        write_document(doc)
+        accounts.write_document(doc)
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -80,14 +47,14 @@ class CallbackHandler(BaseHTTPRequestHandler):
 
 
 class Accounts(CTkFrame):
-    doc: Document
+    doc: accounts.Document
 
     def __init__(self, master) -> None:
         super().__init__(master=master)
 
         self.grid_columnconfigure(0, weight=1)
 
-        self.doc = read_document()
+        self.doc = accounts.read_document()
 
         self.heading = CTkLabel(
             master=self,
@@ -115,7 +82,9 @@ class Accounts(CTkFrame):
         self.update_accounts_list()
 
     def add_account(self) -> None:
-        login_url, state, code_verifier = msa.get_secure_login_data(__client_id__, __redirect_uri__)
+        login_url, state, code_verifier = msa.get_secure_login_data(
+            __client_id__, __redirect_uri__
+        )
 
         webbrowser.open(login_url)
         handler = CallbackHandler
@@ -127,7 +96,7 @@ class Accounts(CTkFrame):
 
     def delete_account(self, index) -> None:
         del self.doc["accounts"][index]
-        write_document(self.doc)
+        accounts.write_document(self.doc)
         self.update_accounts_list()
 
     def update_accounts_list(self) -> None:
