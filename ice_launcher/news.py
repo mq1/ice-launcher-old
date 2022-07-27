@@ -59,8 +59,7 @@ class News(CTkFrame):
         )
         self.next_button.grid(row=0, column=2, sticky="nswe")
 
-        updater = Thread(target=self.update_news)
-        updater.start()
+        Thread(target=self.update_news).start()
 
     def update_news(self) -> None:
         self.articles = get_minecraft_news()
