@@ -2,10 +2,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from threading import Thread
+
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
 
-from ice_launcher import About, Accounts, Instances, News, Settings
+from ice_launcher import About, Accounts, Instances, News, Settings, Update
+from ice_launcher.__about__ import __version__
+from ice_launcher.lib import updater
 
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("blue")
@@ -96,6 +100,9 @@ class App(CTk):
 
         self.update_main_frame()
 
+        update_checker = Thread(target=self.check_for_updates)
+        update_checker.start()
+
     def on_closing(self, event=0) -> None:
         self.destroy()
 
@@ -107,6 +114,11 @@ class App(CTk):
         self.__dict__[f"{self.current_view}_button"].configure(fg_color=None)
         self.current_view = view
         self.update_main_frame()
+
+    def check_for_updates(self) -> None:
+        latest_version = updater.check_for_updates(__version__)
+        if latest_version:
+            Update(master=self, latest_version=latest_version)
 
 
 if __name__ == "__main__":

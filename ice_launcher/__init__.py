@@ -7,5 +7,6 @@ from .accounts import Accounts
 from .instances import Instances
 from .news import News
 from .settings import Settings
+from .update import Update
 
-__all__ = ["About", "Accounts", "Instances", "News", "Settings"]
+__all__ = ["About", "Accounts", "Instances", "News", "Settings", "Update"]
