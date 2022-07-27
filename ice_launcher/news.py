@@ -20,14 +20,15 @@ class News(CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
 
-        self.article = CTkLabel(
-            master=self,
-            height=100,
-            fg_color=("white", "gray38"),  # <- custom tuple-color
-            text_font=("Roboto Medium", -20),  # font name and size in px
+        self.title_frame = CTkFrame(master=self, fg_color="gray38")
+        self.title_frame.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
+
+        self.article_title = CTkLabel(
+            master=self.title_frame,
+            text_font=("Roboto Medium", 30),
             text="Loading",
         )
-        self.article.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
+        self.article_title.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
         self.article_subheader = CTkLabel(master=self, text="Loading")
         self.article_subheader.grid(row=1, column=0, pady=10, padx=10, sticky="nswe")
@@ -68,7 +69,7 @@ class News(CTkFrame):
     def update_article(self) -> None:
         index = int(self.current_article_index.text)
         tile = self.articles["article_grid"][index - 1]["default_tile"]
-        self.article.set_text(tile["title"])
+        self.article_title.set_text(tile["title"])
         self.article_subheader.set_text(tile["sub_header"])
         self.update_image(index)
 
