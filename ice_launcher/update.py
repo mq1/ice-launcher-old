@@ -42,6 +42,7 @@ class Update(CTkToplevel):
             master=self,
             text="No",
             command=self.destroy,
+            fg_color=None
         )
         self.no_button.grid(row=4, column=0, pady=10, padx=20)
 
