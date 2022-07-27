@@ -29,7 +29,7 @@ jobs:
       - run: python -m pip install hatch
       - run: python -m hatch env create pyinstaller
       - run: python -m hatch run pyinstaller:build
-      - run: zip -r "IceLauncher-linux-x86_64.zip" "dist/Ice Launcher"
+      - run: tar cavf "IceLauncher-linux-x86_64.tar.xz" "dist/Ice Launcher"
       - uses: softprops/action-gh-release@v1
         with:
           files: IceLauncher-linux-x86_64.zip
