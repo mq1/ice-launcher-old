@@ -2,12 +2,16 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from customtkinter import CTkFrame, CTkLabel
+from customtkinter import BooleanVar, CTkButton, CTkFrame, CTkLabel, CTkSwitch
+
+from .lib import config
 
 
 class Settings(CTkFrame):
     def __init__(self, master) -> None:
         super().__init__(master=master)
+
+        self.app_config = config.read()
 
         self.grid_columnconfigure(0, weight=1)
 
@@ -19,3 +23,31 @@ class Settings(CTkFrame):
             text="Settings",
         )
         self.app_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
+
+        self.automatically_check_for_updates = BooleanVar(value=True)
+
+        self.automatically_check_for_updates_switch = CTkSwitch(
+            master=self,
+            text="Automatically check for updates",
+            variable=self.automatically_check_for_updates,
+        )
+        self.automatically_check_for_updates_switch.grid(
+            row=1, column=0, pady=10, padx=20, sticky="w"
+        )
+
+        # empty row as spacing
+        self.grid_rowconfigure(2, weight=1)
+
+        self.save_button = CTkButton(
+            master=self,
+            text="Save",
+            command=self.save,
+        )
+        self.save_button.grid(row=3, column=0, pady=20, padx=20, sticky="se")
+
+    def save(self) -> None:
+        self.app_config[
+            "automatically_check_for_updates"
+        ] = self.automatically_check_for_updates.get()
+
+        config.write(self.app_config)
