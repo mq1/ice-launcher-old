@@ -14,12 +14,14 @@ __config_path__: str = path.join(dirs.user_data_dir, "config.json")
 class Config(TypedDict):
     config_version: int
     automatically_check_for_updates: bool
+    last_used_account: str
 
 
 def default() -> Config:
     return {
         "config_version": 1,
         "automatically_check_for_updates": True,
+        "last_used_account": "",
     }
 
 

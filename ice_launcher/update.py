@@ -39,10 +39,7 @@ class Update(CTkToplevel):
         self.update_question.grid(row=3, column=0, columnspan=2, pady=(10, 20), padx=20)
 
         self.no_button = CTkButton(
-            master=self,
-            text="No",
-            command=self.destroy,
-            fg_color=None
+            master=self, text="No", command=self.destroy, fg_color=None
         )
         self.no_button.grid(row=4, column=0, pady=10, padx=20)
 

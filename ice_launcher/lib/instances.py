@@ -56,9 +56,10 @@ def get_info(instance_name: str) -> InstanceJson:
         return json.load(f)
 
 
-def launch(instance_name: str) -> None:
-    # TODO: account selection
-    account = accounts.read_document()["accounts"][0]
+def launch(instance_name: str, account_name) -> None:
+    account = next(
+        a for a in accounts.read_document()["accounts"] if a["name"] == account_name
+    )
 
     instance_dir = path.join(__instances_dir__, instance_name)
     with open(path.join(instance_dir, "instance.json"), "r") as f:
