@@ -46,6 +46,9 @@ class Instances(CTkFrame):
         # empty column as spacing
         self.status_bar.grid_columnconfigure(0, weight=1)
 
+        self.account_label = CTkLabel(master=self.status_bar, text="Account:")
+        self.account_label.grid(row=0, column=1, pady=0, padx=0, sticky="nse")
+
         self.selected_account = StringVar()
         self.account_selector = CTkComboBox(
             master=self.status_bar,
@@ -53,7 +56,7 @@ class Instances(CTkFrame):
             command=lambda _: self.update_account_list(),
             variable=self.selected_account,
         )
-        self.account_selector.grid(row=0, column=1, pady=10, padx=10, sticky="se")
+        self.account_selector.grid(row=0, column=2, pady=10, padx=(0, 10), sticky="se")
 
         self.update_instance_list()
         self.set_default_account()
