@@ -42,9 +42,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"<p>You can close this window.</p>")
         self.wfile.write(b"</body></html>")
 
-        killer = Thread(target=self.server.shutdown)
-        killer.daemon = True
-        killer.start()
+        Thread(target=self.server.shutdown).start()
 
 
 class Accounts(CTkFrame):
@@ -68,18 +66,13 @@ class Accounts(CTkFrame):
         self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
         self.accounts_list = CTkFrame(master=self)
-        self.accounts_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
-        self.accounts_list.grid_columnconfigure(1, weight=1)
-
-        # empty row as spacing
-        self.grid_rowconfigure(2, weight=1)
 
         self.add_account_button = CTkButton(
             master=self,
             text="Add Account",
             command=self.add_account,
         )
-        self.add_account_button.grid(row=3, column=0, pady=20, padx=20)
+        self.add_account_button.grid(row=2, column=0, pady=20, padx=20, sticky="nw")
 
         self.update_accounts_list()
 
@@ -105,9 +98,13 @@ class Accounts(CTkFrame):
         for account in self.accounts_list.winfo_children():
             account.destroy()
 
+        if len(self.doc["accounts"]) > 0:
+            self.accounts_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
+            self.accounts_list.grid_columnconfigure(0, weight=10)
+
         for index, account in enumerate(self.doc["accounts"]):
             account_label = CTkLabel(master=self.accounts_list, text=account["name"])
-            account_label.grid(row=index, column=0, pady=10, padx=10, sticky="w")
+            account_label.grid(row=index, column=0, pady=10, padx=0, sticky="w")
             delete_button = CTkButton(
                 master=self.accounts_list,
                 text="Delete",
