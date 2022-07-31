@@ -27,15 +27,13 @@ class Instances(CTkFrame):
         self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
         self.instances_list = CTkFrame(master=self)
-        self.instances_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
-        self.instances_list.grid_columnconfigure(1, weight=1)
 
-        self.add_account_button = CTkButton(
+        self.new_instance_button = CTkButton(
             master=self,
             text="New Instance",
             command=self.add_new_instance,
         )
-        self.add_account_button.grid(row=2, column=0, pady=20, padx=20)
+        self.new_instance_button.grid(row=2, column=0, pady=20, padx=20, sticky="nw")
 
         # empty row as spacing
         self.grid_rowconfigure(3, weight=1)
@@ -73,10 +71,16 @@ class Instances(CTkFrame):
         self.update_instance_list()
 
     def update_instance_list(self) -> None:
+        instance_list = instances.list()
+
         for instance in self.instances_list.winfo_children():
             instance.destroy()
 
-        for index, instance_name in enumerate(instances.list()):
+        if len(instance_list) > 0:
+            self.instances_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
+            self.instances_list.grid_columnconfigure(0, weight=1)
+
+        for index, instance_name in enumerate(instance_list):
             label = CTkLabel(master=self.instances_list, text=instance_name)
             label.grid(row=index, column=0, pady=10, padx=10, sticky="nswe")
             launch_button = CTkButton(

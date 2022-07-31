@@ -100,7 +100,7 @@ class Accounts(CTkFrame):
 
         if len(self.doc["accounts"]) > 0:
             self.accounts_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
-            self.accounts_list.grid_columnconfigure(0, weight=10)
+            self.accounts_list.grid_columnconfigure(0, weight=1)
 
         for index, account in enumerate(self.doc["accounts"]):
             account_label = CTkLabel(master=self.accounts_list, text=account["name"])
