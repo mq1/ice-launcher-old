@@ -4,6 +4,7 @@
 
 import json
 import subprocess
+from importlib.metadata import version
 from os import listdir, makedirs, path
 from typing import List, TypedDict
 
@@ -11,8 +12,6 @@ from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import MinecraftOptions
-
-from ice_launcher.__about__ import __version__
 
 from . import accounts, dirs
 
@@ -88,7 +87,7 @@ def launch(instance_name: str, account_name) -> None:
         "executablePath": java_executable,
         "jvmArguments": ["-Xmx2G", "-Xms2G"],
         "launcherName": "Ice Launcher",
-        "launcherVersion": __version__,
+        "launcherVersion": version("ice-launcher"),
         "gameDirectory": path.join(__instances_dir__, instance_name),
     }
 

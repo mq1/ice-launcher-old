@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -32,7 +32,7 @@ Issues = "https://github.com/mq1/ice-launcher/issues"
 Source = "https://github.com/mq1/ice-launcher"
 
 [tool.hatch.version]
-path = "ice_launcher/__about__.py"
+source = "vcs"
 
 [tool.hatch.build.targets.sdist]
 [tool.hatch.build.targets.wheel]

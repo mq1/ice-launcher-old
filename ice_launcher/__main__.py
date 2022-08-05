@@ -2,13 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from importlib.metadata import version
 from threading import Thread
 
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
 
 from ice_launcher import About, Accounts, Instances, News, Settings, Update
-from ice_launcher.__about__ import __version__
 from ice_launcher.lib import config, updater
 
 customtkinter.set_appearance_mode("dark")
@@ -116,7 +116,7 @@ class App(CTk):
         self.update_main_frame()
 
     def check_for_updates(self) -> None:
-        latest_version = updater.check_for_updates(__version__)
+        latest_version = updater.check_for_updates(version("ice-launcher"))
         if latest_version:
             Update(master=self, latest_version=latest_version)
 
