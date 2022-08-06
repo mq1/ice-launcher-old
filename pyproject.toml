@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling", "hatch-vcs", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
 [project]
@@ -18,13 +18,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
-dependencies = [
-  "customtkinter~=4.5.5",
-  "requests~=2.28.1",
-  "minecraft-launcher-lib~=5.2",
-  "appdirs~=1.4.4",
-]
-dynamic = ["version"]
+dynamic = ["version", "dependencies"]
 
 [project.urls]
 Documentation = "https://github.com/mq1/ice-launcher#readme"
@@ -34,21 +28,34 @@ Source = "https://github.com/mq1/ice-launcher"
 [tool.hatch.version]
 source = "vcs"
 
+[tool.hatch.metadata.hooks.requirements_txt]
+filename = "requirements.txt"
+
 [tool.hatch.build.targets.sdist]
 [tool.hatch.build.targets.wheel]
 
-[tool.hatch.envs.default]
-dependencies = [
-  "types-requests",
-  "types-appdirs",
-  "pytest",
-  "pytest-cov",
-  "mypy",
-  "pytype",
+[project.optional-dependencies]
+lint = [
   "black",
-  "isort",
+  "isort"
 ]
-[tool.hatch.envs.default.scripts]
+types = [
+  "mypy",
+  "pytype"
+]
+pyinstaller = [
+  "pyinstaller"
+]
+dev = [
+  "ice-launcher[lint,types,pyinstaller]"
+]
+
+[tool.hatch.envs.dev]
+features = [
+  "dev"
+]
+
+[tool.hatch.envs.dev.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ice_launcher --cov=tests"
 no-cov = "cov --no-cov"
 check-types = "mypy ice_launcher"
@@ -56,9 +63,10 @@ format = "black ice_launcher"
 sort-imports = "isort ice_launcher"
 
 [tool.hatch.envs.pyinstaller]
-dependencies = [
-  "pyinstaller",
+features = [
+  "pyinstaller"
 ]
+
 [tool.hatch.envs.pyinstaller.scripts]
 build = "python -OO -m PyInstaller ice-launcher.spec"
 
@@ -68,9 +76,6 @@ python = ["310"]
 [tool.coverage.run]
 branch = true
 parallel = true
-omit = [
-  "ice_launcher/__about__.py",
-]
 
 [tool.coverage.report]
 exclude_lines = [

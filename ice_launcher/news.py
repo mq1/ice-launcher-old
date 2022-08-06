@@ -36,7 +36,7 @@ class News(CTkFrame):
         Thread(target=self.update_news).start()
 
     def update_news(self) -> None:
-        articles = get_minecraft_news()["article_grid"]
+        articles = get_minecraft_news(7)["article_grid"]
 
         for index, article in enumerate(articles):
             label = CTkLabel(
