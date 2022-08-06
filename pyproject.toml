@@ -44,7 +44,8 @@ types = [
   "pytype"
 ]
 pyinstaller = [
-  "pyinstaller"
+  "pyinstaller",
+  "Pillow"
 ]
 dev = [
   "ice-launcher[lint,types,pyinstaller]"
