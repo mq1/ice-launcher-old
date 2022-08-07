@@ -111,7 +111,7 @@ class Accounts(CTkFrame):
             )
 
         add_account_button = CTkButton(
-            master=self,
+            master=self.accounts_list.content,
             text="Add Account",
             command=self.add_account,
         )
