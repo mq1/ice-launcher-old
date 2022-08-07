@@ -89,12 +89,12 @@ class Instances(CTkFrame):
             )
 
         new_instance_button = CTkButton(
-            master=self,
+            master=self.instances_list.content,
             text="New Instance",
             command=self.add_new_instance,
         )
         new_instance_button.grid(
-            row=len(instance_list) * 2, column=0, pady=20, padx=20, sticky="w"
+            row=len(instance_list) * 2, column=0, pady=20, padx=20, sticky="nw"
         )
 
     def set_default_account(self) -> None:
