@@ -11,7 +11,7 @@ from customtkinter import CTkFrame, CTkScrollbar
 
 
 class ScrollableFrame(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master) -> None:
         super().__init__(master)  # create a frame (self)
 
         self.grid_rowconfigure(
@@ -61,20 +61,20 @@ class ScrollableFrame(CTkFrame):
             None
         )  # perform an initial stretch on render, otherwise the scroll region has a tiny border until the first resize
 
-    def on_frame_configure(self, event):
+    def on_frame_configure(self, event) -> None:
         """Reset the scroll region to encompass the inner frame"""
         self.canvas.configure(
             scrollregion=self.canvas.bbox("all")
         )  # whenever the size of the frame changes, alter the scroll region respectively.
 
-    def on_canvas_configure(self, event):
+    def on_canvas_configure(self, event) -> None:
         """Reset the canvas window to encompass inner frame when required"""
         canvas_width = event.width
         self.canvas.itemconfig(
             self.canvas_window, width=canvas_width
         )  # whenever the size of the canvas changes alter the window region respectively.
 
-    def on_mouse_wheel(self, event):  # cross platform scroll wheel event
+    def on_mouse_wheel(self, event) -> None:  # cross platform scroll wheel event
         if platform.system() == "Windows":
             self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
         elif platform.system() == "Darwin":
@@ -85,7 +85,9 @@ class ScrollableFrame(CTkFrame):
             elif event.num == 5:
                 self.canvas.yview_scroll(1, "units")
 
-    def on_enter(self, event):  # bind wheel events when the cursor enters the control
+    def on_enter(
+        self, event
+    ) -> None:  # bind wheel events when the cursor enters the control
         if platform.system() == "Linux":
             self.canvas.bind_all("<Button-4>", self.on_mouse_wheel)
             self.canvas.bind_all("<Button-5>", self.on_mouse_wheel)
@@ -94,7 +96,7 @@ class ScrollableFrame(CTkFrame):
 
     def on_leave(
         self, event
-    ):  # unbind wheel events when the cursorl leaves the control
+    ) -> None:  # unbind wheel events when the cursorl leaves the control
         if platform.system() == "Linux":
             self.canvas.unbind_all("<Button-4>")
             self.canvas.unbind_all("<Button-5>")
