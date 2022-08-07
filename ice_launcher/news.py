@@ -10,6 +10,8 @@ from customtkinter import CTkButton, CTkFrame, CTkLabel
 from minecraft_launcher_lib.types import Article, Articles
 from minecraft_launcher_lib.utils import get_minecraft_news
 
+from .components.scrollable_frame import ScrollableFrame
+
 
 class News(CTkFrame):
     articles: Articles
@@ -29,27 +31,27 @@ class News(CTkFrame):
         )
         self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
-        self.news_frame = CTkFrame(master=self)
+        self.news_frame = ScrollableFrame(master=self)
         self.news_frame.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
-        self.news_frame.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
         Thread(target=self.update_news).start()
 
     def update_news(self) -> None:
-        articles = get_minecraft_news(7)["article_grid"]
+        articles = get_minecraft_news()["article_grid"]
 
         for index, article in enumerate(articles):
             label = CTkLabel(
-                master=self.news_frame, text=article["default_tile"]["title"]
+                master=self.news_frame.content, text=article["default_tile"]["title"]
             )
             label.grid(row=index * 2, column=0, pady=10, padx=10, sticky="nw")
             open_button = CTkButton(
-                master=self.news_frame,
+                master=self.news_frame.content,
                 text="Open",
                 command=lambda: self.open_article(article),
             )
             open_button.grid(row=index * 2, column=1, pady=10, padx=10, sticky="e")
-            separator = ttk.Separator(self.news_frame, orient="horizontal")
+            separator = ttk.Separator(self.news_frame.content, orient="horizontal")
             separator.grid(
                 row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=10, sticky="ew"
             )
