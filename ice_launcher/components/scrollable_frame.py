@@ -17,11 +17,15 @@ class ScrollableFrame(CTkFrame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self, borderwidth=0, background="#2A2D2E", highlightthickness=0)
+        self.canvas = Canvas(
+            self, borderwidth=0, background="#2A2D2E", highlightthickness=0
+        )
         self.canvas.grid(row=0, column=0, sticky="nswe")
 
         self.content = CTkFrame(self.canvas)
-        self.canvas_window = self.canvas.create_window((0, 0), window=self.content, anchor="nw")
+        self.canvas_window = self.canvas.create_window(
+            (0, 0), window=self.content, anchor="nw"
+        )
         self.content.grid_columnconfigure(0, weight=1)
 
         self.scrollbar = CTkScrollbar(self, command=self.canvas.yview)
@@ -32,7 +36,7 @@ class ScrollableFrame(CTkFrame):
         self.content.bind("<Configure>", self.on_frame_configure)
 
         # bind an event whenever the size of the canvas frame changes.
-        self.canvas.bind("<Configure>", self.on_canvas_configure)  
+        self.canvas.bind("<Configure>", self.on_canvas_configure)
 
         # bind wheel events when the cursor enters the control
         self.content.bind("<Enter>", self.on_enter)
@@ -45,18 +49,18 @@ class ScrollableFrame(CTkFrame):
 
     def on_frame_configure(self, event) -> None:
         """Reset the scroll region to encompass the inner frame"""
-        self.canvas.configure(
-            scrollregion=self.canvas.bbox("all")
-        )  # whenever the size of the frame changes, alter the scroll region respectively.
+
+        # whenever the size of the frame changes, alter the scroll region respectively.
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def on_canvas_configure(self, event) -> None:
         """Reset the canvas window to encompass inner frame when required"""
-        canvas_width = event.width
-        self.canvas.itemconfig(
-            self.canvas_window, width=canvas_width
-        )  # whenever the size of the canvas changes alter the window region respectively.
 
-    def on_mouse_wheel(self, event) -> None:  # cross platform scroll wheel event
+        # whenever the size of the canvas changes alter the window region respectively.
+        self.canvas.itemconfig(self.canvas_window, width=event.width)
+
+    def on_mouse_wheel(self, event) -> None:
+        """Cross platform scroll wheel event"""
         if platform.system() == "Windows":
             self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
         elif platform.system() == "Darwin":
@@ -67,18 +71,16 @@ class ScrollableFrame(CTkFrame):
             elif event.num == 5:
                 self.canvas.yview_scroll(1, "units")
 
-    def on_enter(
-        self, event
-    ) -> None:  # bind wheel events when the cursor enters the control
+    def on_enter(self, event) -> None:
+        """Bind wheel events when the cursor enters the control"""
         if platform.system() == "Linux":
             self.canvas.bind_all("<Button-4>", self.on_mouse_wheel)
             self.canvas.bind_all("<Button-5>", self.on_mouse_wheel)
         else:
             self.canvas.bind_all("<MouseWheel>", self.on_mouse_wheel)
 
-    def on_leave(
-        self, event
-    ) -> None:  # unbind wheel events when the cursorl leaves the control
+    def on_leave(self, event) -> None:
+        """Unbind wheel events when the cursor leaves the control"""
         if platform.system() == "Linux":
             self.canvas.unbind_all("<Button-4>")
             self.canvas.unbind_all("<Button-5>")
