@@ -5,10 +5,12 @@
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
+from tkinter import ttk
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
 from minecraft_launcher_lib import microsoft_account as msa
 
+from .components.scrollable_frame import ScrollableFrame
 from .lib import accounts
 
 __client_id__: str = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
@@ -65,14 +67,10 @@ class Accounts(CTkFrame):
         )
         self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
-        self.accounts_list = CTkFrame(master=self)
-
-        self.add_account_button = CTkButton(
-            master=self,
-            text="Add Account",
-            command=self.add_account,
-        )
-        self.add_account_button.grid(row=2, column=0, pady=20, padx=20, sticky="nw")
+        self.accounts_list = ScrollableFrame(master=self)
+        self.accounts_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
+        self.grid_rowconfigure(1, weight=1)
+        self.accounts_list.content.grid_columnconfigure(0, weight=1)
 
         self.update_accounts_list()
 
@@ -95,19 +93,28 @@ class Accounts(CTkFrame):
         self.update_accounts_list()
 
     def update_accounts_list(self) -> None:
-        for account in self.accounts_list.winfo_children():
+        for account in self.accounts_list.content.winfo_children():
             account.destroy()
 
-        if len(self.doc["accounts"]) > 0:
-            self.accounts_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
-            self.accounts_list.grid_columnconfigure(0, weight=1)
-
         for index, account in enumerate(self.doc["accounts"]):
-            account_label = CTkLabel(master=self.accounts_list, text=account["name"])
-            account_label.grid(row=index, column=0, pady=10, padx=0, sticky="w")
+            label = CTkLabel(master=self.accounts_list.content, text=account["name"])
+            label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
             delete_button = CTkButton(
-                master=self.accounts_list,
+                master=self.accounts_list.content,
                 text="Delete",
                 command=lambda index=index: self.delete_account(index),
             )
-            delete_button.grid(row=index, column=2, pady=10, padx=10, sticky="e")
+            delete_button.grid(row=index * 2, column=1, pady=10, padx=10, sticky="e")
+            separator = ttk.Separator(self.accounts_list.content, orient="horizontal")
+            separator.grid(
+                row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=10, sticky="ew"
+            )
+
+        add_account_button = CTkButton(
+            master=self,
+            text="Add Account",
+            command=self.add_account,
+        )
+        add_account_button.grid(
+            row=len(self.doc["accounts"]) * 2, column=0, pady=20, padx=20, sticky="nw"
+        )
