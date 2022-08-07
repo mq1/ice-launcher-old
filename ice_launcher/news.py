@@ -26,7 +26,7 @@ class News(CTkFrame):
 
         self.view_name = CTkLabel(
             master=self.title_frame,
-            text_font=("Roboto Medium", 30),
+            text_font=("Roboto Medium", 30),  # type: ignore
             text="News",
         )
         self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
