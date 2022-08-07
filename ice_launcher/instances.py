@@ -2,8 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from tkinter import ttk
+
 from customtkinter import CTkButton, CTkComboBox, CTkFrame, CTkLabel, StringVar
 
+from .components.scrollable_frame import ScrollableFrame
 from .lib import accounts, config, instances
 from .new_instance import NewInstance
 
@@ -26,20 +29,13 @@ class Instances(CTkFrame):
         )
         self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
 
-        self.instances_list = CTkFrame(master=self)
-
-        self.new_instance_button = CTkButton(
-            master=self,
-            text="New Instance",
-            command=self.add_new_instance,
-        )
-        self.new_instance_button.grid(row=2, column=0, pady=20, padx=20, sticky="nw")
-
-        # empty row as spacing
-        self.grid_rowconfigure(3, weight=1)
+        self.instances_list = ScrollableFrame(master=self)
+        self.instances_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
+        self.grid_rowconfigure(1, weight=1)
+        self.instances_list.content.grid_columnconfigure(0, weight=1)
 
         self.status_bar = CTkFrame(master=self)
-        self.status_bar.grid(row=4, column=0, pady=20, padx=20, sticky="nswe")
+        self.status_bar.grid(row=2, column=0, pady=20, padx=20, sticky="nswe")
 
         # empty column as spacing
         self.status_bar.grid_columnconfigure(0, weight=1)
@@ -73,24 +69,33 @@ class Instances(CTkFrame):
     def update_instance_list(self) -> None:
         instance_list = instances.list()
 
-        for instance in self.instances_list.winfo_children():
+        for instance in self.instances_list.content.winfo_children():
             instance.destroy()
 
-        if len(instance_list) > 0:
-            self.instances_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
-            self.instances_list.grid_columnconfigure(0, weight=1)
-
         for index, instance_name in enumerate(instance_list):
-            label = CTkLabel(master=self.instances_list, text=instance_name)
-            label.grid(row=index, column=0, pady=10, padx=10, sticky="nswe")
+            label = CTkLabel(master=self.instances_list.content, text=instance_name)
+            label.grid(row=index * 2, column=0, pady=10, padx=10, sticky="nw")
             launch_button = CTkButton(
-                master=self.instances_list,
+                master=self.instances_list.content,
                 text="Launch",
                 command=lambda: instances.launch(
                     instance_name, self.selected_account.get()
                 ),
             )
-            launch_button.grid(row=index, column=1, pady=10, padx=10, sticky="e")
+            launch_button.grid(row=index * 2, column=1, pady=10, padx=10, sticky="e")
+            separator = ttk.Separator(self.instances_list.content, orient="horizontal")
+            separator.grid(
+                row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=10, sticky="ew"
+            )
+
+        new_instance_button = CTkButton(
+            master=self,
+            text="New Instance",
+            command=self.add_new_instance,
+        )
+        new_instance_button.grid(
+            row=len(instance_list) * 2, column=0, pady=20, padx=20, sticky="w"
+        )
 
     def set_default_account(self) -> None:
         c = config.read()
