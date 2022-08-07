@@ -6,6 +6,7 @@ from tkinter import ttk
 
 from customtkinter import CTkButton, CTkComboBox, CTkFrame, CTkLabel, StringVar
 
+from .__about__ import __version__
 from .components.scrollable_frame import ScrollableFrame
 from .lib import accounts, config, instances
 from .new_instance import NewInstance
@@ -79,7 +80,7 @@ class Instances(CTkFrame):
                 master=self.instances_list.content,
                 text="Launch",
                 command=lambda: instances.launch(
-                    instance_name, self.selected_account.get()
+                    instance_name, self.selected_account.get(), __version__
                 ),
             )
             launch_button.grid(row=index * 2, column=1, pady=10, padx=10, sticky="e")

@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import tkinter
-from importlib.metadata import version
 
 from customtkinter import CTkFrame, CTkLabel
+
+from .__about__ import __version__
 
 
 class About(CTkFrame):
@@ -30,7 +31,7 @@ class About(CTkFrame):
 
         self.app_info = CTkLabel(
             master=self.info_frame,
-            text=f"Version {version('ice-launcher')}\n\nCopyright © 2022-present Manuel Quarneti\n\nGPL-3.0 Licensed",
+            text=f"Version {__version__}\n\nCopyright © 2022-present Manuel Quarneti\n\nGPL-3.0 Licensed",
             justify=tkinter.LEFT,
         )
         self.app_info.grid(row=1, column=0, pady=20, padx=20, sticky="w")

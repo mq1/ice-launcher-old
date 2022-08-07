@@ -4,7 +4,6 @@
 
 import json
 import subprocess
-from importlib.metadata import version
 from os import listdir, makedirs, path
 from typing import List, TypedDict
 
@@ -55,7 +54,7 @@ def get_info(instance_name: str) -> InstanceJson:
         return json.load(f)
 
 
-def launch(instance_name: str, account_name) -> None:
+def launch(instance_name: str, account_name: str, launcher_version: str) -> None:
     account = next(
         a for a in accounts.read_document()["accounts"] if a["name"] == account_name
     )
@@ -87,7 +86,7 @@ def launch(instance_name: str, account_name) -> None:
         "executablePath": java_executable,
         "jvmArguments": ["-Xmx2G", "-Xms2G"],
         "launcherName": "Ice Launcher",
-        "launcherVersion": version("ice-launcher"),
+        "launcherVersion": launcher_version,
         "gameDirectory": path.join(__instances_dir__, instance_name),
     }
 
