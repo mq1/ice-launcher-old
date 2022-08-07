@@ -70,7 +70,6 @@ class Accounts(CTkFrame):
         self.accounts_list = ScrollableFrame(master=self)
         self.accounts_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
         self.grid_rowconfigure(1, weight=1)
-        self.accounts_list.content.grid_columnconfigure(0, weight=1)
 
         self.update_accounts_list()
 

@@ -11,55 +11,37 @@ from customtkinter import CTkFrame, CTkScrollbar
 
 
 class ScrollableFrame(CTkFrame):
-    def __init__(self, master) -> None:
-        super().__init__(master)  # create a frame (self)
+    def __init__(self, master, *args, **kwargs) -> None:
+        super().__init__(master, *args, **kwargs)
 
-        self.grid_rowconfigure(
-            0, weight=1
-        )  # make the frame expandable in the y direction
-        self.grid_columnconfigure(
-            0, weight=1
-        )  # make the frame expandable in the x direction
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(
-            self, borderwidth=0, background="#2A2D2E", highlightthickness=0
-        )  # place canvas on self
-        self.content = CTkFrame(
-            self.canvas
-        )  # place a frame on the canvas, this frame will hold the child widgets
-        self.scrollbar = CTkScrollbar(
-            self, command=self.canvas.yview
-        )  # place a scrollbar on self
-        self.canvas.configure(
-            yscrollcommand=self.scrollbar.set
-        )  # attach scrollbar action to scroll of canvas
+        self.canvas = Canvas(self, borderwidth=0, background="#2A2D2E", highlightthickness=0)
+        self.canvas.grid(row=0, column=0, sticky="nswe")
 
+        self.content = CTkFrame(self.canvas)
+        self.canvas_window = self.canvas.create_window((0, 0), window=self.content, anchor="nw")
+        self.content.grid_columnconfigure(0, weight=1)
+
+        self.scrollbar = CTkScrollbar(self, command=self.canvas.yview)
         self.scrollbar.grid(row=0, column=1, padx=5, pady=5, sticky="ns")
-        self.canvas.grid(row=0, column=0, sticky="nsew")  # attach canvas to self
-        self.canvas_window = self.canvas.create_window(
-            (0, 0),
-            window=self.content,
-            anchor="nw",  # add view port frame to canvas
-            tags="self.viewPort",
-        )
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
-        self.content.bind(
-            "<Configure>", self.on_frame_configure
-        )  # bind an event whenever the size of the viewPort frame changes.
-        self.canvas.bind(
-            "<Configure>", self.on_canvas_configure
-        )  # bind an event whenever the size of the canvas frame changes.
+        # bind an event whenever the size of the content frame changes.
+        self.content.bind("<Configure>", self.on_frame_configure)
 
-        self.content.bind(
-            "<Enter>", self.on_enter
-        )  # bind wheel events when the cursor enters the control
-        self.content.bind(
-            "<Leave>", self.on_leave
-        )  # unbind wheel events when the cursorl leaves the control
+        # bind an event whenever the size of the canvas frame changes.
+        self.canvas.bind("<Configure>", self.on_canvas_configure)  
 
-        self.on_frame_configure(
-            None
-        )  # perform an initial stretch on render, otherwise the scroll region has a tiny border until the first resize
+        # bind wheel events when the cursor enters the control
+        self.content.bind("<Enter>", self.on_enter)
+
+        # unbind wheel events when the cursorl leaves the control
+        self.content.bind("<Leave>", self.on_leave)
+
+        # perform an initial stretch on render, otherwise the scroll region has a tiny border until the first resize
+        self.on_frame_configure(None)
 
     def on_frame_configure(self, event) -> None:
         """Reset the scroll region to encompass the inner frame"""

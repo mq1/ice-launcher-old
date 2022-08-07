@@ -34,7 +34,6 @@ class News(CTkFrame):
         self.news_frame = ScrollableFrame(master=self)
         self.news_frame.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
         self.grid_rowconfigure(1, weight=1)
-        self.news_frame.content.grid_columnconfigure(0, weight=1)
 
         Thread(target=self.update_news).start()
 

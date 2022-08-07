@@ -33,7 +33,6 @@ class Instances(CTkFrame):
         self.instances_list = ScrollableFrame(master=self)
         self.instances_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
         self.grid_rowconfigure(1, weight=1)
-        self.instances_list.content.grid_columnconfigure(0, weight=1)
 
         self.status_bar = CTkFrame(master=self)
         self.status_bar.grid(row=2, column=0, pady=20, padx=20, sticky="nswe")
