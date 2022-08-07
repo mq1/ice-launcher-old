@@ -8,9 +8,8 @@ import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
 
 from ice_launcher import About, Accounts, Instances, News, Settings, Update
+from ice_launcher.__about__ import __version__
 from ice_launcher.lib import config, updater
-
-from .__about__ import __version__
 
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("blue")
