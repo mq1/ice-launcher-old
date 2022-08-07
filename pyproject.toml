@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs", "hatch-requirements-txt"]
+requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
 [project]
@@ -26,7 +26,7 @@ Issues = "https://github.com/mq1/ice-launcher/issues"
 Source = "https://github.com/mq1/ice-launcher"
 
 [tool.hatch.version]
-source = "vcs"
+path = "ice_launcher/__about__.py"
 
 [tool.hatch.metadata.hooks.requirements_txt]
 filename = "requirements.txt"
@@ -77,6 +77,9 @@ python = ["310"]
 [tool.coverage.run]
 branch = true
 parallel = true
+omit = [
+  "ice_launcher/__about__.py",
+]
 
 [tool.coverage.report]
 exclude_lines = [
