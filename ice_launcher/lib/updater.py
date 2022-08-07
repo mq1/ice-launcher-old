@@ -14,7 +14,10 @@ def _get_latest_release() -> str:
 
 
 def check_for_updates(current_version: str) -> Optional[str]:
-    latest_release = version.parse(_get_latest_release())
+    if "dev" in current_version:
+        return None
+
     current_release = version.parse(current_version)
+    latest_release = version.parse(_get_latest_release())
 
     return latest_release.__str__() if latest_release > current_release else None
