@@ -28,23 +28,23 @@ class Instances(CTkFrame):
         self.instances_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
         self.grid_rowconfigure(1, weight=1)
 
-        self.status_bar = CTkFrame(master=self)
-        self.status_bar.grid(row=2, column=0, pady=20, padx=20, sticky="nswe")
+        status_bar = CTkFrame(master=self)
+        status_bar.grid(row=100, column=0, pady=0, padx=0, sticky="swe")
 
         # empty column as spacing
-        self.status_bar.grid_columnconfigure(0, weight=1)
+        status_bar.grid_columnconfigure(0, weight=1)
 
-        self.account_label = CTkLabel(master=self.status_bar, text="Account:")
-        self.account_label.grid(row=0, column=1, pady=0, padx=0, sticky="nse")
+        account_label = CTkLabel(master=status_bar, text="Account:", anchor="e")
+        account_label.grid(row=0, column=1, pady=0, padx=0, sticky="nse")
 
         self.selected_account = StringVar()
-        self.account_selector = CTkComboBox(
-            master=self.status_bar,
+        account_selector = CTkComboBox(
+            master=status_bar,
             values=self.account_list,
             command=lambda _: self.update_account_list(),
             variable=self.selected_account,
         )
-        self.account_selector.grid(row=0, column=2, pady=10, padx=(0, 10), sticky="se")
+        account_selector.grid(row=0, column=2, pady=10, padx=10, sticky="e")
 
         self.update_instance_list()
         self.set_default_account()
@@ -100,7 +100,6 @@ class Instances(CTkFrame):
 
     def update_account_list(self) -> None:
         self.account_list = [a["name"] for a in accounts.read_document()["accounts"]]
-        self.account_selector.configure(values=self.account_list)
 
         # update last used account
         c = config.read()
