@@ -109,7 +109,10 @@ class App(CTk):
                     self.views[self.current_view] = Settings(master=self)
                 case "about":
                     self.views[self.current_view] = About(master=self)
-            self.views[self.current_view].grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
+
+            self.views[self.current_view].grid(
+                row=0, column=1, pady=20, padx=20, sticky="nswe"
+            )
 
         self.views[self.current_view].tkraise()
         self.__dict__[f"{self.current_view}_button"].configure(fg_color="#1F6AA5")

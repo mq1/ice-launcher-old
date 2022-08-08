@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from tkinter import ttk
+
 from customtkinter import (
     BooleanVar,
     CTkButton,
@@ -11,7 +13,6 @@ from customtkinter import (
     CTkSwitch,
     StringVar,
 )
-from tkinter import ttk
 
 from .components.heading import Heading
 from .components.scrollable_frame import ScrollableFrame
@@ -52,9 +53,7 @@ class Settings(CTkFrame):
         )
 
         separator = ttk.Separator(settings_frame.content, orient="horizontal")
-        separator.grid(
-            row=1, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew"
-        )
+        separator.grid(row=1, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew")
 
         self.jvm_options = StringVar()
         jvm_options_label = CTkLabel(
@@ -67,9 +66,7 @@ class Settings(CTkFrame):
         jvm_options_entry.grid(row=2, column=1, pady=10, padx=(0, 10), sticky="e")
 
         separator = ttk.Separator(settings_frame.content, orient="horizontal")
-        separator.grid(
-            row=3, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew"
-        )
+        separator.grid(row=3, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew")
 
         self.jvm_memory = StringVar()
         jvm_memory_label = CTkLabel(

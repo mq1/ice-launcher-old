@@ -99,10 +99,17 @@ class Accounts(CTkFrame):
                 text="Delete",
                 command=lambda index=index: self.delete_account(index),
             )
-            delete_button.grid(row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e")
+            delete_button.grid(
+                row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e"
+            )
             separator = ttk.Separator(self.accounts_list.content, orient="horizontal")
             separator.grid(
-                row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew"
+                row=index * 2 + 1,
+                column=0,
+                columnspan=2,
+                pady=0,
+                padx=(0, 10),
+                sticky="ew",
             )
 
         add_account_button = CTkButton(

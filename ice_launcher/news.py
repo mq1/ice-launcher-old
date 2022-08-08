@@ -49,7 +49,12 @@ class News(CTkFrame):
             open_button.grid(row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e")
             separator = ttk.Separator(self.news_frame.content, orient="horizontal")
             separator.grid(
-                row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew"
+                row=index * 2 + 1,
+                column=0,
+                columnspan=2,
+                pady=0,
+                padx=(0, 10),
+                sticky="ew",
             )
 
     def open_article(self, article: Article) -> None:
