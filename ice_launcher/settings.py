@@ -11,8 +11,10 @@ from customtkinter import (
     CTkSwitch,
     StringVar,
 )
+from tkinter import ttk
 
 from .components.heading import Heading
+from .components.scrollable_frame import ScrollableFrame
 from .lib import config
 
 
@@ -27,57 +29,57 @@ class Settings(CTkFrame):
         heading = Heading(master=self, text="Settings")
         heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
+        settings_frame = ScrollableFrame(master=self)
+        settings_frame.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
+        self.grid_rowconfigure(1, weight=1)
+
         self.automatically_check_for_updates = BooleanVar()
-        automatically_check_for_updates_frame = CTkFrame(master=self)
-        automatically_check_for_updates_frame.grid(
-            row=1, column=0, pady=5, padx=20, sticky="we"
-        )
         automatically_check_for_updates_label = CTkLabel(
-            master=automatically_check_for_updates_frame,
+            master=settings_frame.content,
             text="Automatically check for updates",
             anchor="w",
         )
         automatically_check_for_updates_label.grid(
-            row=0, column=0, pady=10, padx=20, sticky="w"
+            row=0, column=0, pady=10, padx=0, sticky="w"
         )
-        automatically_check_for_updates_frame.grid_columnconfigure(0, weight=1)
         automatically_check_for_updates_switch = CTkSwitch(
-            master=automatically_check_for_updates_frame,
+            master=settings_frame.content,
             variable=self.automatically_check_for_updates,
             text="",
         )
         automatically_check_for_updates_switch.grid(
-            row=0, column=1, pady=10, padx=20, sticky="e"
+            row=0, column=1, pady=10, padx=(0, 10), sticky="e"
+        )
+
+        separator = ttk.Separator(settings_frame.content, orient="horizontal")
+        separator.grid(
+            row=1, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew"
         )
 
         self.jvm_options = StringVar()
-        jvm_options_frame = CTkFrame(master=self)
-        jvm_options_frame.grid(row=2, column=0, pady=5, padx=20, sticky="we")
         jvm_options_label = CTkLabel(
-            master=jvm_options_frame, text="JVM options", anchor="w"
+            master=settings_frame.content, text="JVM options", anchor="w"
         )
-        jvm_options_label.grid(row=0, column=0, pady=10, padx=20, sticky="w")
-        jvm_options_frame.grid_columnconfigure(0, weight=1)
+        jvm_options_label.grid(row=2, column=0, pady=10, padx=0, sticky="w")
         jvm_options_entry = CTkEntry(
-            master=jvm_options_frame, textvariable=self.jvm_options
+            master=settings_frame.content, textvariable=self.jvm_options
         )
-        jvm_options_entry.grid(row=0, column=1, pady=10, padx=20, sticky="e")
+        jvm_options_entry.grid(row=2, column=1, pady=10, padx=(0, 10), sticky="e")
+
+        separator = ttk.Separator(settings_frame.content, orient="horizontal")
+        separator.grid(
+            row=3, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew"
+        )
 
         self.jvm_memory = StringVar()
-        jvm_memory_frame = CTkFrame(master=self)
-        jvm_memory_frame.grid(row=3, column=0, pady=5, padx=20, sticky="we")
         jvm_memory_label = CTkLabel(
-            master=jvm_memory_frame, text="JVM memory", anchor="w"
+            master=settings_frame.content, text="JVM memory", anchor="w"
         )
-        jvm_memory_label.grid(row=0, column=0, pady=10, padx=20, sticky="w")
-        jvm_memory_frame.grid_columnconfigure(0, weight=1)
+        jvm_memory_label.grid(row=4, column=0, pady=10, padx=0, sticky="w")
         jvm_memory_entry = CTkEntry(
-            master=jvm_memory_frame, textvariable=self.jvm_memory
+            master=settings_frame.content, textvariable=self.jvm_memory
         )
-        jvm_memory_entry.grid(row=0, column=1, pady=10, padx=20, sticky="e")
-
-        # empty row as spacing
-        self.grid_rowconfigure(99, weight=1)
+        jvm_memory_entry.grid(row=4, column=1, pady=10, padx=(0, 10), sticky="e")
 
         self.button_bar = CTkFrame(master=self)
         self.button_bar.grid(row=100, column=0, pady=0, padx=0, sticky="swe")
