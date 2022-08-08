@@ -36,7 +36,9 @@ class News(CTkFrame):
 
         for index, article in enumerate(articles):
             label = CTkLabel(
-                master=self.news_frame.content, text=article["default_tile"]["title"]
+                master=self.news_frame.content,
+                text=article["default_tile"]["title"],
+                anchor="w",
             )
             label.grid(row=index * 2, column=0, pady=10, padx=10, sticky="nw")
             open_button = CTkButton(

@@ -90,8 +90,10 @@ class Accounts(CTkFrame):
             account.destroy()
 
         for index, account in enumerate(self.doc["accounts"]):
-            label = CTkLabel(master=self.accounts_list.content, text=account["name"])
-            label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
+            label = CTkLabel(
+                master=self.accounts_list.content, text=account["name"], anchor="w"
+            )
+            label.grid(row=index * 2, column=0, pady=10, padx=10, sticky="nw")
             delete_button = CTkButton(
                 master=self.accounts_list.content,
                 text="Delete",
