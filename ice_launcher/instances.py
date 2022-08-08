@@ -90,7 +90,7 @@ class Instances(CTkFrame):
             command=self.add_new_instance,
         )
         new_instance_button.grid(
-            row=len(instance_list) * 2, column=0, pady=20, padx=20, sticky="nw"
+            row=len(instance_list) * 2, column=0, pady=20, padx=10, sticky="nw"
         )
 
     def set_default_account(self) -> None:

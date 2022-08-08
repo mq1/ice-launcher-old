@@ -111,5 +111,5 @@ class Accounts(CTkFrame):
             command=self.add_account,
         )
         add_account_button.grid(
-            row=len(self.doc["accounts"]) * 2, column=0, pady=20, padx=20, sticky="nw"
+            row=len(self.doc["accounts"]) * 2, column=0, pady=20, padx=10, sticky="nw"
         )
