@@ -70,7 +70,7 @@ class Instances(CTkFrame):
             label = CTkLabel(
                 master=self.instances_list.content, text=instance_name, anchor="w"
             )
-            label.grid(row=index * 2, column=0, pady=10, padx=10, sticky="nw")
+            label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
             launch_button = CTkButton(
                 master=self.instances_list.content,
                 text="Launch",
@@ -78,10 +78,10 @@ class Instances(CTkFrame):
                     instance_name, self.selected_account.get(), __version__
                 ),
             )
-            launch_button.grid(row=index * 2, column=1, pady=10, padx=10, sticky="e")
+            launch_button.grid(row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e")
             separator = ttk.Separator(self.instances_list.content, orient="horizontal")
             separator.grid(
-                row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=10, sticky="ew"
+                row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew"
             )
 
         new_instance_button = CTkButton(
@@ -90,7 +90,7 @@ class Instances(CTkFrame):
             command=self.add_new_instance,
         )
         new_instance_button.grid(
-            row=len(instance_list) * 2, column=0, pady=20, padx=10, sticky="nw"
+            row=len(instance_list) * 2, column=0, pady=20, padx=0, sticky="nw"
         )
 
     def set_default_account(self) -> None:

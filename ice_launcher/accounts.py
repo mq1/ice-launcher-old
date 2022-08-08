@@ -93,16 +93,16 @@ class Accounts(CTkFrame):
             label = CTkLabel(
                 master=self.accounts_list.content, text=account["name"], anchor="w"
             )
-            label.grid(row=index * 2, column=0, pady=10, padx=10, sticky="nw")
+            label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
             delete_button = CTkButton(
                 master=self.accounts_list.content,
                 text="Delete",
                 command=lambda index=index: self.delete_account(index),
             )
-            delete_button.grid(row=index * 2, column=1, pady=10, padx=10, sticky="e")
+            delete_button.grid(row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e")
             separator = ttk.Separator(self.accounts_list.content, orient="horizontal")
             separator.grid(
-                row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=10, sticky="ew"
+                row=index * 2 + 1, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew"
             )
 
         add_account_button = CTkButton(
@@ -111,5 +111,5 @@ class Accounts(CTkFrame):
             command=self.add_account,
         )
         add_account_button.grid(
-            row=len(self.doc["accounts"]) * 2, column=0, pady=20, padx=10, sticky="nw"
+            row=len(self.doc["accounts"]) * 2, column=0, pady=20, padx=0, sticky="nw"
         )
