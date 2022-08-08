@@ -25,13 +25,7 @@ class App(CTk):
     def __init__(self) -> None:
         super().__init__()
 
-        self.views = {
-            "instances": Instances(master=self),
-            "news": News(master=self),
-            "accounts": Accounts(master=self),
-            "settings": Settings(master=self),
-            "about": About(master=self),
-        }
+        self.views = {}
 
         self.title("Ice Launcher")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
@@ -94,10 +88,6 @@ class App(CTk):
         )
         self.about_button.grid(row=5, column=0, pady=(10, 20), padx=20)
 
-        # place all views in the same place
-        for view in self.views.values():
-            view.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
-
         self.update_main_frame()
 
         if config.read()["automatically_check_for_updates"]:
@@ -107,6 +97,20 @@ class App(CTk):
         self.destroy()
 
     def update_main_frame(self) -> None:
+        if not self.current_view in self.views:
+            match self.current_view:
+                case "instances":
+                    self.views[self.current_view] = Instances(master=self)
+                case "news":
+                    self.views[self.current_view] = News(master=self)
+                case "accounts":
+                    self.views[self.current_view] = Accounts(master=self)
+                case "settings":
+                    self.views[self.current_view] = Settings(master=self)
+                case "about":
+                    self.views[self.current_view] = About(master=self)
+            self.views[self.current_view].grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
+
         self.views[self.current_view].tkraise()
         self.__dict__[f"{self.current_view}_button"].configure(fg_color="#1F6AA5")
 
