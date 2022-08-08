@@ -4,7 +4,7 @@
 
 import json
 from os import path
-from typing import TypedDict
+from typing import List, TypedDict
 
 from . import dirs
 
@@ -15,6 +15,8 @@ class Config(TypedDict):
     config_version: int
     automatically_check_for_updates: bool
     last_used_account: str
+    jvm_options: List[str]
+    jvm_memory: str
 
 
 def default() -> Config:
@@ -22,6 +24,8 @@ def default() -> Config:
         "config_version": 1,
         "automatically_check_for_updates": True,
         "last_used_account": "",
+        "jvm_options": [],
+        "jvm_memory": "2G",
     }
 
 
@@ -35,4 +39,12 @@ def read() -> Config:
         write(default())
 
     with open(__config_path__, "r") as f:
-        return json.load(f)
+        config = json.load(f)
+
+    # Update old config with new values
+    for key, value in default().items():
+        if key not in config:
+            config[key] = value
+
+    write(config)
+    return config

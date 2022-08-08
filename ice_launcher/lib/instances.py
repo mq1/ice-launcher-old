@@ -12,7 +12,7 @@ from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import MinecraftOptions
 
-from . import accounts, dirs
+from . import accounts, config, dirs
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
 
@@ -55,6 +55,8 @@ def get_info(instance_name: str) -> InstanceJson:
 
 
 def launch(instance_name: str, account_name: str, launcher_version: str) -> None:
+    conf = config.read()
+
     account = next(
         a for a in accounts.read_document()["accounts"] if a["name"] == account_name
     )
@@ -84,7 +86,8 @@ def launch(instance_name: str, account_name: str, launcher_version: str) -> None
         "uuid": account["id"],
         "token": account["access_token"],
         "executablePath": java_executable,
-        "jvmArguments": ["-Xmx2G", "-Xms2G"],
+        "jvmArguments": [f"-Xmx{conf['jvm_memory']}", f"-Xms{conf['jvm_memory']}"]
+        + conf["jvm_options"],
         "launcherName": "Ice Launcher",
         "launcherVersion": launcher_version,
         "gameDirectory": path.join(__instances_dir__, instance_name),
