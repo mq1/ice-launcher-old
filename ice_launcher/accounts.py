@@ -10,6 +10,7 @@ from tkinter import ttk
 from customtkinter import CTkButton, CTkFrame, CTkLabel
 from minecraft_launcher_lib import microsoft_account as msa
 
+from .components.heading import Heading
 from .components.scrollable_frame import ScrollableFrame
 from .lib import accounts
 
@@ -57,15 +58,8 @@ class Accounts(CTkFrame):
 
         self.doc = accounts.read_document()
 
-        self.title_frame = CTkFrame(master=self, fg_color="gray38")
-        self.title_frame.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
-
-        self.view_name = CTkLabel(
-            master=self.title_frame,
-            text_font=("Roboto Medium", 30),  # type: ignore
-            text="Accounts",
-        )
-        self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
+        heading = Heading(self, "Accounts")
+        heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         self.accounts_list = ScrollableFrame(master=self)
         self.accounts_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")

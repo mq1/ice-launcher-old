@@ -12,6 +12,7 @@ from customtkinter import (
     StringVar,
 )
 
+from .components.heading import Heading
 from .lib import config
 
 
@@ -23,15 +24,8 @@ class Settings(CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
 
-        self.title_frame = CTkFrame(master=self, fg_color="gray38")
-        self.title_frame.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
-
-        self.view_name = CTkLabel(
-            master=self.title_frame,
-            text_font=("Roboto Medium", 30),
-            text="Settings",
-        )
-        self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
+        heading = Heading(master=self, text="Settings")
+        heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         self.automatically_check_for_updates = BooleanVar()
         automatically_check_for_updates_frame = CTkFrame(master=self)

@@ -10,6 +10,7 @@ from customtkinter import CTkButton, CTkFrame, CTkLabel
 from minecraft_launcher_lib.types import Article, Articles
 from minecraft_launcher_lib.utils import get_minecraft_news
 
+from .components.heading import Heading
 from .components.scrollable_frame import ScrollableFrame
 
 
@@ -21,15 +22,8 @@ class News(CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
 
-        self.title_frame = CTkFrame(master=self, fg_color="gray38")
-        self.title_frame.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
-
-        self.view_name = CTkLabel(
-            master=self.title_frame,
-            text_font=("Roboto Medium", 30),  # type: ignore
-            text="News",
-        )
-        self.view_name.grid(row=0, column=0, pady=20, padx=20, sticky="nswe")
+        heading = Heading(master=self, text="News")
+        heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         self.news_frame = ScrollableFrame(master=self)
         self.news_frame.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
