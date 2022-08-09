@@ -75,13 +75,15 @@ class Instances(CTkFrame):
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nsw")
             edit_button = CTkButton(
                 master=self.instances_list.content,
-                text="Edit",
+                text="Edit ⚙️",
+                width=0,
                 command=lambda: EditInstance(master=self, instance_name=instance_name),
             )
             edit_button.grid(row=index * 2, column=1, pady=10, padx=0, sticky="nse")
             launch_button = CTkButton(
                 master=self.instances_list.content,
-                text="Launch",
+                text="Launch 🚀",
+                width=0,
                 command=lambda: instances.launch(
                     instance_name, self.selected_account.get(), __version__
                 ),
