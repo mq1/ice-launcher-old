@@ -87,6 +87,8 @@ class Settings(CTkFrame):
         self.reset_button = CTkButton(
             master=self.button_bar,
             text="Reset to default settings ♻️",
+            fg_color=None,
+            border_width=2,
             command=self.reset_to_default_settings,
         )
         self.reset_button.grid(row=0, column=1, pady=10, padx=10, sticky="nse")
