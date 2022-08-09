@@ -28,14 +28,14 @@ class EditInstance(CTkToplevel):
 
         rename_button = CTkButton(
             master=button_bar,
-            text="Rename",
+            text="Rename 📝",
             command=self.rename_instance,
         )
         rename_button.grid(row=0, column=1, pady=10, padx=10, sticky="nse")
 
         delete_button = CTkButton(
             master=button_bar,
-            text="Delete",
+            text="Delete 🗑️",
             command=self.delete_instance,
         )
         delete_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")
