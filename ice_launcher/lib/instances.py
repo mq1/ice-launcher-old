@@ -5,6 +5,8 @@
 import json
 import subprocess
 from os import listdir, makedirs, path
+from os import rename as mv
+from shutil import rmtree
 from typing import List, TypedDict
 
 from minecraft_launcher_lib.command import get_minecraft_command
@@ -52,6 +54,17 @@ def new(instance_name: str, minecraft_version: str) -> None:
 def get_info(instance_name: str) -> InstanceJson:
     with open(path.join(__instances_dir__, instance_name, "instance.json"), "r") as f:
         return json.load(f)
+
+
+def rename(old_name: str, new_name: str) -> None:
+    old_dir = path.join(__instances_dir__, old_name)
+    new_dir = path.join(__instances_dir__, new_name)
+    mv(old_dir, new_dir)
+
+
+def delete(instance_name: str) -> None:
+    instance_dir = path.join(__instances_dir__, instance_name)
+    rmtree(instance_dir)
 
 
 def launch(instance_name: str, account_name: str, launcher_version: str) -> None:

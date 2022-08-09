@@ -89,14 +89,14 @@ class Settings(CTkFrame):
             text="Reset to default settings",
             command=self.reset_to_default_settings,
         )
-        self.reset_button.grid(row=0, column=1, pady=10, padx=10, sticky="se")
+        self.reset_button.grid(row=0, column=1, pady=10, padx=10, sticky="nse")
 
         self.save_button = CTkButton(
             master=self.button_bar,
             text="Save",
             command=self.save,
         )
-        self.save_button.grid(row=0, column=2, pady=10, padx=10, sticky="se")
+        self.save_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")
 
         self.update_settings()
 

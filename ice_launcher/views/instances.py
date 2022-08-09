@@ -10,6 +10,7 @@ from ice_launcher.__about__ import __version__
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
 from ice_launcher.lib import accounts, config, instances
+from ice_launcher.views.edit_instance import EditInstance
 
 from .new_instance import NewInstance
 
@@ -71,7 +72,13 @@ class Instances(CTkFrame):
             label = CTkLabel(
                 master=self.instances_list.content, text=instance_name, anchor="w"
             )
-            label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
+            label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nsw")
+            edit_button = CTkButton(
+                master=self.instances_list.content,
+                text="Edit",
+                command=lambda: EditInstance(master=self, instance_name=instance_name),
+            )
+            edit_button.grid(row=index * 2, column=1, pady=10, padx=0, sticky="nse")
             launch_button = CTkButton(
                 master=self.instances_list.content,
                 text="Launch",
@@ -79,14 +86,12 @@ class Instances(CTkFrame):
                     instance_name, self.selected_account.get(), __version__
                 ),
             )
-            launch_button.grid(
-                row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e"
-            )
+            launch_button.grid(row=index * 2, column=2, pady=10, padx=10, sticky="nse")
             separator = ttk.Separator(self.instances_list.content, orient="horizontal")
             separator.grid(
                 row=index * 2 + 1,
                 column=0,
-                columnspan=2,
+                columnspan=3,
                 pady=0,
                 padx=(0, 10),
                 sticky="ew",

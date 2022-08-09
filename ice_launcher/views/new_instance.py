@@ -9,8 +9,8 @@ from ice_launcher.lib import instances, versions
 
 
 class NewInstance(CTkToplevel):
-    def __init__(self, master) -> None:
-        super().__init__(master=master)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.title("Add new instance")
         self.geometry("250x200")
 
