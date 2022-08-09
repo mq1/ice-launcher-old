@@ -101,7 +101,7 @@ class Instances(CTkFrame):
 
         new_instance_button = CTkButton(
             master=self.instances_list.content,
-            text="New Instance",
+            text="New Instance ✨",
             command=self.add_new_instance,
         )
         new_instance_button.grid(
