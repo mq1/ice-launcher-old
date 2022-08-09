@@ -70,7 +70,7 @@ class Instances(CTkFrame):
 
         for index, instance_name in enumerate(instance_list):
             label = CTkLabel(
-                master=self.instances_list.content, text=instance_name, anchor="w"
+                master=self.instances_list.content, text=f"🧊 {instance_name}", anchor="w"
             )
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nsw")
             edit_button = CTkButton(
