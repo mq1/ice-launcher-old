@@ -10,8 +10,8 @@ from customtkinter import CTkButton, CTkFrame, CTkLabel
 from minecraft_launcher_lib.types import Article, Articles
 from minecraft_launcher_lib.utils import get_minecraft_news
 
-from .components.heading import Heading
-from .components.scrollable_frame import ScrollableFrame
+from ice_launcher.components.heading import Heading
+from ice_launcher.components.scrollable_frame import ScrollableFrame
 
 
 class News(CTkFrame):

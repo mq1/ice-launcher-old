@@ -6,10 +6,11 @@ from tkinter import ttk
 
 from customtkinter import CTkButton, CTkComboBox, CTkFrame, CTkLabel, StringVar
 
-from .__about__ import __version__
-from .components.heading import Heading
-from .components.scrollable_frame import ScrollableFrame
-from .lib import accounts, config, instances
+from ice_launcher.__about__ import __version__
+from ice_launcher.components.heading import Heading
+from ice_launcher.components.scrollable_frame import ScrollableFrame
+from ice_launcher.lib import accounts, config, instances
+
 from .new_instance import NewInstance
 
 

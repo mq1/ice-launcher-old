@@ -5,7 +5,7 @@
 from customtkinter import CTkButton, CTkComboBox, CTkEntry, CTkToplevel, StringVar
 from minecraft_launcher_lib.utils import get_latest_version
 
-from .lib import instances, versions
+from ice_launcher.lib import instances, versions
 
 
 class NewInstance(CTkToplevel):

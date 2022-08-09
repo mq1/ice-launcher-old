@@ -6,8 +6,8 @@ import tkinter
 
 from customtkinter import CTkFrame, CTkLabel
 
-from .__about__ import __version__
-from .components.heading import Heading
+from ice_launcher.__about__ import __version__
+from ice_launcher.components.heading import Heading
 
 
 class About(CTkFrame):

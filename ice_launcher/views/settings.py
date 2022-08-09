@@ -14,9 +14,9 @@ from customtkinter import (
     StringVar,
 )
 
-from .components.heading import Heading
-from .components.scrollable_frame import ScrollableFrame
-from .lib import config
+from ice_launcher.components.heading import Heading
+from ice_launcher.components.scrollable_frame import ScrollableFrame
+from ice_launcher.lib import config
 
 
 class Settings(CTkFrame):

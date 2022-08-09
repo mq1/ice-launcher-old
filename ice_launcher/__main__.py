@@ -7,9 +7,14 @@ from threading import Thread
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
 
-from ice_launcher import About, Accounts, Instances, News, Settings, Update
 from ice_launcher.__about__ import __version__
 from ice_launcher.lib import config, updater
+from ice_launcher.views.about import About
+from ice_launcher.views.accounts import Accounts
+from ice_launcher.views.instances import Instances
+from ice_launcher.views.news import News
+from ice_launcher.views.settings import Settings
+from ice_launcher.views.update import Update
 
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("blue")
