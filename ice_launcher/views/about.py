@@ -16,7 +16,7 @@ class About(CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
 
-        heading = Heading(master=self, text="Ice Launcher")
+        heading = Heading(master=self, text="🧊 Ice Launcher")
         heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         self.info_frame = CTkFrame(master=self)

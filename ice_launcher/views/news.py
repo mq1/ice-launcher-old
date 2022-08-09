@@ -22,7 +22,7 @@ class News(CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
 
-        heading = Heading(master=self, text="News")
+        heading = Heading(master=self, text="🌎 News")
         heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         self.news_frame = ScrollableFrame(master=self)
@@ -43,7 +43,8 @@ class News(CTkFrame):
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
             open_button = CTkButton(
                 master=self.news_frame.content,
-                text="Open",
+                text="Open ↗️",
+                width=0,
                 command=lambda: self.open_article(article),
             )
             open_button.grid(row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e")

@@ -58,7 +58,7 @@ class Accounts(CTkFrame):
 
         self.doc = accounts.read_document()
 
-        heading = Heading(self, "Accounts")
+        heading = Heading(self, "👥 Accounts")
         heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         self.accounts_list = ScrollableFrame(master=self)
@@ -91,12 +91,13 @@ class Accounts(CTkFrame):
 
         for index, account in enumerate(self.doc["accounts"]):
             label = CTkLabel(
-                master=self.accounts_list.content, text=account["name"], anchor="w"
+                master=self.accounts_list.content, text=f"👤 {account['name']}", anchor="w"
             )
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
             delete_button = CTkButton(
                 master=self.accounts_list.content,
                 text="Delete 💣",
+                width=0,
                 command=lambda index=index: self.delete_account(index),
             )
             delete_button.grid(
@@ -114,7 +115,7 @@ class Accounts(CTkFrame):
 
         add_account_button = CTkButton(
             master=self.accounts_list.content,
-            text="Add Account",
+            text="Add Account ✨",
             command=self.add_account,
         )
         add_account_button.grid(

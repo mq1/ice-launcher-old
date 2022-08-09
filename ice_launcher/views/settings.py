@@ -27,7 +27,7 @@ class Settings(CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
 
-        heading = Heading(master=self, text="Settings")
+        heading = Heading(master=self, text="⚙️ Settings")
         heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         settings_frame = ScrollableFrame(master=self)
