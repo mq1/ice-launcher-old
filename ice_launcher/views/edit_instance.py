@@ -35,7 +35,7 @@ class EditInstance(CTkToplevel):
 
         delete_button = CTkButton(
             master=button_bar,
-            text="Delete 🗑️",
+            text="Delete 💣",
             command=self.delete_instance,
         )
         delete_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")

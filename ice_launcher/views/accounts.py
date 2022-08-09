@@ -96,7 +96,7 @@ class Accounts(CTkFrame):
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
             delete_button = CTkButton(
                 master=self.accounts_list.content,
-                text="Delete",
+                text="Delete 💣",
                 command=lambda index=index: self.delete_account(index),
             )
             delete_button.grid(
