@@ -43,7 +43,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='ice-launcher.png',
+    icon='ice_launcher/assets/ice-launcher.png',
 )
 coll = COLLECT(
     exe,
@@ -58,6 +58,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='Ice Launcher.app',
-    icon='ice-launcher.png',
+    icon='ice_launcher/assets/ice-launcher.png',
     bundle_identifier=None,
 )
