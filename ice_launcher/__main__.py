@@ -2,10 +2,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from importlib import resources
 from threading import Thread
 
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
+from PIL import Image, ImageTk
 
 from ice_launcher.__about__ import __version__
 from ice_launcher.lib import config, updater
@@ -35,6 +37,12 @@ class App(CTk):
         self.title("Ice Launcher")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        # set app icon
+        with resources.path("ice_launcher.assets", "ice-launcher.png") as image_path:
+            ico = Image.open(image_path)
+            photo = ImageTk.PhotoImage(ico)
+            self.wm_iconphoto(True, photo)  # type: ignore
 
         # configure grid layout (2x1)
         self.grid_columnconfigure(1, weight=1)
