@@ -69,9 +69,18 @@ class Instances(CTkFrame):
             instance.destroy()
 
         for index, instance_name in enumerate(instance_list):
+            instance_emoji = "⛏"
+
+            info = instances.get_info(instance_name)
+            match info["instance_type"]:
+                case instances.InstanceType.FABRIC:
+                    instance_emoji = "🧵"
+                case instances.InstanceType.FORGE:
+                    instance_emoji = "⚒️"
+
             label = CTkLabel(
                 master=self.instances_list.content,
-                text=f"🧊 {instance_name}",
+                text=f"{instance_emoji} {instance_name}",
                 anchor="w",
             )
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nsw")

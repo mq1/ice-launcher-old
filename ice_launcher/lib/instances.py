@@ -4,6 +4,7 @@
 
 import json
 import subprocess
+from enum import Enum
 from os import listdir, makedirs, path
 from os import rename as mv
 from shutil import rmtree
@@ -19,8 +20,15 @@ from . import accounts, config, dirs
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
 
 
+class InstanceType(str, Enum):
+    VANILLA = "vanilla"
+    FABRIC = "fabric"
+    FORGE = "forge"
+
+
 class InstanceJson(TypedDict):
     config_version: int
+    instance_type: InstanceType
     minecraft_version: str
 
 
@@ -36,14 +44,20 @@ def list() -> List[str]:
     return list
 
 
+def _default_instance_json() -> InstanceJson:
+    return {
+        "config_version": 1,
+        "instance_type": InstanceType.VANILLA,
+        "minecraft_version": "",
+    }
+
+
 def new(instance_name: str, minecraft_version: str) -> None:
     print("Creating instance")
     instance_dir = path.join(__instances_dir__, instance_name)
     makedirs(instance_dir)
-    instance_json: InstanceJson = {
-        "config_version": 1,
-        "minecraft_version": minecraft_version,
-    }
+    instance_json = _default_instance_json()
+    instance_json["minecraft_version"] = minecraft_version
     with open(path.join(instance_dir, "instance.json"), "w") as f:
         json.dump(instance_json, f)
 
@@ -51,9 +65,22 @@ def new(instance_name: str, minecraft_version: str) -> None:
     print("Done")
 
 
+def write_info(instance_name: str, instance_json: InstanceJson) -> None:
+    with open(path.join(__instances_dir__, instance_name, "instance.json"), "w") as f:
+        json.dump(instance_json, f)
+
+
 def get_info(instance_name: str) -> InstanceJson:
     with open(path.join(__instances_dir__, instance_name, "instance.json"), "r") as f:
-        return json.load(f)
+        info = json.load(f)
+
+    # Update old config with new values
+    for key, value in _default_instance_json().items():
+        if key not in info:
+            info[key] = value
+
+    write_info(instance_name, info)
+    return info
 
 
 def rename(old_name: str, new_name: str) -> None:
