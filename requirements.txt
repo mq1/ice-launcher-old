@@ -3,3 +3,4 @@ requests==2.28.1
 minecraft-launcher-lib==5.2
 appdirs==1.4.4
 packaging==21.3
+Pillow==9.2.0

@@ -91,7 +91,9 @@ class Accounts(CTkFrame):
 
         for index, account in enumerate(self.doc["accounts"]):
             label = CTkLabel(
-                master=self.accounts_list.content, text=f"👤 {account['name']}", anchor="w"
+                master=self.accounts_list.content,
+                text=f"👤 {account['name']}",
+                anchor="w",
             )
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
             delete_button = CTkButton(

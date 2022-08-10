@@ -23,7 +23,7 @@ class Instances(CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
 
-        heading = Heading(master=self, text="⛏️ Instances")
+        heading = Heading(master=self, text="🧊 Instances")
         heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         self.instances_list = ScrollableFrame(master=self)
@@ -70,7 +70,9 @@ class Instances(CTkFrame):
 
         for index, instance_name in enumerate(instance_list):
             label = CTkLabel(
-                master=self.instances_list.content, text=f"🧊 {instance_name}", anchor="w"
+                master=self.instances_list.content,
+                text=f"🧊 {instance_name}",
+                anchor="w",
             )
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nsw")
             edit_button = CTkButton(
