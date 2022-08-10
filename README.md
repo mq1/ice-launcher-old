@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./ice-launcher.png" alt="Ice Launcher Logo" height="128px">
+<img src="./ice_launcher/assets/ice-launcher.png" alt="Ice Launcher Logo" height="128px">
 </p>
 
 <h1 align="center">Ice Launcher</h1>
