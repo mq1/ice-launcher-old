@@ -14,6 +14,8 @@ from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import MinecraftOptions
+from minecraft_launcher_lib.microsoft_account import complete_refresh
+from ice_launcher.__about__ import __client_id__
 
 from . import accounts, config, dirs
 
@@ -96,10 +98,25 @@ def delete(instance_name: str) -> None:
 
 def launch(instance_name: str, account_name: str, launcher_version: str) -> None:
     conf = config.read()
+    account_document = accounts.read_document()
 
-    account = next(
-        a for a in accounts.read_document()["accounts"] if a["name"] == account_name
-    )
+    account = None
+    for i in range(len(account_document["accounts"])):
+        if account_document["accounts"][i]["name"] == account_name:
+            account = account_document["accounts"][i]
+            print("Refreshing account")
+            account = complete_refresh(
+                client_id=__client_id__,
+                client_secret=None,
+                redirect_uri=None,
+                refresh_token=account["refresh_token"],
+            )
+            account_document["accounts"][i] = account
+            accounts.write_document(account_document)
+            print("Account successfully refreshed")
+            break
+
+    assert(account is not None)
 
     instance_dir = path.join(__instances_dir__, instance_name)
     with open(path.join(instance_dir, "instance.json"), "r") as f:
