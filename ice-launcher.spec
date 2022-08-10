@@ -2,6 +2,7 @@
 from PyInstaller.utils.hooks import collect_data_files
 
 datas = []
+datas += collect_data_files('ice_launcher')
 datas += collect_data_files('minecraft_launcher_lib')
 datas += collect_data_files('customtkinter')
 
