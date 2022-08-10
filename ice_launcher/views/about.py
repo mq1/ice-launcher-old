@@ -3,14 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import tkinter
+import webbrowser
 from importlib import resources
-from os import path
 
-from customtkinter import CTkFrame, CTkLabel
+from customtkinter import CTkButton, CTkFrame, CTkLabel
 from PIL import Image, ImageTk
 
 from ice_launcher.__about__ import __version__
-from ice_launcher.components.heading import Heading
 
 
 class About(CTkFrame):
@@ -34,7 +33,32 @@ class About(CTkFrame):
 
         self.app_info = CTkLabel(
             master=self.info_frame,
-            text=f"Version {__version__}\n\nCopyright © 2022-present Manuel Quarneti\n\nGPL-3.0 Licensed",
+            text=f"Version {__version__}\n\nCopyright © 2022-present Manuel Quarneti",
             justify=tkinter.LEFT,
         )
         self.app_info.grid(row=1, column=0, pady=20, padx=20, sticky="w")
+
+        # empty row as spacing
+        self.grid_rowconfigure(99, weight=1)
+
+        links_bar = CTkFrame(master=self)
+        links_bar.grid(row=100, column=0, pady=0, padx=0, sticky="swe")
+
+        # empty column as spacing
+        links_bar.grid_columnconfigure(0, weight=1)
+
+        license_button = CTkButton(
+            master=links_bar,
+            text="GPL-3.0 Licensed ↗️",
+            command=lambda: webbrowser.open(
+                "https://github.com/mq1/ice-launcher/blob/main/LICENSE.txt"
+            ),
+        )
+        license_button.grid(row=0, column=1, pady=10, padx=10)
+
+        source_code_button = CTkButton(
+            master=links_bar,
+            text="Source Code ↗️",
+            command=lambda: webbrowser.open("https://github.com/mq1/ice-launcher"),
+        )
+        source_code_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")
