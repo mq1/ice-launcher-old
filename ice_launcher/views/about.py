@@ -5,9 +5,9 @@
 import tkinter
 import webbrowser
 from importlib import resources
+from tkinter import PhotoImage
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
-from PIL import Image, ImageTk
 
 from ice_launcher.__about__ import __version__
 
@@ -19,9 +19,7 @@ class About(CTkFrame):
         self.grid_columnconfigure(0, weight=1)
 
         with resources.path("ice_launcher.assets", "ice-launcher.png") as image_path:
-            self.logo_image = ImageTk.PhotoImage(
-                Image.open(image_path).resize((100, 100))
-            )
+            self.logo_image = PhotoImage(file=image_path).subsample(5)
             logo = CTkLabel(master=self, image=self.logo_image)
             logo.grid(row=0, column=0, pady=(20, 0), sticky="nswe")
 

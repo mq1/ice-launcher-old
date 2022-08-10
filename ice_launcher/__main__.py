@@ -4,10 +4,10 @@
 
 from importlib import resources
 from threading import Thread
+from tkinter import PhotoImage
 
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
-from PIL import Image, ImageTk
 
 from ice_launcher.__about__ import __version__
 from ice_launcher.lib import config, updater
@@ -40,9 +40,8 @@ class App(CTk):
 
         # set app icon
         with resources.path("ice_launcher.assets", "ice-launcher.png") as image_path:
-            ico = Image.open(image_path)
-            photo = ImageTk.PhotoImage(ico)
-            self.wm_iconphoto(True, photo)  # type: ignore
+            self.app_icon = PhotoImage(file=image_path)
+            self.wm_iconphoto(True, self.app_icon)
 
         # configure grid layout (2x1)
         self.grid_columnconfigure(1, weight=1)
