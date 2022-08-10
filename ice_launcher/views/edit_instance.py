@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from tkinter import messagebox
+
 from customtkinter import CTkButton, CTkFrame, CTkInputDialog, CTkToplevel, StringVar
 
 from ice_launcher.components.heading import Heading
@@ -54,6 +56,10 @@ class EditInstance(CTkToplevel):
         self.master.update_instance_list()  # type: ignore
 
     def delete_instance(self) -> None:
-        instances.delete(self.instance_name)
-        self.master.update_instance_list()  # type: ignore
-        self.destroy()
+        if messagebox.askyesno(
+            "Delete Instance",
+            f"Are you sure you want to delete the instance {self.instance_name}?",
+        ):
+            instances.delete(self.instance_name)
+            self.master.update_instance_list()  # type: ignore
+            self.destroy()

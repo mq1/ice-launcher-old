@@ -5,7 +5,7 @@
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
 from minecraft_launcher_lib import microsoft_account as msa
@@ -81,9 +81,12 @@ class Accounts(CTkFrame):
         self.update_accounts_list()
 
     def delete_account(self, index) -> None:
-        del self.doc["accounts"][index]
-        accounts.write_document(self.doc)
-        self.update_accounts_list()
+        if messagebox.askyesno(
+            "Delete account", "Are you sure you want to delete this account?"
+        ):
+            del self.doc["accounts"][index]
+            accounts.write_document(self.doc)
+            self.update_accounts_list()
 
     def update_accounts_list(self) -> None:
         for account in self.accounts_list.content.winfo_children():
