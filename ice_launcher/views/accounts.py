@@ -51,11 +51,11 @@ class Accounts(CTkFrame):
         httpd = HTTPServer(("127.0.0.1", 3003), handler)
         httpd.serve_forever()
 
-    def delete_account(self, index) -> None:
+    def delete_account(self, account_name: str) -> None:
         if messagebox.askyesno(
             "Delete account", "Are you sure you want to delete this account?"
         ):
-            del self.doc["accounts"][index]
+            del self.doc["accounts"][account_name]
             accounts.write_document(self.doc)
             self.update_accounts_list()
 
@@ -74,7 +74,7 @@ class Accounts(CTkFrame):
                 master=self.accounts_list.content,
                 text="Delete 💣",
                 width=0,
-                command=lambda index=index: self.delete_account(index),
+                command=lambda: self.delete_account(account["name"]),
             )
             delete_button.grid(
                 row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e"
