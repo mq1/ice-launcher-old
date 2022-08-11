@@ -57,7 +57,7 @@ def _default_instance_json() -> InstanceJson:
 
 
 def new(instance_name: str, minecraft_version: str, callback: CallbackDict) -> None:
-    print("Creating instance")
+    print(f"Creating instance {instance_name}")
     instance_dir = path.join(__instances_dir__, instance_name)
     makedirs(instance_dir)
     instance_json = _default_instance_json()
