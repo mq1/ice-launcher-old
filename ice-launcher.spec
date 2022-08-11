@@ -11,7 +11,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['ice_launcher/app.py'],
+    ['ice_launcher/__main__.py'],
     pathex=[],
     binaries=[],
     datas=datas,
