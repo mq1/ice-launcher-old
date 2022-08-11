@@ -4,9 +4,17 @@
 
 from threading import Thread
 
-from customtkinter import CTkButton, CTkComboBox, CTkEntry, CTkToplevel, StringVar, CTkLabel, CTkProgressBar
-from minecraft_launcher_lib.utils import get_latest_version
+from customtkinter import (
+    CTkButton,
+    CTkComboBox,
+    CTkEntry,
+    CTkLabel,
+    CTkProgressBar,
+    CTkToplevel,
+    StringVar,
+)
 from minecraft_launcher_lib.types import CallbackDict
+from minecraft_launcher_lib.utils import get_latest_version
 
 from ice_launcher.lib import instances, versions
 
@@ -50,7 +58,7 @@ class NewInstance(CTkToplevel):
 
         for widget in self.winfo_children():
             widget.destroy()
-        
+
         self.title(f"Creating instance {instance_name}")
         self.geometry("600x100")
 
@@ -63,9 +71,9 @@ class NewInstance(CTkToplevel):
 
         def set_status(status: str) -> None:
             self.status_label.configure(text=status)
-        
+
         def set_progress(progress: int) -> None:
-            self.progress_bar.set(progress/self.max_progress)
+            self.progress_bar.set(progress / self.max_progress)
 
         def set_max(value: int) -> None:
             self.max_progress = value
