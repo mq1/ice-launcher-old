@@ -38,7 +38,6 @@ class Accounts(CTkFrame):
 
         button_bar = CTkFrame(master=self)
         button_bar.grid(row=100, column=0, pady=0, padx=0, sticky="nwe")
-        button_bar.grid_columnconfigure(0, weight=1)
 
         add_account_button = CTkButton(
             master=button_bar,
@@ -46,8 +45,9 @@ class Accounts(CTkFrame):
             command=self.add_account,
         )
         add_account_button.grid(
-            row=0, column=1, pady=10, padx=10, sticky="nse"
+            row=0, column=0, pady=10, padx=10, sticky="nse"
         )
+        button_bar.grid_columnconfigure(1, weight=1)
 
         self.update_accounts_list()
 

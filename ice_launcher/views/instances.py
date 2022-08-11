@@ -32,11 +32,20 @@ class Instances(CTkFrame):
         status_bar = CTkFrame(master=self)
         status_bar.grid(row=100, column=0, pady=0, padx=0, sticky="swe")
 
+        new_instance_button = CTkButton(
+            master=status_bar,
+            text="New Instance ✨",
+            command=self.add_new_instance,
+        )
+        new_instance_button.grid(
+            row=0, column=0, pady=10, padx=10, sticky="nsw"
+        )
+
         # empty column as spacing
-        status_bar.grid_columnconfigure(0, weight=1)
+        status_bar.grid_columnconfigure(1, weight=1)
 
         account_label = CTkLabel(master=status_bar, text="Account:", anchor="e")
-        account_label.grid(row=0, column=1, pady=0, padx=0, sticky="nse")
+        account_label.grid(row=0, column=2, pady=0, padx=0, sticky="nse")
 
         self.selected_account = StringVar()
         account_selector = CTkComboBox(
@@ -45,7 +54,7 @@ class Instances(CTkFrame):
             command=lambda _: self.update_account_list(),
             variable=self.selected_account,
         )
-        account_selector.grid(row=0, column=2, pady=10, padx=10, sticky="e")
+        account_selector.grid(row=0, column=3, pady=10, padx=10, sticky="e")
 
         self.update_instance_list()
         self.set_default_account()
@@ -108,15 +117,6 @@ class Instances(CTkFrame):
                 padx=(0, 10),
                 sticky="ew",
             )
-
-        new_instance_button = CTkButton(
-            master=self.instances_list.content,
-            text="New Instance ✨",
-            command=self.add_new_instance,
-        )
-        new_instance_button.grid(
-            row=len(instance_list) * 2, column=0, pady=20, padx=0, sticky="nw"
-        )
 
     def set_default_account(self) -> None:
         c = config.read()
