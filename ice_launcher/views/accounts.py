@@ -36,6 +36,19 @@ class Accounts(CTkFrame):
         self.accounts_list.grid(row=1, column=0, pady=20, padx=20, sticky="nswe")
         self.grid_rowconfigure(1, weight=1)
 
+        button_bar = CTkFrame(master=self)
+        button_bar.grid(row=100, column=0, pady=0, padx=0, sticky="nwe")
+        button_bar.grid_columnconfigure(0, weight=1)
+
+        add_account_button = CTkButton(
+            master=button_bar,
+            text="Add Account ✨",
+            command=self.add_account,
+        )
+        add_account_button.grid(
+            row=0, column=1, pady=10, padx=10, sticky="nse"
+        )
+
         self.update_accounts_list()
 
     def add_account(self) -> None:
@@ -59,44 +72,41 @@ class Accounts(CTkFrame):
             accounts.write_document(self.doc)
             self.update_accounts_list()
 
+    def add_account_to_list(self, account_name: str) -> None:
+        accounts_count = len(self.accounts_list.content.winfo_children())
+        account_index = accounts_count+1
+
+        label = CTkLabel(
+            master=self.accounts_list.content,
+            text=f"👤 {account_name}",
+            anchor="w",
+        )
+        label.grid(row=account_index, column=0, pady=10, padx=0, sticky="nw")
+        delete_button = CTkButton(
+            master=self.accounts_list.content,
+            text="Delete 💣",
+            width=0,
+            command=lambda: self.delete_account(account_name),
+        )
+        delete_button.grid(
+            row=account_index, column=1, pady=10, padx=(0, 10), sticky="e"
+        )
+        separator = ttk.Separator(self.accounts_list.content, orient="horizontal")
+        separator.grid(
+            row=account_index + 1,
+            column=0,
+            columnspan=2,
+            pady=0,
+            padx=(0, 10),
+            sticky="ew",
+        )
+
     def update_accounts_list(self) -> None:
         for account in self.accounts_list.content.winfo_children():
             account.destroy()
 
-        for index, account in enumerate(self.doc["accounts"].values()):
-            label = CTkLabel(
-                master=self.accounts_list.content,
-                text=f"👤 {account['name']}",
-                anchor="w",
-            )
-            label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
-            delete_button = CTkButton(
-                master=self.accounts_list.content,
-                text="Delete 💣",
-                width=0,
-                command=lambda: self.delete_account(account["name"]),
-            )
-            delete_button.grid(
-                row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e"
-            )
-            separator = ttk.Separator(self.accounts_list.content, orient="horizontal")
-            separator.grid(
-                row=index * 2 + 1,
-                column=0,
-                columnspan=2,
-                pady=0,
-                padx=(0, 10),
-                sticky="ew",
-            )
-
-        add_account_button = CTkButton(
-            master=self.accounts_list.content,
-            text="Add Account ✨",
-            command=self.add_account,
-        )
-        add_account_button.grid(
-            row=len(self.doc["accounts"]) * 2, column=0, pady=20, padx=0, sticky="nw"
-        )
+        for account in self.doc["accounts"].keys():
+            self.add_account_to_list(account)
 
 
 class CallbackHandler(BaseHTTPRequestHandler):
@@ -127,5 +137,5 @@ class CallbackHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"<p>You can close this window.</p>")
         self.wfile.write(b"</body></html>")
 
-        Thread(target=self.master.update_accounts_list).start()
+        self.master.add_account_to_list(login_data["name"])
         Thread(target=self.server.shutdown).start()
