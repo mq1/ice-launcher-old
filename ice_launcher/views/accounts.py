@@ -18,36 +18,6 @@ from ice_launcher.lib import accounts
 __redirect_uri__: str = "http://localhost:3003"
 
 
-class CallbackHandler(BaseHTTPRequestHandler):
-    state: str
-    code_verifier: str
-
-    def do_GET(self) -> None:
-        auth_code = msa.parse_auth_code_url(self.path, self.state)
-
-        login_data = msa.complete_login(
-            client_id=__client_id__,
-            client_secret=None,
-            redirect_uri=__redirect_uri__,
-            auth_code=auth_code,
-            code_verifier=self.code_verifier,
-        )
-
-        doc = accounts.read_document()
-        doc["accounts"].append(login_data)
-        accounts.write_document(doc)
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(b"<html><head><title>Login</title></head>")
-        self.wfile.write(b"<body><p>You have been logged in.</p>")
-        self.wfile.write(b"<p>You can close this window.</p>")
-        self.wfile.write(b"</body></html>")
-
-        Thread(target=self.server.shutdown).start()
-
-
 class Accounts(CTkFrame):
     doc: accounts.Document
 
@@ -76,9 +46,9 @@ class Accounts(CTkFrame):
         handler = CallbackHandler
         handler.state = state
         handler.code_verifier = code_verifier
+        handler.master = self
         httpd = HTTPServer(("127.0.0.1", 3003), handler)
         httpd.serve_forever()
-        self.update_accounts_list()
 
     def delete_account(self, index) -> None:
         if messagebox.askyesno(
@@ -126,3 +96,35 @@ class Accounts(CTkFrame):
         add_account_button.grid(
             row=len(self.doc["accounts"]) * 2, column=0, pady=20, padx=0, sticky="nw"
         )
+
+
+class CallbackHandler(BaseHTTPRequestHandler):
+    state: str
+    code_verifier: str
+    master: Accounts
+
+    def do_GET(self) -> None:
+        auth_code = msa.parse_auth_code_url(self.path, self.state)
+
+        login_data = msa.complete_login(
+            client_id=__client_id__,
+            client_secret=None,
+            redirect_uri=__redirect_uri__,
+            auth_code=auth_code,
+            code_verifier=self.code_verifier,
+        )
+
+        doc = accounts.read_document()
+        doc["accounts"].append(login_data)
+        accounts.write_document(doc)
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(b"<html><head><title>Login</title></head>")
+        self.wfile.write(b"<body><p>You have been logged in.</p>")
+        self.wfile.write(b"<p>You can close this window.</p>")
+        self.wfile.write(b"</body></html>")
+
+        self.master.update_accounts_list()
+        Thread(target=self.server.shutdown).start()
