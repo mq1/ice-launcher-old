@@ -5,6 +5,7 @@
 import json
 import subprocess
 from enum import Enum
+from importlib.metadata import version
 from os import listdir, makedirs, path
 from os import rename as mv
 from shutil import rmtree
@@ -12,10 +13,11 @@ from typing import List, TypedDict
 
 from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.install import install_minecraft_version
+from minecraft_launcher_lib.microsoft_account import complete_refresh
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import MinecraftOptions
-from minecraft_launcher_lib.microsoft_account import complete_refresh
-from ice_launcher.__about__ import __client_id__
+
+from ice_launcher import __client_id__
 
 from . import accounts, config, dirs
 
@@ -96,7 +98,7 @@ def delete(instance_name: str) -> None:
     rmtree(instance_dir)
 
 
-def launch(instance_name: str, account_name: str, launcher_version: str) -> None:
+def launch(instance_name: str, account_name: str) -> None:
     conf = config.read()
     account_document = accounts.read_document()
 
@@ -116,7 +118,7 @@ def launch(instance_name: str, account_name: str, launcher_version: str) -> None
             print("Account successfully refreshed")
             break
 
-    assert(account is not None)
+    assert account is not None
 
     instance_dir = path.join(__instances_dir__, instance_name)
     with open(path.join(instance_dir, "instance.json"), "r") as f:
@@ -146,7 +148,7 @@ def launch(instance_name: str, account_name: str, launcher_version: str) -> None
         "jvmArguments": [f"-Xmx{conf['jvm_memory']}", f"-Xms{conf['jvm_memory']}"]
         + conf["jvm_options"],
         "launcherName": "Ice Launcher",
-        "launcherVersion": launcher_version,
+        "launcherVersion": version("ice_launcher"),
         "gameDirectory": path.join(__instances_dir__, instance_name),
     }
 

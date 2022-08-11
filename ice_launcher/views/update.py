@@ -4,10 +4,9 @@
 
 import sys
 import webbrowser
+from importlib.metadata import version
 
 from customtkinter import CTkButton, CTkLabel, CTkToplevel
-
-from ice_launcher.__about__ import __version__
 
 
 class Update(CTkToplevel):
@@ -19,7 +18,7 @@ class Update(CTkToplevel):
         self.grid_columnconfigure(0, weight=1)
 
         self.current_release = CTkLabel(
-            master=self, text=f"Current version: {__version__}"
+            master=self, text=f"Current version: {version('ice_launcher')}"
         )
         self.current_release.grid(
             row=0, column=0, columnspan=2, pady=(20, 10), padx=20, sticky="nswe"

@@ -9,7 +9,6 @@ from tkinter import PhotoImage
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
 
-from ice_launcher.__about__ import __version__
 from ice_launcher.lib import config, updater
 from ice_launcher.views.about import About
 from ice_launcher.views.accounts import Accounts
@@ -135,11 +134,14 @@ class App(CTk):
         self.update_main_frame()
 
     def check_for_updates(self) -> None:
-        latest_version = updater.check_for_updates(__version__)
+        latest_version = updater.check_for_updates()
         if latest_version:
             Update(master=self, latest_version=latest_version)
 
 
+def main():
+    App().mainloop()
+
+
 if __name__ == "__main__":
-    app: App = App()
-    app.mainloop()
+    main()

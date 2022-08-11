@@ -1,96 +1,34 @@
-[build-system]
-requires = ["hatchling", "hatch-requirements-txt"]
-build-backend = "hatchling.build"
-
-[project]
+[tool.poetry]
 name = "ice-launcher"
-description = 'An unofficial WIP Minecraft Launcher'
-readme = "README.md"
-requires-python = ">=3.10"
+version = "0.0.12"
+description = "An unofficial WIP Minecraft Launcher"
 license = "GPL-3.0-only"
-keywords = []
-authors = [
-  { name = "Manuel Quarneti", email = "manuelquarneti@gmail.com" },
-]
-classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: Implementation :: CPython",
-]
-dynamic = ["version", "dependencies"]
+authors = ["Manuel Quarneti <manuelquarneti@gmail.com>"]
+readme = "README.md"
+homepage = "https://github.com/mq1/ice-launcher#readme"
+repository = "https://github.com/mq1/ice-launcher"
+keywords = ["minecraft", "minecraft-launcher"]
 
-[project.urls]
-Documentation = "https://github.com/mq1/ice-launcher#readme"
-Issues = "https://github.com/mq1/ice-launcher/issues"
-Source = "https://github.com/mq1/ice-launcher"
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+customtkinter = "^4.5.10"
+requests = "^2.28.1"
+appdirs = "^1.4.4"
+packaging = "^21.3"
+minecraft-launcher-lib = "^5.2"
 
-[tool.hatch.version]
-path = "ice_launcher/__about__.py"
+[tool.poetry.dev-dependencies]
+pyinstaller = "^5.3"
+Pillow = "^9.2.0"
+black = "^22.6.0"
+isort = "^5.10.1"
 
-[tool.hatch.metadata.hooks.requirements_txt]
-filename = "requirements.txt"
+[tool.poetry.scripts]
+start = "ice_launcher.__main__:main"
 
-[tool.hatch.build.targets.sdist]
-[tool.hatch.build.targets.wheel]
-
-[project.optional-dependencies]
-lint = [
-  "black",
-  "isort"
-]
-types = [
-  "mypy",
-  "pytype"
-]
-pyinstaller = [
-  "pyinstaller",
-  "Pillow"
-]
-dev = [
-  "ice-launcher[lint,types,pyinstaller]"
-]
-
-[tool.hatch.envs.dev]
-features = [
-  "dev"
-]
-
-[tool.hatch.envs.default.scripts]
-start = "python ice_launcher"
-
-[tool.hatch.envs.dev.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ice_launcher --cov=tests"
-no-cov = "cov --no-cov"
-check-types = "mypy ice_launcher"
-generate-types = "pytype ice_launcher"
-format = "black ice_launcher"
-sort-imports = "isort ice_launcher"
-
-[tool.hatch.envs.pyinstaller]
-features = [
-  "pyinstaller"
-]
-
-[tool.hatch.envs.pyinstaller.scripts]
-build = "python -OO -m PyInstaller ice-launcher.spec"
-
-[[tool.hatch.envs.test.matrix]]
-python = ["310"]
-
-[tool.coverage.run]
-branch = true
-parallel = true
-omit = [
-  "ice_launcher/__about__.py",
-]
-
-[tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"

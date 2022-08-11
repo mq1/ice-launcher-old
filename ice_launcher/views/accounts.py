@@ -10,10 +10,10 @@ from tkinter import messagebox, ttk
 from customtkinter import CTkButton, CTkFrame, CTkLabel
 from minecraft_launcher_lib import microsoft_account as msa
 
+from ice_launcher import __client_id__
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
 from ice_launcher.lib import accounts
-from ice_launcher.__about__ import __client_id__
 
 __redirect_uri__: str = "http://localhost:3003"
 

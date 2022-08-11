@@ -6,7 +6,6 @@ from tkinter import ttk
 
 from customtkinter import CTkButton, CTkComboBox, CTkFrame, CTkLabel, StringVar
 
-from ice_launcher.__about__ import __version__
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
 from ice_launcher.lib import accounts, config, instances
@@ -96,7 +95,7 @@ class Instances(CTkFrame):
                 text="Launch 🚀",
                 width=0,
                 command=lambda: instances.launch(
-                    instance_name, self.selected_account.get(), __version__
+                    instance_name, self.selected_account.get()
                 ),
             )
             launch_button.grid(row=index * 2, column=2, pady=10, padx=10, sticky="nse")
