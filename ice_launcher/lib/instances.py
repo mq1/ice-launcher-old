@@ -15,7 +15,7 @@ from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.microsoft_account import complete_refresh
 from minecraft_launcher_lib.runtime import get_executable_path
-from minecraft_launcher_lib.types import MinecraftOptions
+from minecraft_launcher_lib.types import MinecraftOptions, CallbackDict
 
 from ice_launcher import __client_id__
 
@@ -56,7 +56,7 @@ def _default_instance_json() -> InstanceJson:
     }
 
 
-def new(instance_name: str, minecraft_version: str) -> None:
+def new(instance_name: str, minecraft_version: str, callback: CallbackDict) -> None:
     print("Creating instance")
     instance_dir = path.join(__instances_dir__, instance_name)
     makedirs(instance_dir)
@@ -65,7 +65,7 @@ def new(instance_name: str, minecraft_version: str) -> None:
     with open(path.join(instance_dir, "instance.json"), "w") as f:
         json.dump(instance_json, f)
 
-    install_minecraft_version(minecraft_version, dirs.user_data_dir)
+    install_minecraft_version(minecraft_version, dirs.user_data_dir, callback)
     print("Done")
 
 

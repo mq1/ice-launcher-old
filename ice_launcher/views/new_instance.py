@@ -4,8 +4,9 @@
 
 from threading import Thread
 
-from customtkinter import CTkButton, CTkComboBox, CTkEntry, CTkToplevel, StringVar
+from customtkinter import CTkButton, CTkComboBox, CTkEntry, CTkToplevel, StringVar, CTkLabel, CTkProgressBar
 from minecraft_launcher_lib.utils import get_latest_version
+from minecraft_launcher_lib.types import CallbackDict
 
 from ice_launcher.lib import instances, versions
 
@@ -44,6 +45,44 @@ class NewInstance(CTkToplevel):
         self.version.set(get_latest_version()["release"])
 
     def create_instance(self) -> None:
-        instances.new(self.instance_name.get(), self.version.get())
-        self.master.update_instance_list()  # type: ignore
-        self.destroy()
+        instance_name = self.instance_name.get()
+        version_id = self.version.get()
+
+        for widget in self.winfo_children():
+            widget.destroy()
+        
+        self.title(f"Creating instance {instance_name}")
+        self.geometry("600x100")
+
+        self.status_label = CTkLabel(master=self, text="Creating instance...")
+        self.status_label.grid(row=0, column=0, pady=10, padx=20)
+
+        self.progress_bar = CTkProgressBar(master=self)
+        self.progress_bar.grid(row=1, column=0, pady=10, padx=20)
+        self.max_progress = 0
+
+        def set_status(status: str) -> None:
+            self.status_label.configure(text=status)
+        
+        def set_progress(progress: int) -> None:
+            self.progress_bar.set(progress/self.max_progress)
+
+        def set_max(value: int) -> None:
+            self.max_progress = value
+
+        callback: CallbackDict = {
+            "setStatus": set_status,
+            "setProgress": set_progress,
+            "setMax": set_max,
+        }
+
+        def new_instance():
+            instances.new(
+                instance_name,
+                version_id,
+                callback,
+            )
+            self.master.update_instance_list()  # type: ignore
+            self.destroy()
+
+        Thread(target=new_instance).start()
