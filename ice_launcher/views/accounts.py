@@ -6,6 +6,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
 from tkinter import messagebox, ttk
+from typing import Any
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
 from minecraft_launcher_lib import microsoft_account as msa
@@ -46,7 +47,7 @@ class Accounts(CTkFrame):
         handler = CallbackHandler
         handler.state = state
         handler.code_verifier = code_verifier
-        handler.master = self
+        handler.callback_function = lambda: self.update_accounts_list()
         httpd = HTTPServer(("127.0.0.1", 3003), handler)
         httpd.serve_forever()
 
@@ -101,7 +102,7 @@ class Accounts(CTkFrame):
 class CallbackHandler(BaseHTTPRequestHandler):
     state: str
     code_verifier: str
-    master: Accounts
+    callback_function: Any
 
     def do_GET(self) -> None:
         auth_code = msa.parse_auth_code_url(self.path, self.state)
@@ -126,5 +127,5 @@ class CallbackHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"<p>You can close this window.</p>")
         self.wfile.write(b"</body></html>")
 
-        self.master.update_accounts_list()
+        self.callback_function()
         Thread(target=self.server.shutdown).start()
