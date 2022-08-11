@@ -45,4 +45,5 @@ class NewInstance(CTkToplevel):
 
     def create_instance(self) -> None:
         instances.new(self.instance_name.get(), self.version.get())
+        self.master.update_instance_list()  # type: ignore
         self.destroy()
