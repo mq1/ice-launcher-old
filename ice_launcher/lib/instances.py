@@ -9,8 +9,10 @@ from importlib.metadata import version
 from os import listdir, makedirs, path
 from os import rename as mv
 from shutil import rmtree
-from typing import List, TypedDict
+from typing import Any, List, TypedDict, cast
 
+import tomli
+import tomli_w
 from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.microsoft_account import complete_refresh
@@ -30,7 +32,7 @@ class InstanceType(str, Enum):
     FORGE = "forge"
 
 
-class InstanceJson(TypedDict):
+class InstanceInfo(TypedDict):
     config_version: int
     instance_type: InstanceType
     minecraft_version: str
@@ -48,7 +50,7 @@ def list() -> List[str]:
     return list
 
 
-def _default_instance_json() -> InstanceJson:
+def _default_instance_info() -> InstanceInfo:
     return {
         "config_version": 1,
         "instance_type": InstanceType.VANILLA,
@@ -60,26 +62,24 @@ def new(instance_name: str, minecraft_version: str, callback: CallbackDict) -> N
     print(f"Creating instance {instance_name}")
     instance_dir = path.join(__instances_dir__, instance_name)
     makedirs(instance_dir)
-    instance_json = _default_instance_json()
-    instance_json["minecraft_version"] = minecraft_version
-    with open(path.join(instance_dir, "instance.json"), "w") as f:
-        json.dump(instance_json, f)
-
+    instance_info = _default_instance_info()
+    instance_info["minecraft_version"] = minecraft_version
+    write_info(instance_name, instance_info)
     install_minecraft_version(minecraft_version, dirs.user_data_dir, callback)
     print("Done")
 
 
-def write_info(instance_name: str, instance_json: InstanceJson) -> None:
-    with open(path.join(__instances_dir__, instance_name, "instance.json"), "w") as f:
-        json.dump(instance_json, f)
+def write_info(instance_name: str, instance_info: InstanceInfo) -> None:
+    with open(path.join(__instances_dir__, instance_name, "instance.toml"), "wb") as f:
+        tomli_w.dump(cast(dict[str, Any], instance_info), f)
 
 
-def get_info(instance_name: str) -> InstanceJson:
-    with open(path.join(__instances_dir__, instance_name, "instance.json"), "r") as f:
-        info = json.load(f)
+def get_info(instance_name: str) -> InstanceInfo:
+    with open(path.join(__instances_dir__, instance_name, "instance.toml"), "rb") as f:
+        info = cast(InstanceInfo, tomli.load(f))
 
     # Update old config with new values
-    for key, value in _default_instance_json().items():
+    for key, value in _default_instance_info().items():
         if key not in info:
             info[key] = value
 
@@ -102,34 +102,28 @@ def launch(instance_name: str, account_name: str) -> None:
     conf = config.read()
     account_document = accounts.read_document()
 
-    account = None
-    for i in range(len(account_document["accounts"])):
-        if account_document["accounts"][i]["name"] == account_name:
-            account = account_document["accounts"][i]
-            print("Refreshing account")
-            account = complete_refresh(
-                client_id=__client_id__,
-                client_secret=None,
-                redirect_uri=None,
-                refresh_token=account["refresh_token"],
-            )
-            account_document["accounts"][i] = account
-            accounts.write_document(account_document)
-            print("Account successfully refreshed")
-            break
+    account = account_document["accounts"][account_name]
+    print("Refreshing account")
+    account = complete_refresh(
+        client_id=__client_id__,
+        client_secret=None,
+        redirect_uri=None,
+        refresh_token=account["refresh_token"],
+    )
+    account_document["accounts"][account_name] = account
+    accounts.write_document(account_document)
+    print("Account successfully refreshed")
 
     assert account is not None
 
-    instance_dir = path.join(__instances_dir__, instance_name)
-    with open(path.join(instance_dir, "instance.json"), "r") as f:
-        instance_json: InstanceJson = json.load(f)
+    instance_info = get_info(instance_name)
 
     with open(
         path.join(
             dirs.user_data_dir,
             "versions",
-            instance_json["minecraft_version"],
-            f"{instance_json['minecraft_version']}.json",
+            instance_info["minecraft_version"],
+            f"{instance_info['minecraft_version']}.json",
         ),
         "r",
     ) as f:
@@ -153,6 +147,6 @@ def launch(instance_name: str, account_name: str) -> None:
     }
 
     minecraft_command = get_minecraft_command(
-        instance_json["minecraft_version"], dirs.user_data_dir, options
+        instance_info["minecraft_version"], dirs.user_data_dir, options
     )
     subprocess.call(minecraft_command)

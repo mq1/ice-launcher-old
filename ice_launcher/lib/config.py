@@ -2,13 +2,15 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import json
 from os import path
-from typing import List, TypedDict
+from typing import Any, List, TypedDict, cast
+
+import tomli
+import tomli_w
 
 from . import dirs
 
-__config_path__: str = path.join(dirs.user_data_dir, "config.json")
+__config_path__: str = path.join(dirs.user_data_dir, "config.toml")
 
 
 class Config(TypedDict):
@@ -30,16 +32,16 @@ def default() -> Config:
 
 
 def write(config: Config) -> None:
-    with open(__config_path__, "w") as f:
-        json.dump(config, f)
+    with open(__config_path__, "wb") as f:
+        tomli_w.dump(cast(dict[str, Any], config), f)
 
 
 def read() -> Config:
     if not path.exists(__config_path__):
         write(default())
 
-    with open(__config_path__, "r") as f:
-        config = json.load(f)
+    with open(__config_path__, "rb") as f:
+        config = cast(Config, tomli.load(f))
 
     # Update old config with new values
     for key, value in default().items():

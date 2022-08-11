@@ -62,7 +62,7 @@ class Accounts(CTkFrame):
         for account in self.accounts_list.content.winfo_children():
             account.destroy()
 
-        for index, account in enumerate(self.doc["accounts"]):
+        for index, account in enumerate(self.doc["accounts"].values()):
             label = CTkLabel(
                 master=self.accounts_list.content,
                 text=f"👤 {account['name']}",
@@ -115,7 +115,7 @@ class CallbackHandler(BaseHTTPRequestHandler):
         )
 
         doc = accounts.read_document()
-        doc["accounts"].append(login_data)
+        doc["accounts"][login_data["name"]] = login_data
         accounts.write_document(doc)
 
         self.send_response(200)

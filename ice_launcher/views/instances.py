@@ -18,7 +18,7 @@ class Instances(CTkFrame):
     def __init__(self, master) -> None:
         super().__init__(master=master)
 
-        self.account_list = [a["name"] for a in accounts.read_document()["accounts"]]
+        self.account_list = list(accounts.read_document()["accounts"].keys())
 
         self.grid_columnconfigure(0, weight=1)
 
@@ -126,7 +126,7 @@ class Instances(CTkFrame):
             self.selected_account.set(self.account_list[0])
 
     def update_account_list(self) -> None:
-        self.account_list = [a["name"] for a in accounts.read_document()["accounts"]]
+        self.account_list = list(accounts.read_document()["accounts"].keys())
 
         # update last used account
         c = config.read()
