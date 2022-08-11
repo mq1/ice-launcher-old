@@ -47,6 +47,7 @@ class Accounts(CTkFrame):
         handler = CallbackHandler
         handler.state = state
         handler.code_verifier = code_verifier
+        handler.master = self
         httpd = HTTPServer(("127.0.0.1", 3003), handler)
         httpd.serve_forever()
 
@@ -101,6 +102,7 @@ class Accounts(CTkFrame):
 class CallbackHandler(BaseHTTPRequestHandler):
     state: str
     code_verifier: str
+    master: Accounts
 
     def do_GET(self) -> None:
         auth_code = msa.parse_auth_code_url(self.path, self.state)
@@ -125,4 +127,5 @@ class CallbackHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"<p>You can close this window.</p>")
         self.wfile.write(b"</body></html>")
 
+        Thread(target=self.master.update_accounts_list).start()
         Thread(target=self.server.shutdown).start()
