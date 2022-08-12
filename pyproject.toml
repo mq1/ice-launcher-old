@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ice-launcher"
-version = "0.0.14"
+version = "0.0.15"
 description = "An unofficial WIP Minecraft Launcher"
 license = "GPL-3.0-only"
 authors = ["Manuel Quarneti <manuelquarneti@gmail.com>"]
