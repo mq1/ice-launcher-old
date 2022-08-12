@@ -3,7 +3,7 @@
 ref_name="$1"
 arch="$(uname -m)"
 
-test -f "IceLauncher-macos-${ref_name}-${arch}.dmg" && rm "IceLauncher-macos-${ref_name}-${arch}.dmg"
+test -f "IceLauncher-${ref_name}-macos-${arch}.dmg" && rm "IceLauncher-${ref_name}-macos-${arch}.dmg"
 
 create-dmg \
     --volname "Ice Launcher Installer" \
@@ -13,5 +13,5 @@ create-dmg \
     --app-drop-link 200 100 \
     --no-internet-enable \
     --format ULMO \
-    "IceLauncher-macos-${ref_name}-${arch}.dmg" \
+    "IceLauncher-${ref_name}-macos-${arch}.dmg" \
     dist/Ice\ Launcher.app
