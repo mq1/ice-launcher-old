@@ -26,10 +26,10 @@ jobs:
       - run: poetry install
       - run: poetry run python -OO -m PyInstaller ice-launcher.spec
       - run: brew install create-dmg
-      - run: sh build-dmg.sh
+      - run: sh build-dmg.sh ${{github.ref_name}}
       - uses: softprops/action-gh-release@v1
         with:
-          files: IceLauncher-macos-x86_64.dmg
+          files: IceLauncher-macos-${{github.ref_name}}-x86_64.dmg
   build-ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -40,10 +40,10 @@ jobs:
       - run: python -m pip install poetry
       - run: poetry install
       - run: poetry run python -OO -m PyInstaller ice-launcher.spec
-      - run: tar cavf "IceLauncher-linux-x86_64.tar.xz" "dist/Ice Launcher"
+      - run: tar cavf "IceLauncher-linux-${{github.ref_name}}-x86_64.tar.xz" "dist/Ice Launcher/"
       - uses: softprops/action-gh-release@v1
         with:
-          files: IceLauncher-linux-x86_64.tar.xz
+          files: IceLauncher-${{github.ref_name}}-linux-x86_64.tar.xz
   build-windows:
     runs-on: windows-latest
     steps:
@@ -54,7 +54,7 @@ jobs:
       - run: python -m pip install poetry
       - run: poetry install
       - run: poetry run python -OO -m PyInstaller ice-launcher.spec
-      - run: Compress-Archive -Path 'dist\Ice Launcher' -DestinationPath 'IceLauncher-windows-x86_64.zip'
+      - run: Compress-Archive -Path 'dist\Ice Launcher\' -DestinationPath 'IceLauncher-windows-${{github.ref_name}}-x86_64.zip'
       - uses: softprops/action-gh-release@v1
         with:
-          files: IceLauncher-windows-x86_64.zip
+          files: IceLauncher-windows-${{github.ref_name}}-x86_64.zip
