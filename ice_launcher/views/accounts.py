@@ -64,13 +64,13 @@ class Accounts(CTkFrame):
             anchor="w",
         )
         label.grid(row=index, column=0, pady=10, padx=0, sticky="nsw")
-        delete_button = CTkButton(
+        remove_button = CTkButton(
             master=self.accounts_list.content,
-            text="Delete 💣",
+            text="Remove 💣",
             width=0,
             command=lambda: self.remove_account(account_id),
         )
-        delete_button.grid(row=index, column=1, pady=10, padx=10, sticky="nse")
+        remove_button.grid(row=index, column=1, pady=10, padx=10, sticky="nse")
         select_button = CTkButton(
             master=self.accounts_list.content,
             text="Select ✅",
