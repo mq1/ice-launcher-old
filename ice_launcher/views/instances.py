@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from subprocess import Popen
 from tkinter import ttk
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
@@ -53,7 +54,16 @@ class Instances(CTkFrame):
         self.master.open_view("new_instance")  # type: ignore
 
     def edit_instance(self, instance_name: str) -> None:
+        self.master.views["edit_instance"].update_instance(instance_name)  # type: ignore
         self.master.open_view("edit_instance", options={"instance_name": instance_name})  # type: ignore
+
+    def launch_instance(self, instance_name: str) -> None:
+        self.master.open_view("logs")  # type: ignore
+
+        def show_logs(process: Popen):
+            self.master.views["logs"].update_logs(process)  # type: ignore
+
+        instances.launch(instance_name, self.selected_account[0], show_logs)  # type: ignore
 
     def update_selected_account(self) -> None:
         self.selected_account = accounts.get_active_account()
@@ -94,7 +104,7 @@ class Instances(CTkFrame):
                 master=self.instances_list.content,
                 text="Launch 🚀",
                 width=0,
-                command=lambda: instances.launch(instance_name, self.selected_account[0]),  # type: ignore
+                command=lambda: self.launch_instance(instance_name),
             )
             launch_button.grid(row=index, column=2, pady=10, padx=10, sticky="nse")
 

@@ -14,6 +14,7 @@ from ice_launcher.views.about import About
 from ice_launcher.views.accounts import Accounts
 from ice_launcher.views.edit_instance import EditInstance
 from ice_launcher.views.instances import Instances
+from ice_launcher.views.logs import Logs
 from ice_launcher.views.new_instance import NewInstance
 from ice_launcher.views.news import News
 from ice_launcher.views.settings import Settings
@@ -26,10 +27,13 @@ customtkinter.set_default_color_theme("blue")
 class App(CTk):
     WIDTH: int = 780
     HEIGHT: int = 520
+
+    views: dict[str, CTkFrame]
     current_view: str = "instances"
 
     def __init__(self) -> None:
         super().__init__()
+        self.views = {}
 
         self.title("Ice Launcher")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
@@ -86,7 +90,16 @@ class App(CTk):
         self.settings_button.grid(row=3, column=0, pady=10, padx=20)
 
         # empty row as spacing
-        self.navigator.grid_rowconfigure(4, weight=1)
+        self.navigator.grid_rowconfigure(50, weight=1)
+
+        self.logs_button = CTkButton(
+            master=self.navigator,
+            text="Logs",
+            command=lambda: self.open_view("logs"),
+            border_width=2,
+            fg_color=None,
+        )
+        self.logs_button.grid(row=100, column=0, pady=10, padx=20)
 
         self.about_button = CTkButton(
             master=self.navigator,
@@ -95,7 +108,7 @@ class App(CTk):
             border_width=2,
             fg_color=None,
         )
-        self.about_button.grid(row=5, column=0, pady=(10, 20), padx=20)
+        self.about_button.grid(row=101, column=0, pady=(10, 20), padx=20)
 
         self.view = CTkFrame(master=self)
         self.open_view("instances")
@@ -106,43 +119,44 @@ class App(CTk):
     def on_closing(self, event=0) -> None:
         self.destroy()
 
-    def update_main_frame(self, options={}) -> None:
-        for widget in self.view.winfo_children():
-            widget.destroy()
-        self.view.destroy()
+    def update_main_frame(self) -> None:
+        if not self.current_view in self.views:
+            match self.current_view:
+                case "about":
+                    self.views[self.current_view] = About(master=self)
+                case "accounts":
+                    self.views[self.current_view] = Accounts(master=self)
+                case "edit_instance":
+                    self.views[self.current_view] = EditInstance(master=self)
+                case "instances":
+                    self.views[self.current_view] = Instances(master=self)
+                case "logs":
+                    self.views[self.current_view] = Logs(master=self)
+                case "new_instance":
+                    self.views[self.current_view] = NewInstance(master=self)
+                case "news":
+                    self.views[self.current_view] = News(master=self)
+                case "settings":
+                    self.views[self.current_view] = Settings(master=self)
 
-        match self.current_view:
-            case "instances":
-                self.view = Instances(master=self)
-            case "new_instance":
-                self.view = NewInstance(master=self)
-            case "edit_instance":
-                self.view = EditInstance(
-                    master=self, instance_name=options["instance_name"]
-                )
-            case "news":
-                self.view = News(master=self)
-            case "accounts":
-                self.view = Accounts(master=self)
-            case "settings":
-                self.view = Settings(master=self)
-            case "about":
-                self.view = About(master=self)
+            self.views[self.current_view].grid(
+                row=0, column=1, pady=20, padx=20, sticky="nswe"
+            )
 
-        self.view.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
+        self.views[self.current_view].tkraise()
 
         try:
             self.__dict__[f"{self.current_view}_button"].configure(fg_color="#1F6AA5")
         except KeyError:
             pass
 
-    def open_view(self, view: str, options={}) -> None:
+    def open_view(self, view: str) -> None:
         try:
             self.__dict__[f"{self.current_view}_button"].configure(fg_color=None)
         except KeyError:
             pass
         self.current_view = view
-        self.update_main_frame(options=options)
+        self.update_main_frame()
 
     def check_for_updates(self) -> None:
         latest_version = updater.check_for_updates()

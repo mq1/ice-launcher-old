@@ -9,6 +9,7 @@ from importlib.metadata import version
 from os import listdir, makedirs, path
 from os import rename as mv
 from shutil import rmtree
+from threading import Thread
 from typing import Any, List, TypedDict, cast
 
 import tomli
@@ -95,7 +96,7 @@ def delete(instance_name: str) -> None:
     rmtree(instance_dir)
 
 
-def launch(instance_name: str, account_id: str) -> None:
+def launch(instance_name: str, account_id: str, callback_function: Any) -> None:
     conf = config.read()
 
     print("Refreshing account")
@@ -135,4 +136,9 @@ def launch(instance_name: str, account_id: str) -> None:
     minecraft_command = get_minecraft_command(
         instance_info["minecraft_version"], dirs.user_data_dir, options
     )
-    subprocess.call(minecraft_command)
+
+    def start():
+        p = subprocess.Popen(minecraft_command, stdout=subprocess.PIPE)
+        callback_function(p)
+
+    Thread(target=start).start()

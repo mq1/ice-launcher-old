@@ -11,12 +11,12 @@ from ice_launcher.lib import instances
 
 
 class EditInstance(CTkFrame):
-    def __init__(self, master, instance_name: str):
+    def __init__(self, master):
         super().__init__(master=master)
-        self.instance_name = instance_name
+        self.instance_name = ""
         self.grid_columnconfigure(0, weight=1)
 
-        self.heading = Heading(master=self, text=instance_name)
+        self.heading = Heading(master=self, text=self.instance_name)
         self.heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         # empty row as spacing
@@ -41,6 +41,10 @@ class EditInstance(CTkFrame):
             command=self.delete_instance,
         )
         delete_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")
+
+    def update_instance(self, instance_name: str) -> None:
+        self.instance_name = instance_name
+        self.heading.label.configure(text=instance_name)
 
     def rename_instance(self):
         dialog = CTkInputDialog(
