@@ -3,14 +3,12 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from tkinter import ttk
-from typing import Optional
 
-from customtkinter import CTkButton, CTkFrame, CTkLabel, StringVar
+from customtkinter import CTkButton, CTkFrame, CTkLabel
 
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
 from ice_launcher.lib import accounts, instances
-from ice_launcher.views.edit_instance import EditInstance
 
 
 class Instances(CTkFrame):
