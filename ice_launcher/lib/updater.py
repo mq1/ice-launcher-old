@@ -2,11 +2,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from importlib.metadata import version
 from typing import Optional
 
 import packaging.version
 import requests
+
+from ice_launcher import __version__
 
 
 def _get_latest_release() -> str:
@@ -15,12 +16,10 @@ def _get_latest_release() -> str:
 
 
 def check_for_updates() -> Optional[str]:
-    current_version = version("ice_launcher")
-
-    if "dev" in current_version:
+    if "dev" in __version__:
         return None
 
-    current_release = packaging.version.parse(current_version)
+    current_release = packaging.version.parse(__version__)
     latest_release = packaging.version.parse(_get_latest_release())
 
     return latest_release.__str__() if latest_release > current_release else None

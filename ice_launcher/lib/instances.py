@@ -5,7 +5,6 @@
 import json
 import subprocess
 from enum import Enum
-from importlib.metadata import version
 from os import listdir, makedirs, path
 from os import rename as mv
 from shutil import rmtree
@@ -18,6 +17,8 @@ from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
+
+from ice_launcher import __version__
 
 from . import accounts, config, dirs
 
@@ -129,7 +130,7 @@ def launch(instance_name: str, account_id: str, callback_function: Any) -> None:
         "jvmArguments": [f"-Xmx{conf['jvm_memory']}", f"-Xms{conf['jvm_memory']}"]
         + conf["jvm_options"],
         "launcherName": "Ice Launcher",
-        "launcherVersion": version("ice_launcher"),
+        "launcherVersion": __version__,
         "gameDirectory": path.join(__instances_dir__, instance_name),
     }
 

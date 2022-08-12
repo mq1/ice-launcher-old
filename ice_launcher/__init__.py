@@ -2,6 +2,4 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from importlib.metadata import version
-
-__version__ = version("ice_launcher")
+__version__ = "0.0.15"

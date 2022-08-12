@@ -5,10 +5,11 @@
 import tkinter
 import webbrowser
 from importlib import resources
-from importlib.metadata import version
 from tkinter import PhotoImage
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
+
+from ice_launcher import __version__
 
 
 class About(CTkFrame):
@@ -30,7 +31,7 @@ class About(CTkFrame):
 
         self.app_info = CTkLabel(
             master=self.info_frame,
-            text=f"Version {version('ice_launcher')}\n\nCopyright © 2022-present Manuel Quarneti",
+            text=f"Version {__version__}\n\nCopyright © 2022-present Manuel Quarneti",
             justify=tkinter.LEFT,
         )
         self.app_info.grid(row=1, column=0, pady=20, padx=20, sticky="w")
