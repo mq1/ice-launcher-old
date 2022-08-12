@@ -16,7 +16,6 @@ __config_path__: str = path.join(dirs.user_data_dir, "config.toml")
 class Config(TypedDict):
     config_version: int
     automatically_check_for_updates: bool
-    last_used_account: str
     jvm_options: List[str]
     jvm_memory: str
 
@@ -25,7 +24,6 @@ def default() -> Config:
     return {
         "config_version": 1,
         "automatically_check_for_updates": True,
-        "last_used_account": "",
         "jvm_options": [],
         "jvm_memory": "2G",
     }

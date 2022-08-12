@@ -103,8 +103,6 @@ def launch(instance_name: str, account_id: str) -> None:
     account = accounts.refresh_account(account_id)
     print("Account successfully refreshed")
 
-    assert account is not None
-
     instance_info = get_info(instance_name)
 
     with open(
