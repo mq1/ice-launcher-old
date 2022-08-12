@@ -15,7 +15,6 @@ import tomli
 import tomli_w
 from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.install import install_minecraft_version
-from minecraft_launcher_lib.microsoft_account import complete_refresh
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
 
