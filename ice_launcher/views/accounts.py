@@ -52,11 +52,8 @@ class Accounts(CTkFrame):
             self.update_accounts_list()
 
     def add_account_to_list(
-        self, account_id: str, account: accounts.CompleteLoginResponse
+        self, index: int, account_id: str, account: accounts.CompleteLoginResponse
     ) -> None:
-        accounts_count = len(self.accounts_list.content.winfo_children())
-        account_index = accounts_count + 1
-
         emoji = "✅" if accounts.is_active_account(account_id) else "👤"
 
         label = CTkLabel(
@@ -64,36 +61,35 @@ class Accounts(CTkFrame):
             text=f"{emoji} {account['name']}",
             anchor="w",
         )
-        label.grid(row=account_index, column=0, pady=10, padx=0, sticky="nw")
+        label.grid(row=index, column=0, pady=10, padx=0, sticky="nsw")
         delete_button = CTkButton(
             master=self.accounts_list.content,
             text="Delete 💣",
             width=0,
             command=lambda: self.remove_account(account_id),
         )
-        delete_button.grid(row=account_index, column=1, pady=10, padx=10, sticky="e")
+        delete_button.grid(row=index, column=1, pady=10, padx=10, sticky="nse")
         select_button = CTkButton(
             master=self.accounts_list.content,
             text="Select ✅",
             width=0,
             command=lambda: self.select_account(account_id),
         )
-        select_button.grid(
-            row=account_index, column=2, pady=10, padx=(0, 10), sticky="e"
-        )
-        separator = ttk.Separator(self.accounts_list.content, orient="horizontal")
-        separator.grid(
-            row=account_index + 1,
-            column=0,
-            columnspan=3,
-            pady=0,
-            padx=(0, 10),
-            sticky="ew",
-        )
+        select_button.grid(row=index, column=2, pady=10, padx=(0, 10), sticky="nse")
 
     def update_accounts_list(self) -> None:
         for account in self.accounts_list.content.winfo_children():
             account.destroy()
 
-        for account_id, account in accounts.get_accounts().items():
-            self.add_account_to_list(account_id, account)
+        for index, (account_id, account) in enumerate(accounts.get_accounts().items()):
+            self.add_account_to_list(index * 2, account_id, account)
+
+            separator = ttk.Separator(self.accounts_list.content, orient="horizontal")
+            separator.grid(
+                row=index * 2 + 1,
+                column=0,
+                columnspan=3,
+                pady=0,
+                padx=(0, 10),
+                sticky="ew",
+            )
