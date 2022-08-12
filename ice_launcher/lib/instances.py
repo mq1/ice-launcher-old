@@ -19,8 +19,6 @@ from minecraft_launcher_lib.microsoft_account import complete_refresh
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
 
-from ice_launcher import __client_id__
-
 from . import accounts, config, dirs
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
@@ -98,20 +96,11 @@ def delete(instance_name: str) -> None:
     rmtree(instance_dir)
 
 
-def launch(instance_name: str, account_name: str) -> None:
+def launch(instance_name: str, account_id: str) -> None:
     conf = config.read()
-    account_document = accounts.read_document()
 
-    account = account_document["accounts"][account_name]
     print("Refreshing account")
-    account = complete_refresh(
-        client_id=__client_id__,
-        client_secret=None,
-        redirect_uri=None,
-        refresh_token=account["refresh_token"],
-    )
-    account_document["accounts"][account_name] = account
-    accounts.write_document(account_document)
+    account = accounts.refresh_account(account_id)
     print("Account successfully refreshed")
 
     assert account is not None
@@ -136,7 +125,7 @@ def launch(instance_name: str, account_name: str) -> None:
 
     options: MinecraftOptions = {
         "username": account["name"],
-        "uuid": account["id"],
+        "uuid": account_id,
         "token": account["access_token"],
         "executablePath": java_executable,
         "jvmArguments": [f"-Xmx{conf['jvm_memory']}", f"-Xms{conf['jvm_memory']}"]

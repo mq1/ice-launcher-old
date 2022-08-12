@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from tkinter import ttk
+from typing import Optional
 
-from customtkinter import CTkButton, CTkComboBox, CTkFrame, CTkLabel, StringVar
+from customtkinter import CTkButton, CTkFrame, CTkLabel, StringVar
 
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
-from ice_launcher.lib import accounts, config, instances
+from ice_launcher.lib import accounts, instances
 from ice_launcher.views.edit_instance import EditInstance
 
 from .new_instance import NewInstance
@@ -18,7 +19,7 @@ class Instances(CTkFrame):
     def __init__(self, master) -> None:
         super().__init__(master=master)
 
-        self.account_list = list(accounts.read_document()["accounts"].keys())
+        self.account_list = list(accounts.get_accounts().keys())
 
         self.grid_columnconfigure(0, weight=1)
 
@@ -37,28 +38,21 @@ class Instances(CTkFrame):
             text="New Instance ✨",
             command=self.add_new_instance,
         )
-        new_instance_button.grid(
-            row=0, column=0, pady=10, padx=10, sticky="nsw"
-        )
+        new_instance_button.grid(row=0, column=0, pady=10, padx=10, sticky="nsw")
 
         # empty column as spacing
         status_bar.grid_columnconfigure(1, weight=1)
 
-        account_label = CTkLabel(master=status_bar, text="Account:", anchor="e")
-        account_label.grid(row=0, column=2, pady=0, padx=0, sticky="nse")
-
-        self.selected_account = StringVar()
-        account_selector = CTkComboBox(
+        self.account_var = StringVar()
+        account_label = CTkLabel(
             master=status_bar,
-            values=self.account_list,
-            command=lambda _: self.update_account_list(),
-            variable=self.selected_account,
+            textvariable=self.account_var,
+            anchor="e",
         )
-        account_selector.grid(row=0, column=3, pady=10, padx=10, sticky="e")
+        account_label.grid(row=0, column=2, pady=0, padx=10, sticky="nse")
 
-        self.update_instance_list()
-        self.set_default_account()
-        self.update_account_list()
+        self.update_selected_account()
+        # self.update_instance_list() is called in update_selected_account()
 
     def add_new_instance(self) -> None:
         self.new_instance_window = NewInstance(master=self)
@@ -68,9 +62,21 @@ class Instances(CTkFrame):
 
     def on_closing_new_instance_window(self, event=0) -> None:
         self.new_instance_window.destroy()
-        self.update_instance_list()
+        self.update_selected_account()
 
-    def update_instance_list(self) -> None:
+    def update_selected_account(self) -> None:
+        account = accounts.get_active_account()
+        if account is None:
+            account_name = "You need to select an account first"
+        else:
+            account_name = f"Account: {account[1]['name']}"
+
+        self.account_var.set(account_name)
+
+        account_id = account[0] if account is not None else None
+        self.update_instance_list(account_id)
+
+    def update_instance_list(self, account_id: Optional[str]) -> None:
         instance_list = instances.list()
 
         for instance in self.instances_list.content.winfo_children():
@@ -99,15 +105,17 @@ class Instances(CTkFrame):
                 command=lambda: EditInstance(master=self, instance_name=instance_name),
             )
             edit_button.grid(row=index * 2, column=1, pady=10, padx=0, sticky="nse")
-            launch_button = CTkButton(
-                master=self.instances_list.content,
-                text="Launch 🚀",
-                width=0,
-                command=lambda: instances.launch(
-                    instance_name, self.selected_account.get()
-                ),
-            )
-            launch_button.grid(row=index * 2, column=2, pady=10, padx=10, sticky="nse")
+
+            if account_id is not None:
+                launch_button = CTkButton(
+                    master=self.instances_list.content,
+                    text="Launch 🚀",
+                    width=0,
+                    command=lambda: instances.launch(instance_name, account_id),
+                )
+                launch_button.grid(
+                    row=index * 2, column=2, pady=10, padx=10, sticky="nse"
+                )
             separator = ttk.Separator(self.instances_list.content, orient="horizontal")
             separator.grid(
                 row=index * 2 + 1,
@@ -117,18 +125,3 @@ class Instances(CTkFrame):
                 padx=(0, 10),
                 sticky="ew",
             )
-
-    def set_default_account(self) -> None:
-        c = config.read()
-        if c["last_used_account"] != "":
-            self.selected_account.set(c["last_used_account"])
-        elif len(self.account_list) > 0:
-            self.selected_account.set(self.account_list[0])
-
-    def update_account_list(self) -> None:
-        self.account_list = list(accounts.read_document()["accounts"].keys())
-
-        # update last used account
-        c = config.read()
-        c["last_used_account"] = self.selected_account.get()
-        config.write(c)

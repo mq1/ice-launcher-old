@@ -24,14 +24,10 @@ customtkinter.set_default_color_theme("blue")
 class App(CTk):
     WIDTH: int = 780
     HEIGHT: int = 520
-
-    views: dict[str, CTkFrame]
     current_view: str = "instances"
 
     def __init__(self) -> None:
         super().__init__()
-
-        self.views = {}
 
         self.title("Ice Launcher")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
@@ -99,7 +95,8 @@ class App(CTk):
         )
         self.about_button.grid(row=5, column=0, pady=(10, 20), padx=20)
 
-        self.update_main_frame()
+        self.view = CTkFrame(master=self)
+        self.open_view("instances")
 
         if config.read()["automatically_check_for_updates"]:
             Thread(target=self.check_for_updates).start()
@@ -108,24 +105,23 @@ class App(CTk):
         self.destroy()
 
     def update_main_frame(self) -> None:
-        if not self.current_view in self.views:
-            match self.current_view:
-                case "instances":
-                    self.views[self.current_view] = Instances(master=self)
-                case "news":
-                    self.views[self.current_view] = News(master=self)
-                case "accounts":
-                    self.views[self.current_view] = Accounts(master=self)
-                case "settings":
-                    self.views[self.current_view] = Settings(master=self)
-                case "about":
-                    self.views[self.current_view] = About(master=self)
+        for widget in self.view.winfo_children():
+            widget.destroy()
 
-            self.views[self.current_view].grid(
-                row=0, column=1, pady=20, padx=20, sticky="nswe"
-            )
+        match self.current_view:
+            case "instances":
+                self.view = Instances(master=self)
+            case "news":
+                self.view = News(master=self)
+            case "accounts":
+                self.view = Accounts(master=self)
+            case "settings":
+                self.view = Settings(master=self)
+            case "about":
+                self.view = About(master=self)
 
-        self.views[self.current_view].tkraise()
+        self.view.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
+
         self.__dict__[f"{self.current_view}_button"].configure(fg_color="#1F6AA5")
 
     def open_view(self, view: str) -> None:
