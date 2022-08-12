@@ -107,6 +107,7 @@ class App(CTk):
     def update_main_frame(self) -> None:
         for widget in self.view.winfo_children():
             widget.destroy()
+        self.view.destroy()
 
         match self.current_view:
             case "instances":
