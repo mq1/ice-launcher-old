@@ -13,6 +13,7 @@ from ice_launcher.lib import config, updater
 from ice_launcher.views.about import About
 from ice_launcher.views.accounts import Accounts
 from ice_launcher.views.instances import Instances
+from ice_launcher.views.new_instance import NewInstance
 from ice_launcher.views.news import News
 from ice_launcher.views.settings import Settings
 from ice_launcher.views.update import Update
@@ -112,6 +113,8 @@ class App(CTk):
         match self.current_view:
             case "instances":
                 self.view = Instances(master=self)
+            case "new_instance":
+                self.view = NewInstance(master=self)
             case "news":
                 self.view = News(master=self)
             case "accounts":
@@ -123,10 +126,16 @@ class App(CTk):
 
         self.view.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
 
-        self.__dict__[f"{self.current_view}_button"].configure(fg_color="#1F6AA5")
+        try:
+            self.__dict__[f"{self.current_view}_button"].configure(fg_color="#1F6AA5")
+        except KeyError:
+            pass
 
     def open_view(self, view: str) -> None:
-        self.__dict__[f"{self.current_view}_button"].configure(fg_color=None)
+        try:
+            self.__dict__[f"{self.current_view}_button"].configure(fg_color=None)
+        except KeyError:
+            pass
         self.current_view = view
         self.update_main_frame()
 

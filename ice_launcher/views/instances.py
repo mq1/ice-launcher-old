@@ -12,8 +12,6 @@ from ice_launcher.components.scrollable_frame import ScrollableFrame
 from ice_launcher.lib import accounts, instances
 from ice_launcher.views.edit_instance import EditInstance
 
-from .new_instance import NewInstance
-
 
 class Instances(CTkFrame):
     def __init__(self, master) -> None:
@@ -55,14 +53,7 @@ class Instances(CTkFrame):
         # self.update_instance_list() is called in update_selected_account()
 
     def add_new_instance(self) -> None:
-        self.new_instance_window = NewInstance(master=self)
-        self.new_instance_window.protocol(
-            "WM_DELETE_WINDOW", self.on_closing_new_instance_window
-        )
-
-    def on_closing_new_instance_window(self, event=0) -> None:
-        self.new_instance_window.destroy()
-        self.update_selected_account()
+        self.master.open_view("new_instance")  # type: ignore
 
     def update_selected_account(self) -> None:
         account = accounts.get_active_account()

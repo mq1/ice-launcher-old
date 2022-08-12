@@ -8,9 +8,9 @@ from customtkinter import (
     CTkButton,
     CTkComboBox,
     CTkEntry,
+    CTkFrame,
     CTkLabel,
     CTkProgressBar,
-    CTkToplevel,
     StringVar,
 )
 from minecraft_launcher_lib.types import CallbackDict
@@ -19,11 +19,9 @@ from minecraft_launcher_lib.utils import get_latest_version
 from ice_launcher.lib import instances, versions
 
 
-class NewInstance(CTkToplevel):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.title("Add new instance")
-        self.geometry("250x200")
+class NewInstance(CTkFrame):
+    def __init__(self, master) -> None:
+        super().__init__(master=master)
 
         self.grid_columnconfigure(0, weight=1)
 
@@ -59,9 +57,6 @@ class NewInstance(CTkToplevel):
         for widget in self.winfo_children():
             widget.destroy()
 
-        self.title(f"Creating instance {instance_name}")
-        self.geometry("600x100")
-
         self.status_label = CTkLabel(master=self, text="Creating instance...")
         self.status_label.grid(row=0, column=0, pady=10, padx=20)
 
@@ -90,7 +85,6 @@ class NewInstance(CTkToplevel):
                 version_id,
                 callback,
             )
-            self.master.update_instance_list()  # type: ignore
-            self.destroy()
+            self.master.open_view("instances")  # type: ignore
 
         Thread(target=new_instance).start()
