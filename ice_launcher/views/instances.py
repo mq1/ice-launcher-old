@@ -41,72 +41,74 @@ class Instances(CTkFrame):
         # empty column as spacing
         status_bar.grid_columnconfigure(1, weight=1)
 
-        self.account_var = StringVar()
-        account_label = CTkLabel(
+        self.account_label = CTkLabel(
             master=status_bar,
-            textvariable=self.account_var,
+            text="",
             anchor="e",
         )
-        account_label.grid(row=0, column=2, pady=0, padx=10, sticky="nse")
+        self.account_label.grid(row=0, column=2, pady=0, padx=10, sticky="nse")
 
         self.update_selected_account()
-        # self.update_instance_list() is called in update_selected_account()
+        self.update_instance_list()
 
     def add_new_instance(self) -> None:
         self.master.open_view("new_instance")  # type: ignore
 
+    def edit_instance(self, instance_name: str) -> None:
+        self.master.open_view("edit_instance", options={"instance_name": instance_name})  # type: ignore
+
     def update_selected_account(self) -> None:
-        account = accounts.get_active_account()
-        if account is None:
+        self.selected_account = accounts.get_active_account()
+
+        if self.selected_account is None:
             account_name = "You need to select an account first"
         else:
-            account_name = f"Account: {account[1]['name']}"
+            account_name = f"Account: {self.selected_account[1]['name']}"
 
-        self.account_var.set(account_name)
+        self.account_label.configure(text=account_name)
 
-        account_id = account[0] if account is not None else None
-        self.update_instance_list(account_id)
+    def add_instance_to_list(self, index: int, instance_name: str) -> None:
+        instance_emoji = "⛏"
 
-    def update_instance_list(self, account_id: Optional[str]) -> None:
+        info = instances.get_info(instance_name)
+        match info["instance_type"]:
+            case instances.InstanceType.FABRIC:
+                instance_emoji = "🧵"
+            case instances.InstanceType.FORGE:
+                instance_emoji = "⚒️"
+
+        label = CTkLabel(
+            master=self.instances_list.content,
+            text=f"{instance_emoji} {instance_name}",
+            anchor="w",
+        )
+        label.grid(row=index, column=0, pady=10, padx=0, sticky="nsw")
+        edit_button = CTkButton(
+            master=self.instances_list.content,
+            text="Edit ⚙️",
+            width=0,
+            command=lambda: self.edit_instance(instance_name),
+        )
+        edit_button.grid(row=index, column=1, pady=10, padx=0, sticky="nse")
+
+        if self.selected_account is not None:
+            launch_button = CTkButton(
+                master=self.instances_list.content,
+                text="Launch 🚀",
+                width=0,
+                command=lambda: instances.launch(instance_name, self.selected_account[0]),  # type: ignore
+            )
+            launch_button.grid(row=index, column=2, pady=10, padx=10, sticky="nse")
+
+    def update_instance_list(self) -> None:
         instance_list = instances.list()
 
         for instance in self.instances_list.content.winfo_children():
             instance.destroy()
 
         for index, instance_name in enumerate(instance_list):
-            instance_emoji = "⛏"
+            self.add_instance_to_list(index * 2, instance_name)
 
-            info = instances.get_info(instance_name)
-            match info["instance_type"]:
-                case instances.InstanceType.FABRIC:
-                    instance_emoji = "🧵"
-                case instances.InstanceType.FORGE:
-                    instance_emoji = "⚒️"
-
-            label = CTkLabel(
-                master=self.instances_list.content,
-                text=f"{instance_emoji} {instance_name}",
-                anchor="w",
-            )
-            label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nsw")
-            edit_button = CTkButton(
-                master=self.instances_list.content,
-                text="Edit ⚙️",
-                width=0,
-                command=lambda: EditInstance(master=self, instance_name=instance_name),
-            )
-            edit_button.grid(row=index * 2, column=1, pady=10, padx=0, sticky="nse")
-
-            if account_id is not None:
-                launch_button = CTkButton(
-                    master=self.instances_list.content,
-                    text="Launch 🚀",
-                    width=0,
-                    command=lambda: instances.launch(instance_name, account_id),
-                )
-                launch_button.grid(
-                    row=index * 2, column=2, pady=10, padx=10, sticky="nse"
-                )
             separator = ttk.Separator(self.instances_list.content, orient="horizontal")
             separator.grid(
                 row=index * 2 + 1,

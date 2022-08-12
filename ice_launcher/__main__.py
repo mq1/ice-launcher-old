@@ -12,6 +12,7 @@ from customtkinter import CTk, CTkButton, CTkFrame
 from ice_launcher.lib import config, updater
 from ice_launcher.views.about import About
 from ice_launcher.views.accounts import Accounts
+from ice_launcher.views.edit_instance import EditInstance
 from ice_launcher.views.instances import Instances
 from ice_launcher.views.new_instance import NewInstance
 from ice_launcher.views.news import News
@@ -105,7 +106,7 @@ class App(CTk):
     def on_closing(self, event=0) -> None:
         self.destroy()
 
-    def update_main_frame(self) -> None:
+    def update_main_frame(self, options={}) -> None:
         for widget in self.view.winfo_children():
             widget.destroy()
         self.view.destroy()
@@ -115,6 +116,10 @@ class App(CTk):
                 self.view = Instances(master=self)
             case "new_instance":
                 self.view = NewInstance(master=self)
+            case "edit_instance":
+                self.view = EditInstance(
+                    master=self, instance_name=options["instance_name"]
+                )
             case "news":
                 self.view = News(master=self)
             case "accounts":
@@ -131,13 +136,13 @@ class App(CTk):
         except KeyError:
             pass
 
-    def open_view(self, view: str) -> None:
+    def open_view(self, view: str, options={}) -> None:
         try:
             self.__dict__[f"{self.current_view}_button"].configure(fg_color=None)
         except KeyError:
             pass
         self.current_view = view
-        self.update_main_frame()
+        self.update_main_frame(options=options)
 
     def check_for_updates(self) -> None:
         latest_version = updater.check_for_updates()
