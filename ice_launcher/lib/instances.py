@@ -18,9 +18,7 @@ from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.runtime import get_executable_path
 from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
 
-from ice_launcher import __version__
-
-from . import accounts, dirs, launcher_config
+from . import __version__, accounts, dirs, launcher_config
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
 

@@ -7,9 +7,7 @@ from typing import Optional
 import packaging.version
 from pydantic import BaseModel
 
-from ice_launcher import __version__
-
-from . import http_client
+from . import __version__, http_client
 
 __LATEST_RELEASE_URL__ = "https://api.github.com/repos/mq1/ice-launcher/releases/latest"
 

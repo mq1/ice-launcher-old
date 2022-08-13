@@ -9,7 +9,7 @@ from tkinter import PhotoImage
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
 
-from ice_launcher import __version__
+from ice_launcher.lib import __version__
 
 
 class About(CTkFrame):

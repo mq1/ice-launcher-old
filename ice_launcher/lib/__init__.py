@@ -8,8 +8,7 @@ from os import makedirs, path
 import httpx
 from appdirs import AppDirs
 
-import ice_launcher
-
+__version__ = "0.0.16"
 __client_id__ = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
 
 
@@ -19,6 +18,6 @@ if not path.exists(dirs.user_data_dir):
 
 
 headers = {
-    "user-agent": f"ice-launcher/{ice_launcher.__version__}",
+    "user-agent": f"ice-launcher/{__version__}",
 }
 http_client = httpx.Client(headers=headers)

@@ -7,7 +7,7 @@ import webbrowser
 
 from customtkinter import CTkButton, CTkLabel, CTkToplevel
 
-from ice_launcher import __version__
+from ice_launcher.lib import __version__
 
 
 class Update(CTkToplevel):

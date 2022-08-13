@@ -6,17 +6,17 @@ from tkinter import messagebox
 
 from customtkinter import CTkButton, CTkFrame, CTkInputDialog
 
+import ice_launcher.views.instances as instances_view
 from ice_launcher.components.heading import Heading
 from ice_launcher.lib import instances
 
 
 class EditInstance(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, instance_name: str) -> None:
         super().__init__(master=master)
-        self.instance_name = ""
         self.grid_columnconfigure(0, weight=1)
 
-        self.heading = Heading(master=self, text=self.instance_name)
+        self.heading = Heading(master=self, text=instance_name)
         self.heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
         # empty row as spacing
@@ -42,28 +42,24 @@ class EditInstance(CTkFrame):
         )
         delete_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")
 
-    def update_instance(self, instance_name: str) -> None:
-        self.instance_name = instance_name
-        self.heading.label.configure(text=instance_name)
-
     def rename_instance(self):
         dialog = CTkInputDialog(
             master=None,
             text="Type a new name for the instance",
             title="Rename Instance",
         )
-        new_name = f"{dialog.get_input()}"
-        instances.rename(self.instance_name, new_name)
-        self.instance_name = new_name
-        self.heading.label.configure(text=new_name)
+        new_name = dialog.get_input()
+        if new_name:
+            instances.rename(self.heading.label.text, new_name)
+            self.heading.label.configure(text=new_name)
 
     def done(self):
-        self.master.open_view("instances")  # type: ignore
+        self.master.open_page(None, instances_view.Instances(master=self.master))  # type: ignore
 
     def delete_instance(self) -> None:
         if messagebox.askyesno(
             "Delete Instance",
-            f"Are you sure you want to delete the instance {self.instance_name}?",
+            f"Are you sure you want to delete the instance {self.heading.label.text}?",
         ):
-            instances.delete(self.instance_name)
-            self.master.open_view("instances")  # type: ignore
+            instances.delete(self.heading.label.text)
+            self.master.open_page(None, instances_view.Instances(master=self.master))  # type: ignore

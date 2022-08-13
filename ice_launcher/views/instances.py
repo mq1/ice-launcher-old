@@ -10,6 +10,9 @@ from customtkinter import CTkButton, CTkFrame, CTkLabel
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
 from ice_launcher.lib import accounts, instances
+from ice_launcher.views.edit_instance import EditInstance
+from ice_launcher.views.logs import Logs
+from ice_launcher.views.new_instance import NewInstance
 
 
 class Instances(CTkFrame):
@@ -51,19 +54,19 @@ class Instances(CTkFrame):
         self.update_instance_list()
 
     def add_new_instance(self) -> None:
-        self.master.open_view("new_instance")  # type: ignore
+        self.master.open_page(None, NewInstance(master=self.master))  # type: ignore
 
     def edit_instance(self, instance_name: str) -> None:
-        self.master.views["edit_instance"].update_instance(instance_name)  # type: ignore
-        self.master.open_view("edit_instance", options={"instance_name": instance_name})  # type: ignore
+        self.master.open_page(None, EditInstance(master=self.master, instance_name=instance_name))  # type: ignore
 
     def launch_instance(self, instance_name: str) -> None:
-        self.master.open_view("logs")  # type: ignore
+        self.master.open_page(None, Logs(master=self.master))  # type: ignore
 
         def show_logs(process: Popen):
-            self.master.views["logs"].update_logs(process)  # type: ignore
+            self.master.current_page.update_logs(process)  # type: ignore
 
-        instances.launch(instance_name, self.selected_account[0], show_logs)  # type: ignore
+        if self.selected_account is not None:
+            instances.launch(instance_name, self.selected_account[0], show_logs)
 
     def update_selected_account(self) -> None:
         self.selected_account = accounts.get_active_account()

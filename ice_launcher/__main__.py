@@ -5,38 +5,37 @@
 from importlib import resources
 from threading import Thread
 from tkinter import PhotoImage
+from typing import Optional
 
-import customtkinter
-from customtkinter import CTk, CTkButton, CTkFrame
+from customtkinter import (
+    CTk,
+    CTkButton,
+    CTkFrame,
+    set_appearance_mode,
+    set_default_color_theme,
+)
 
 from ice_launcher.lib import launcher_config, launcher_updater
 from ice_launcher.views.about import About
 from ice_launcher.views.accounts import Accounts
-from ice_launcher.views.edit_instance import EditInstance
 from ice_launcher.views.instances import Instances
 from ice_launcher.views.logs import Logs
-from ice_launcher.views.new_instance import NewInstance
 from ice_launcher.views.news import News
 from ice_launcher.views.settings import Settings
 from ice_launcher.views.update import Update
 
-customtkinter.set_appearance_mode("dark")
-customtkinter.set_default_color_theme("blue")
+set_appearance_mode("dark")
+set_default_color_theme("blue")
 
 
 class App(CTk):
-    WIDTH: int = 780
-    HEIGHT: int = 520
+    current_active_button: Optional[CTkButton] = None
 
-    views: dict[str, CTkFrame]
-    current_view: str = "instances"
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.views = {}
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.title("Ice Launcher")
-        self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
+        self.geometry("780x520")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # set app icon
@@ -48,70 +47,68 @@ class App(CTk):
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.navigator = CTkFrame(master=self, width=180, corner_radius=0)  # type: ignore
-        self.navigator.grid(row=0, column=0, sticky="nswe")
+        navigator = CTkFrame(master=self, width=180, corner_radius=0)  # type: ignore
+        navigator.grid(row=0, column=0, sticky="nswe")
 
-        self.instances_button = CTkButton(
-            master=self.navigator,
+        instances_button = CTkButton(
+            master=navigator,
             text="Instances",
-            command=lambda: self.open_view("instances"),
+            command=lambda: self.open_page(instances_button, Instances(master=self)),
             border_width=2,
             fg_color=None,
         )
-        self.instances_button.grid(
-            row=0, column=0, pady=(20, 10), padx=20, sticky="nswe"
-        )
+        instances_button.grid(row=0, column=0, pady=(20, 10), padx=20, sticky="nswe")
 
-        self.news_button = CTkButton(
-            master=self.navigator,
+        news_button = CTkButton(
+            master=navigator,
             text="News",
-            command=lambda: self.open_view("news"),
+            command=lambda: self.open_page(news_button, News(master=self)),
             border_width=2,
             fg_color=None,
         )
-        self.news_button.grid(row=1, column=0, pady=10, padx=20)
+        news_button.grid(row=1, column=0, pady=10, padx=20)
 
-        self.accounts_button = CTkButton(
-            master=self.navigator,
+        accounts_button = CTkButton(
+            master=navigator,
             text="Accounts",
-            command=lambda: self.open_view("accounts"),
+            command=lambda: self.open_page(accounts_button, Accounts(master=self)),
             border_width=2,
             fg_color=None,
         )
-        self.accounts_button.grid(row=2, column=0, pady=10, padx=20)
+        accounts_button.grid(row=2, column=0, pady=10, padx=20)
 
-        self.settings_button = CTkButton(
-            master=self.navigator,
+        settings_button = CTkButton(
+            master=navigator,
             text="Settings",
-            command=lambda: self.open_view("settings"),
+            command=lambda: self.open_page(settings_button, Settings(master=self)),
             border_width=2,
             fg_color=None,
         )
-        self.settings_button.grid(row=3, column=0, pady=10, padx=20)
+        settings_button.grid(row=3, column=0, pady=10, padx=20)
 
         # empty row as spacing
-        self.navigator.grid_rowconfigure(50, weight=1)
+        navigator.grid_rowconfigure(50, weight=1)
 
-        self.logs_button = CTkButton(
-            master=self.navigator,
+        logs_button = CTkButton(
+            master=navigator,
             text="Logs",
-            command=lambda: self.open_view("logs"),
+            command=lambda: self.open_page(logs_button, Logs(master=self)),
             border_width=2,
             fg_color=None,
         )
-        self.logs_button.grid(row=100, column=0, pady=10, padx=20)
+        logs_button.grid(row=100, column=0, pady=10, padx=20)
 
-        self.about_button = CTkButton(
-            master=self.navigator,
+        about_button = CTkButton(
+            master=navigator,
             text="About",
-            command=lambda: self.open_view("about"),
+            command=lambda: self.open_page(about_button, About(master=self)),
             border_width=2,
             fg_color=None,
         )
-        self.about_button.grid(row=101, column=0, pady=(10, 20), padx=20)
+        about_button.grid(row=101, column=0, pady=(10, 20), padx=20)
 
-        self.view = CTkFrame(master=self)
-        self.open_view("instances")
+        self.current_page = CTkFrame(master=self)
+        self.open_page(instances_button, Instances(master=self))
 
         if launcher_config.read().automatically_check_for_updates:
             Thread(target=self.check_for_updates).start()
@@ -119,44 +116,20 @@ class App(CTk):
     def on_closing(self, event=0) -> None:
         self.destroy()
 
-    def update_main_frame(self) -> None:
-        if not self.current_view in self.views:
-            match self.current_view:
-                case "about":
-                    self.views[self.current_view] = About(master=self)
-                case "accounts":
-                    self.views[self.current_view] = Accounts(master=self)
-                case "edit_instance":
-                    self.views[self.current_view] = EditInstance(master=self)
-                case "instances":
-                    self.views[self.current_view] = Instances(master=self)
-                case "logs":
-                    self.views[self.current_view] = Logs(master=self)
-                case "new_instance":
-                    self.views[self.current_view] = NewInstance(master=self)
-                case "news":
-                    self.views[self.current_view] = News(master=self)
-                case "settings":
-                    self.views[self.current_view] = Settings(master=self)
+    def open_page(self, button: Optional[CTkButton], page: CTkFrame) -> None:
+        if self.current_active_button:
+            self.current_active_button.configure(fg_color=None)
 
-            self.views[self.current_view].grid(
-                row=0, column=1, pady=20, padx=20, sticky="nswe"
-            )
+        if button:
+            self.current_active_button = button
+            self.current_active_button.configure(fg_color="#1F6AA5")
 
-        self.views[self.current_view].tkraise()
+        for widget in self.current_page.winfo_children():
+            widget.destroy()
+        self.current_page.destroy()
 
-        try:
-            self.__dict__[f"{self.current_view}_button"].configure(fg_color="#1F6AA5")
-        except KeyError:
-            pass
-
-    def open_view(self, view: str) -> None:
-        try:
-            self.__dict__[f"{self.current_view}_button"].configure(fg_color=None)
-        except KeyError:
-            pass
-        self.current_view = view
-        self.update_main_frame()
+        self.current_page = page
+        self.current_page.grid(row=0, column=1, pady=20, padx=20, sticky="nswe")
 
     def check_for_updates(self) -> None:
         latest_version = launcher_updater.check_for_updates()
