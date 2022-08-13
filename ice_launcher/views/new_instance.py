@@ -14,9 +14,8 @@ from customtkinter import (
     StringVar,
 )
 from minecraft_launcher_lib.types import CallbackDict
-from minecraft_launcher_lib.utils import get_latest_version
 
-from ice_launcher.lib import instances, versions
+from ice_launcher.lib import instances, minecraft_versions
 
 
 class NewInstance(CTkFrame):
@@ -45,10 +44,10 @@ class NewInstance(CTkFrame):
         Thread(target=self.update_versions).start()
 
     def update_versions(self) -> None:
-        av = versions.get_available()
-        self.version_ids = [version["id"] for version in av]
+        version_manifest = minecraft_versions.fetch_manifest()
+        self.version_ids = [version.id for version in version_manifest.versions]
         self.version_selector.configure(values=self.version_ids)
-        self.version.set(get_latest_version()["release"])
+        self.version.set(version_manifest.latest.release)
 
     def create_instance(self) -> None:
         instance_name = self.instance_name.get()
