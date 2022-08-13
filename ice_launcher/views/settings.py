@@ -16,15 +16,12 @@ from customtkinter import (
 
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
-from ice_launcher.lib import config
+from ice_launcher.lib import launcher_config
 
 
 class Settings(CTkFrame):
     def __init__(self, master) -> None:
         super().__init__(master=master)
-
-        self.app_config = config.read()
-
         self.grid_columnconfigure(0, weight=1)
 
         heading = Heading(master=self, text="⚙️ Settings")
@@ -55,15 +52,15 @@ class Settings(CTkFrame):
         separator = ttk.Separator(settings_frame.content, orient="horizontal")
         separator.grid(row=1, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew")
 
-        self.jvm_options = StringVar()
-        jvm_options_label = CTkLabel(
-            master=settings_frame.content, text="JVM options", anchor="w"
+        self.jvm_arguments = StringVar()
+        jvm_arguments_label = CTkLabel(
+            master=settings_frame.content, text="JVM arguments", anchor="w"
         )
-        jvm_options_label.grid(row=2, column=0, pady=10, padx=0, sticky="w")
-        jvm_options_entry = CTkEntry(
-            master=settings_frame.content, textvariable=self.jvm_options
+        jvm_arguments_label.grid(row=2, column=0, pady=10, padx=0, sticky="w")
+        jvm_arguments_entry = CTkEntry(
+            master=settings_frame.content, textvariable=self.jvm_arguments
         )
-        jvm_options_entry.grid(row=2, column=1, pady=10, padx=(0, 10), sticky="e")
+        jvm_arguments_entry.grid(row=2, column=1, pady=10, padx=(0, 10), sticky="e")
 
         separator = ttk.Separator(settings_frame.content, orient="horizontal")
         separator.grid(row=3, column=0, columnspan=2, pady=0, padx=(0, 10), sticky="ew")
@@ -100,24 +97,24 @@ class Settings(CTkFrame):
         )
         self.save_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")
 
-        self.update_settings()
+        self.update_settings(launcher_config.read())
 
-    def update_settings(self) -> None:
-        self.automatically_check_for_updates.set(
-            self.app_config["automatically_check_for_updates"]
-        )
-        self.jvm_options.set(" ".join(self.app_config["jvm_options"]))
-        self.jvm_memory.set(self.app_config["jvm_memory"])
+    def update_settings(self, config: launcher_config.Config) -> None:
+        self.automatically_check_for_updates.set(config.automatically_check_for_updates)
+        self.jvm_arguments.set(" ".join(config.jvm_arguments))
+        self.jvm_memory.set(config.jvm_memory)
 
     def reset_to_default_settings(self) -> None:
-        self.app_config = config.default()
-        self.update_settings()
+        default_config = launcher_config.Config()
+        self.update_settings(default_config)
 
     def save(self) -> None:
-        self.app_config[
-            "automatically_check_for_updates"
-        ] = self.automatically_check_for_updates.get()
-        self.app_config["jvm_options"] = self.jvm_options.get().split()
-        self.app_config["jvm_memory"] = self.jvm_memory.get()
+        config = launcher_config.read()
 
-        config.write(self.app_config)
+        config.automatically_check_for_updates = (
+            self.automatically_check_for_updates.get()
+        )
+        config.jvm_arguments = self.jvm_arguments.get().split()
+        config.jvm_memory = self.jvm_memory.get()
+
+        launcher_config.write(config)

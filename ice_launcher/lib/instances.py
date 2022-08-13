@@ -20,7 +20,7 @@ from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
 
 from ice_launcher import __version__
 
-from . import accounts, config, dirs
+from . import accounts, dirs, launcher_config
 
 __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
 
@@ -98,7 +98,7 @@ def delete(instance_name: str) -> None:
 
 
 def launch(instance_name: str, account_id: str, callback_function: Any) -> None:
-    conf = config.read()
+    config = launcher_config.read()
 
     print("Refreshing account")
     account = accounts.refresh_account(account_id)
@@ -127,8 +127,8 @@ def launch(instance_name: str, account_id: str, callback_function: Any) -> None:
         "uuid": account_id,
         "token": account["access_token"],
         "executablePath": java_executable,
-        "jvmArguments": [f"-Xmx{conf['jvm_memory']}", f"-Xms{conf['jvm_memory']}"]
-        + conf["jvm_options"],
+        "jvmArguments": [f"-Xmx{config.jvm_memory}", f"-Xms{config.jvm_memory}"]
+        + config.jvm_arguments,
         "launcherName": "Ice Launcher",
         "launcherVersion": __version__,
         "gameDirectory": path.join(__instances_dir__, instance_name),

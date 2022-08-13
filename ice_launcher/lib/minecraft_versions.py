@@ -3,11 +3,14 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from enum import Enum
+
 from pydantic import BaseModel
+
 from . import http_client
 
-
-__VERSION_MANIFEST_URL__ = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+__VERSION_MANIFEST_URL__ = (
+    "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+)
 
 
 class _TypeEnum(str, Enum):

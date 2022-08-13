@@ -16,7 +16,7 @@ __config_path__: str = path.join(dirs.user_data_dir, "config.toml")
 class Config(BaseModel):
     config_version: int = 1
     automatically_check_for_updates: bool = True
-    jvm_options: list[str] = []
+    jvm_arguments: list[str] = []
     jvm_memory: str = "2G"
 
 
@@ -32,7 +32,7 @@ def read() -> Config:
     with open(__config_path__, "rb") as f:
         config = Config.parse_obj(tomli.load(f))
 
-    # Writes the config file in case it is outdated.
+    # Writes the config file in case it is outdated.
     write(config)
 
     return config
