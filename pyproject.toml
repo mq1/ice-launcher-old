@@ -18,6 +18,8 @@ packaging = "^21.3"
 minecraft-launcher-lib = "^5.2"
 tomli = "^2.0.1"
 tomli-w = "^1.0.0"
+httpx = "^0.23.0"
+pydantic = "^1.9.2"
 
 [tool.poetry.dev-dependencies]
 pyinstaller = "^5.3"
