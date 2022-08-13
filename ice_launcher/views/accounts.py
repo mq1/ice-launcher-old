@@ -60,7 +60,7 @@ class Accounts(CTkFrame):
 
         label = CTkLabel(
             master=self.accounts_list.content,
-            text=f"{emoji} {account['name']}",
+            text=f"{emoji} {account.name}",
             anchor="w",
         )
         label.grid(row=index, column=0, pady=10, padx=0, sticky="nsw")

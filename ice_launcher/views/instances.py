@@ -74,7 +74,7 @@ class Instances(CTkFrame):
         if self.selected_account is None:
             account_name = "You need to select an account first"
         else:
-            account_name = f"Account: {self.selected_account[1]['name']}"
+            account_name = f"Account: {self.selected_account[1].name}"
 
         self.account_label.configure(text=account_name)
 
@@ -83,9 +83,9 @@ class Instances(CTkFrame):
 
         info = instances.get_info(instance_name)
         match info["instance_type"]:
-            case instances.InstanceType.FABRIC:
+            case instances.InstanceType.fabric:
                 instance_emoji = "🧵"
-            case instances.InstanceType.FORGE:
+            case instances.InstanceType.forge:
                 instance_emoji = "⚒️"
 
         label = CTkLabel(

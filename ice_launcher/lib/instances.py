@@ -24,9 +24,9 @@ __instances_dir__: str = path.join(dirs.user_data_dir, "instances")
 
 
 class InstanceType(str, Enum):
-    VANILLA = "vanilla"
-    FABRIC = "fabric"
-    FORGE = "forge"
+    vanilla = "vanilla"
+    fabric = "fabric"
+    forge = "forge"
 
 
 class InstanceInfo(TypedDict):
@@ -50,7 +50,7 @@ def list() -> List[str]:
 def _default_instance_info() -> InstanceInfo:
     return {
         "config_version": 1,
-        "instance_type": InstanceType.VANILLA,
+        "instance_type": InstanceType.vanilla,
         "minecraft_version": "",
     }
 
@@ -121,9 +121,9 @@ def launch(instance_name: str, account_id: str, callback_function: Any) -> None:
         java_executable = "java"
 
     options: MinecraftOptions = {
-        "username": account["name"],
+        "username": account.name,
         "uuid": account_id,
-        "token": account["access_token"],
+        "token": account.access_token,
         "executablePath": java_executable,
         "jvmArguments": [f"-Xmx{config.jvm_memory}", f"-Xms{config.jvm_memory}"]
         + config.jvm_arguments,
