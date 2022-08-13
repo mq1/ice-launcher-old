@@ -16,13 +16,7 @@ from customtkinter import (
 )
 
 from ice_launcher.lib import launcher_config, launcher_updater
-from ice_launcher.views.about import About
-from ice_launcher.views.accounts import Accounts
-from ice_launcher.views.instances import Instances
-from ice_launcher.views.logs import Logs
-from ice_launcher.views.news import News
-from ice_launcher.views.settings import Settings
-from ice_launcher.views.update import Update
+from ice_launcher.views import About, Accounts, Instances, Logs, News, Settings, Update
 
 set_appearance_mode("dark")
 set_default_color_theme("blue")
