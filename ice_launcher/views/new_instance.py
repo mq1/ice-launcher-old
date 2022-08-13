@@ -16,6 +16,7 @@ from customtkinter import (
 from minecraft_launcher_lib.types import CallbackDict
 
 from ice_launcher.lib import instances, minecraft_versions
+from .instances import Instances
 
 
 class NewInstance(CTkFrame):
@@ -84,6 +85,6 @@ class NewInstance(CTkFrame):
                 version_id,
                 callback,
             )
-            self.master.open_view("instances")  # type: ignore
+            self.master.open_page(None, Instances(master=self.master))  # type: ignore
 
         Thread(target=new_instance).start()

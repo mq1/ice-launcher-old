@@ -43,8 +43,6 @@ class Accounts(CTkFrame):
     def select_account(self, account_id: str) -> None:
         accounts.set_active_account(account_id)
         self.update_accounts_list()
-        self.master.views["instances"].update_selected_account()  # type: ignore
-        self.master.views["instances"].update_instance_list()  # type: ignore
 
     def remove_account(self, account_id: str) -> None:
         if messagebox.askyesno(
