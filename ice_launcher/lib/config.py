@@ -3,48 +3,36 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from os import path
-from typing import Any, List, TypedDict, cast
 
 import tomli
 import tomli_w
+from pydantic import BaseModel
 
 from . import dirs
 
 __config_path__: str = path.join(dirs.user_data_dir, "config.toml")
 
 
-class Config(TypedDict):
-    config_version: int
-    automatically_check_for_updates: bool
-    jvm_options: List[str]
-    jvm_memory: str
-
-
-def default() -> Config:
-    return {
-        "config_version": 1,
-        "automatically_check_for_updates": True,
-        "jvm_options": [],
-        "jvm_memory": "2G",
-    }
+class Config(BaseModel):
+    config_version: int = 1
+    automatically_check_for_updates: bool = True
+    jvm_options: list[str] = []
+    jvm_memory: str = "2G"
 
 
 def write(config: Config) -> None:
     with open(__config_path__, "wb") as f:
-        tomli_w.dump(cast(dict[str, Any], config), f)
+        tomli_w.dump(config.dict(), f)
 
 
 def read() -> Config:
     if not path.exists(__config_path__):
-        write(default())
+        return Config()
 
     with open(__config_path__, "rb") as f:
-        config = cast(Config, tomli.load(f))
+        config = Config.parse_obj(tomli.load(f))
 
-    # Update old config with new values
-    for key, value in default().items():
-        if key not in config:
-            config[key] = value
-
+    # Writes the config file in case it is outdated.
     write(config)
+
     return config
