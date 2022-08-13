@@ -9,7 +9,7 @@ from tkinter import PhotoImage
 import customtkinter
 from customtkinter import CTk, CTkButton, CTkFrame
 
-from ice_launcher.lib import config, updater
+from ice_launcher.lib import config, launcher_updater
 from ice_launcher.views.about import About
 from ice_launcher.views.accounts import Accounts
 from ice_launcher.views.edit_instance import EditInstance
@@ -113,7 +113,7 @@ class App(CTk):
         self.view = CTkFrame(master=self)
         self.open_view("instances")
 
-        if config.read()["automatically_check_for_updates"]:
+        if config.read().automatically_check_for_updates:
             Thread(target=self.check_for_updates).start()
 
     def on_closing(self, event=0) -> None:
@@ -159,7 +159,7 @@ class App(CTk):
         self.update_main_frame()
 
     def check_for_updates(self) -> None:
-        latest_version = updater.check_for_updates()
+        latest_version = launcher_updater.check_for_updates()
         if latest_version:
             Update(master=self, latest_version=latest_version)
 
