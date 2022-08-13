@@ -6,7 +6,7 @@ from tkinter import messagebox
 
 from customtkinter import CTkButton, CTkFrame, CTkInputDialog
 
-import ice_launcher.views.instances as instances_view
+from ice_launcher import views
 from ice_launcher.components.heading import Heading
 from ice_launcher.lib import instances
 
@@ -54,7 +54,7 @@ class EditInstance(CTkFrame):
             self.heading.label.configure(text=new_name)
 
     def done(self):
-        self.master.open_page(None, instances_view.Instances(master=self.master))  # type: ignore
+        self.master.open_page(None, views.Instances(master=self.master))  # type: ignore
 
     def delete_instance(self) -> None:
         if messagebox.askyesno(
@@ -62,4 +62,4 @@ class EditInstance(CTkFrame):
             f"Are you sure you want to delete the instance {self.heading.label.text}?",
         ):
             instances.delete(self.heading.label.text)
-            self.master.open_page(None, instances_view.Instances(master=self.master))  # type: ignore
+            self.master.open_page(None, views.Instances(master=self.master))  # type: ignore
