@@ -10,9 +10,7 @@ from customtkinter import CTkButton, CTkFrame, CTkLabel
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
 from ice_launcher.lib import accounts, instances
-from ice_launcher.views.edit_instance import EditInstance
-from ice_launcher.views.logs import Logs
-from ice_launcher.views.new_instance import NewInstance
+from ice_launcher.views import EditInstance, Logs, NewInstance
 
 
 class Instances(CTkFrame):

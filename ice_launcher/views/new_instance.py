@@ -16,6 +16,7 @@ from customtkinter import (
 from minecraft_launcher_lib.types import CallbackDict
 
 from ice_launcher.lib import instances, minecraft_versions
+
 from .instances import Instances
 
 
