@@ -64,13 +64,18 @@ class NewInstance(CTkFrame):
         heading = Heading(master=self, text=f"🔄 Creating instance {instance_name}")
         heading.grid(row=0, column=0, pady=20, padx=20, sticky="nwe")
 
+        self.grid_rowconfigure(1, weight=1)
+
         self.status_label = CTkLabel(
             master=self, text=f"Creating instance {instance_name}"
         )
-        self.status_label.grid(row=1, column=0, pady=10, padx=20)
+        self.status_label.grid(row=2, column=0, pady=10, padx=20)
 
         self.progress_bar = CTkProgressBar(master=self)
-        self.progress_bar.grid(row=2, column=0, pady=10, padx=20)
+        self.progress_bar.grid(row=3, column=0, pady=10, padx=20)
+
+        self.grid_rowconfigure(4, weight=1)
+
         self.current_value = 0
         self.max_progress = 0
 
