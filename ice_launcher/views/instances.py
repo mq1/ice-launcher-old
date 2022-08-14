@@ -81,10 +81,9 @@ class Instances(CTkFrame):
         self.account_label.configure(text=account_name)
 
     def add_instance_to_list(self, index: int, instance_name: str) -> None:
-        instance_emoji = "⛏"
-
-        info = instances.get_info(instance_name)
-        match info["instance_type"]:
+        match instances.read_info(instance_name).instance_type:
+            case instances.InstanceType.vanilla:
+                instance_emoji = "🍦"
             case instances.InstanceType.fabric:
                 instance_emoji = "🧵"
             case instances.InstanceType.forge:
