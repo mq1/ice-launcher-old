@@ -4,7 +4,7 @@
 
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 from . import http_client
 
@@ -23,6 +23,8 @@ class _TypeEnum(str, Enum):
 class MinecraftVersionInfo(BaseModel):
     id: str
     type: _TypeEnum
+    url: HttpUrl
+    sha1: str
 
 
 class LatestVersions(BaseModel):

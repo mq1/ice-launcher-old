@@ -7,7 +7,6 @@ from threading import Thread
 from tkinter import ttk
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
-from minecraft_launcher_lib.types import Articles
 
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
@@ -15,7 +14,7 @@ from ice_launcher.lib import minecraft_news
 
 
 class News(CTkFrame):
-    articles: Articles
+    articles: minecraft_news.Articles
 
     def __init__(self, master) -> None:
         super().__init__(master=master)

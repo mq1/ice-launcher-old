@@ -13,15 +13,13 @@ from typing import Any
 
 import tomli
 import tomli_w
-from minecraft_launcher_lib.command import get_minecraft_command
-from minecraft_launcher_lib.install import install_minecraft_version
-from minecraft_launcher_lib.runtime import get_executable_path
-from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
 from pydantic import BaseModel
 
-from . import __version__, accounts, dirs, launcher_config
+from . import ProgressCallbacks, __version__, accounts, dirs, launcher_config
+from .minecraft_version_meta import install_version
+from .minecraft_versions import MinecraftVersionInfo
 
-__instances_dir__: str = path.join(dirs.user_data_dir, "instances")
+__INSTANCES_DIR__: str = path.join(dirs.user_data_dir, "instances")
 
 
 class InstanceType(str, Enum):
@@ -38,35 +36,41 @@ class InstanceInfo(BaseModel):
 
 def list() -> list[str]:
     # check if instances folder exists
-    if not path.exists(__instances_dir__):
-        makedirs(__instances_dir__)
+    if not path.exists(__INSTANCES_DIR__):
+        makedirs(__INSTANCES_DIR__)
 
     list = [
         x
-        for x in listdir(__instances_dir__)
-        if path.isdir(path.join(__instances_dir__, x))
+        for x in listdir(__INSTANCES_DIR__)
+        if path.isdir(path.join(__INSTANCES_DIR__, x))
     ]
 
     return list
 
 
-def new(instance_name: str, minecraft_version: str, callback: CallbackDict) -> None:
+def new(
+    instance_name: str,
+    minecraft_version: MinecraftVersionInfo,
+    callbacks: ProgressCallbacks,
+) -> None:
     print(f"Creating instance {instance_name}")
-    instance_dir = path.join(__instances_dir__, instance_name)
+
+    instance_dir = path.join(__INSTANCES_DIR__, instance_name)
     makedirs(instance_dir)
-    instance_info = InstanceInfo(minecraft_version=minecraft_version)
+    instance_info = InstanceInfo(minecraft_version=minecraft_version.id)
     _write_info(instance_name, instance_info)
-    install_minecraft_version(minecraft_version, dirs.user_data_dir, callback)
+    install_version(minecraft_version, callbacks)
+
     print("Done")
 
 
 def _write_info(instance_name: str, instance_info: InstanceInfo) -> None:
-    with open(path.join(__instances_dir__, instance_name, "instance.toml"), "wb") as f:
+    with open(path.join(__INSTANCES_DIR__, instance_name, "instance.toml"), "wb") as f:
         tomli_w.dump(instance_info.dict(), f)
 
 
 def read_info(instance_name: str) -> InstanceInfo:
-    with open(path.join(__instances_dir__, instance_name, "instance.toml"), "rb") as f:
+    with open(path.join(__INSTANCES_DIR__, instance_name, "instance.toml"), "rb") as f:
         info = InstanceInfo.parse_obj(tomli.load(f))
 
     # Writes the document file in case it is outdated.
@@ -76,59 +80,11 @@ def read_info(instance_name: str) -> InstanceInfo:
 
 
 def rename(old_name: str, new_name: str) -> None:
-    old_dir = path.join(__instances_dir__, old_name)
-    new_dir = path.join(__instances_dir__, new_name)
+    old_dir = path.join(__INSTANCES_DIR__, old_name)
+    new_dir = path.join(__INSTANCES_DIR__, new_name)
     mv(old_dir, new_dir)
 
 
 def delete(instance_name: str) -> None:
-    instance_dir = path.join(__instances_dir__, instance_name)
+    instance_dir = path.join(__INSTANCES_DIR__, instance_name)
     rmtree(instance_dir)
-
-
-def launch(instance_name: str, account_id: str, callback_function: Any) -> None:
-    config = launcher_config.read()
-
-    print("Refreshing account")
-    account = accounts.refresh_account(account_id)
-    print("Account successfully refreshed")
-
-    instance_info = read_info(instance_name)
-
-    with open(
-        path.join(
-            dirs.user_data_dir,
-            "versions",
-            instance_info.minecraft_version,
-            f"{instance_info.minecraft_version}.json",
-        ),
-        "r",
-    ) as f:
-        version_json: dict = json.load(f)
-
-    jvm_version = version_json["javaVersion"]["component"]
-    java_executable = get_executable_path(jvm_version, dirs.user_data_dir)
-    if java_executable is None:
-        java_executable = "java"
-
-    options: MinecraftOptions = {
-        "username": account.minecraft_username,
-        "uuid": account_id,
-        "token": account.minecraft_access_token,
-        "executablePath": java_executable,
-        "jvmArguments": [f"-Xmx{config.jvm_memory}", f"-Xms{config.jvm_memory}"]
-        + config.jvm_arguments,
-        "launcherName": "Ice Launcher",
-        "launcherVersion": __version__,
-        "gameDirectory": path.join(__instances_dir__, instance_name),
-    }
-
-    minecraft_command = get_minecraft_command(
-        instance_info.minecraft_version, dirs.user_data_dir, options
-    )
-
-    def start():
-        p = subprocess.Popen(minecraft_command, stdout=subprocess.PIPE)
-        callback_function(p)
-
-    Thread(target=start).start()

@@ -197,17 +197,6 @@ python-versions = "*"
 altgraph = ">=0.15"
 
 [[package]]
-name = "minecraft-launcher-lib"
-version = "5.2"
-description = "A library for creating a custom Minecraft launcher"
-category = "main"
-optional = false
-python-versions = ">=3.8"
-
-[package.dependencies]
-requests = "*"
-
-[[package]]
 name = "mypy-extensions"
 version = "0.4.3"
 description = "Experimental type system extensions for programs checked with the mypy typechecker."
@@ -410,7 +399,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "de4c3c1daea319e6c1a998da28a2942646448da0b85bede67c0c75adc2ce41a0"
+content-hash = "7195807aebe21ad21cf0a304a12ed74700d6f76239f969ff29e0a083a64dc5ce"
 
 [metadata.files]
 altgraph = [
@@ -500,10 +489,6 @@ isort = [
 macholib = [
     {file = "macholib-1.16-py2.py3-none-any.whl", hash = "sha256:5a0742b587e6e57bfade1ab90651d4877185bf66fd4a176a488116de36878229"},
     {file = "macholib-1.16.tar.gz", hash = "sha256:001bf281279b986a66d7821790d734e61150d52f40c080899df8fefae056e9f7"},
-]
-minecraft-launcher-lib = [
-    {file = "minecraft-launcher-lib-5.2.tar.gz", hash = "sha256:80bf5542861ba30a1451d5cbaee6e4973bfe177b272c5f43f4c7a204fb0c395e"},
-    {file = "minecraft_launcher_lib-5.2-py3-none-any.whl", hash = "sha256:2f7a068e17d304e1b1a8066c22a70d2f5ee69e438bc7e498fc7767d1a9fe21c7"},
 ]
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
