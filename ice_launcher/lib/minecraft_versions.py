@@ -75,10 +75,10 @@ def install_version(
     )
 
     callbacks.set_status("Installing assets")
-    install_assets(version_meta, callbacks)
+    install_assets(version_meta.assetIndex, callbacks)
 
     callbacks.set_status("Installing libraries")
-    install_libraries(version_meta, callbacks)
+    install_libraries(version_meta.libraries, callbacks)
 
     callbacks.set_status("Installing client")
-    install_client(version_meta, callbacks)
+    install_client(minecraft_version.id, version_meta.downloads.client, callbacks)
