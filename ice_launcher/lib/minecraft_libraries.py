@@ -11,6 +11,7 @@ from typing import Optional
 from pydantic import BaseModel, HttpUrl
 
 from . import ProgressCallbacks, dirs, download_file
+from .minecraft_version_meta import MinecraftVersionMeta
 
 __LIBRARIES_DIR__ = path.join(dirs.user_data_dir, "libraries")
 
@@ -83,12 +84,14 @@ def is_rule_list_valid(rules: list[_Rule]) -> bool:
     return False
 
 
-def install_libraries(libraries: list[Library], callbacks: ProgressCallbacks) -> None:
+def install_libraries(
+    version_meta: MinecraftVersionMeta, callbacks: ProgressCallbacks
+) -> None:
     natives_string = get_natives_string()
     thread_pool = ThreadPool()
     results: list[AsyncResult] = []
 
-    for library in libraries:
+    for library in version_meta.libraries:
         library_path = path.join(__LIBRARIES_DIR__, library.downloads.artifact.path)
 
         if library.downloads.rules and not is_rule_list_valid(library.downloads.rules):

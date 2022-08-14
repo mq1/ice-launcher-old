@@ -26,17 +26,18 @@ class _Downloads(BaseModel):
 class MinecraftVersionMeta(BaseModel):
     assetIndex: AssetIndex
     downloads: _Downloads
+    id: str
     libraries: list[Library]
 
 
 def install_client(
-    version_id: str, client: _Artifact, callbacks: ProgressCallbacks
+    version_meta: MinecraftVersionMeta, callbacks: ProgressCallbacks
 ) -> None:
-    client_path = path.join(__VERSIONS_PATH__, f"{version_id}.jar")
+    client_path = path.join(__VERSIONS_PATH__, f"{version_meta.id}.jar")
     download_file(
-        url=client.url,
+        url=version_meta.downloads.client.url,
         dest=client_path,
-        total_size=client.size,
-        sha1hash=client.sha1,
+        total_size=version_meta.downloads.client.size,
+        sha1hash=version_meta.downloads.client.sha1,
         callbacks=callbacks,
     )

@@ -8,6 +8,7 @@ from os import path
 from pydantic import BaseModel, HttpUrl
 
 from . import ProgressCallbacks, __version__, dirs, download_file
+from .minecraft_version_meta import MinecraftVersionMeta
 
 __ASSETS_BASE_URL__ = "https://resources.download.minecraft.net"
 __ASSETS_DIR__ = path.join(dirs.user_data_dir, "assets")
@@ -30,13 +31,17 @@ class AssetIndex(BaseModel):
     url: HttpUrl
 
 
-def install_assets(asset_index: AssetIndex, callbacks: ProgressCallbacks) -> None:
-    asset_index_path = path.join(__ASSETS_DIR__, "indexes", f"{asset_index.id}.json")
+def install_assets(
+    version_meta: MinecraftVersionMeta, callbacks: ProgressCallbacks
+) -> None:
+    asset_index_path = path.join(
+        __ASSETS_DIR__, "indexes", f"{version_meta.assetIndex.id}.json"
+    )
     download_file(
-        url=asset_index.url,
+        url=version_meta.assetIndex.url,
         dest=asset_index_path,
-        total_size=asset_index.size,
-        sha1hash=asset_index.sha1,
+        total_size=version_meta.assetIndex.size,
+        sha1hash=version_meta.assetIndex.sha1,
         callbacks=callbacks,
     )
     assets = _Assets.parse_file(asset_index_path)
