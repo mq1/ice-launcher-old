@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import webbrowser
-from enum import Enum
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from os import path
 from threading import Thread
@@ -11,70 +10,17 @@ from typing import Any, Optional
 
 import tomli
 import tomli_w
-from minecraft_launcher_lib import microsoft_account as msa
-from minecraft_launcher_lib import microsoft_types
 from pydantic import BaseModel
 
-from . import __client_id__, dirs
+from . import __CLIENT_ID__, dirs, msa
 
 __accounts_file__: str = path.join(dirs.user_data_dir, "accounts.toml")
-__redirect_uri__: str = "http://localhost:3003"
-
-
-class _State(str, Enum):
-    active = "ACTIVE"
-    inactive = "INACTIVE"
-
-
-class _MinecraftProfileInfo(BaseModel):
-    state: _State
-    url: str
-
-
-class _MinecraftProfileSkin(_MinecraftProfileInfo):
-    variant: str
-
-
-class _MinecraftProfileCape(_MinecraftProfileInfo):
-    alias: str
-
-
-class CompleteLoginResponse(BaseModel):
-    name: str
-    skins: dict[str, _MinecraftProfileSkin]
-    capes: dict[str, _MinecraftProfileCape]
-    access_token: str
-    refresh_token: str
 
 
 class Document(BaseModel):
     version: int = 1
     active_account: str = ""
-    accounts: dict[str, CompleteLoginResponse] = {}
-
-
-def convert_account_type(
-    account: microsoft_types.CompleteLoginResponse,
-) -> CompleteLoginResponse:
-    skins: dict[str, _MinecraftProfileSkin] = {}
-    for skin in account["skins"]:
-        skins[skin["id"]] = _MinecraftProfileSkin.parse_obj(skin)
-
-    capes: dict[str, _MinecraftProfileCape] = {}
-    for cape in account["capes"]:
-        capes[cape["id"]] = _MinecraftProfileCape.parse_obj(cape)
-
-    converted_account = CompleteLoginResponse(
-        **{
-            "name": account["name"],
-            "skins": skins,
-            "capes": capes,
-            "access_token": account["access_token"],
-            "refresh_token": account["refresh_token"],
-        }
-    )
-
-    return converted_account
+    accounts: dict[str, msa.Account] = {}
 
 
 def _write_document(doc: Document) -> None:
@@ -95,7 +41,7 @@ def _read_document() -> Document:
     return doc
 
 
-def get_accounts() -> dict[str, CompleteLoginResponse]:
+def get_accounts() -> dict[str, msa.Account]:
     doc = _read_document()
 
     return doc.accounts
@@ -107,17 +53,8 @@ class CallbackHandler(BaseHTTPRequestHandler):
     callback_function: Any
 
     def do_GET(self) -> None:
-        auth_code = msa.parse_auth_code_url(self.path, self.state)
-
-        login_data = msa.complete_login(
-            client_id=__client_id__,
-            client_secret=None,
-            redirect_uri=__redirect_uri__,
-            auth_code=auth_code,
-            code_verifier=self.code_verifier,
-        )
-
-        converted_login_data = add_account(login_data)
+        account_entry = msa.login(self.path, self.state, self.code_verifier)
+        add_account(account_entry)
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -127,36 +64,26 @@ class CallbackHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"<p>You can close this window.</p>")
         self.wfile.write(b"</body></html>")
 
-        self.callback_function(login_data["id"], converted_login_data)
+        self.callback_function()
         Thread(target=self.server.shutdown).start()
 
 
 def login_account(callback_function: Any) -> None:
-    login_url, state, code_verifier = msa.get_secure_login_data(
-        __client_id__, __redirect_uri__
-    )
+    login_data = msa.get_login_data()
 
-    webbrowser.open(login_url)
+    webbrowser.open(login_data.uri)
     handler = CallbackHandler
-    handler.state = state
-    handler.code_verifier = code_verifier
+    handler.state = login_data.state
+    handler.code_verifier = login_data.code_verifier
     handler.callback_function = callback_function
     httpd = HTTPServer(("127.0.0.1", 3003), handler)
     httpd.serve_forever()
 
 
-def add_account(
-    login_data: microsoft_types.CompleteLoginResponse,
-) -> CompleteLoginResponse:
-    converted_login_data = convert_account_type(login_data)
-
+def add_account(account_entry: msa.AccountEntry) -> None:
     doc = _read_document()
-
-    doc.accounts[login_data["id"]] = converted_login_data
-
+    doc.accounts[account_entry.minecraft_id] = account_entry.account
     _write_document(doc)
-
-    return converted_login_data
 
 
 def remove_account(account_id: str) -> None:
@@ -169,40 +96,36 @@ def remove_account(account_id: str) -> None:
     _write_document(doc)
 
 
-def refresh_account(account_id: str) -> CompleteLoginResponse:
+def refresh_account(account_id: str) -> msa.Account:
     doc = _read_document()
 
     account = doc.accounts[account_id]
+    account = msa.refresh(account)
+    doc.accounts[account_id] = account
 
-    account = msa.complete_refresh(
-        client_id=__client_id__,
-        client_secret=None,
-        redirect_uri=None,
-        refresh_token=account.refresh_token,
-    )
-    converted_account = convert_account_type(account)
-
-    doc.accounts[account_id] = converted_account
     _write_document(doc)
 
-    return converted_account
+    return account
 
 
-def get_active_account() -> Optional[tuple[str, CompleteLoginResponse]]:
+def get_active_account() -> Optional[msa.AccountEntry]:
     doc = _read_document()
     id = doc.active_account
 
     if id == "":
         return None
 
-    return id, doc.accounts[id]
+    account_entry = msa.AccountEntry(
+        minecraft_id=id,
+        account=doc.accounts[id],
+    )
+
+    return account_entry
 
 
 def set_active_account(account_id: str) -> None:
     doc = _read_document()
-
     doc.active_account = account_id
-
     _write_document(doc)
 
 

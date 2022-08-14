@@ -9,7 +9,7 @@ import httpx
 from appdirs import AppDirs
 
 __version__ = "0.0.16"
-__client_id__ = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
+__CLIENT_ID__ = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
 
 
 dirs: AppDirs = AppDirs("ice-launcher", "mq1.eu")
