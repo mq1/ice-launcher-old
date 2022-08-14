@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from multiprocessing.pool import ThreadPool
+from multiprocessing.pool import AsyncResult, ThreadPool
 from os import path
 
 from pydantic import BaseModel, HttpUrl
@@ -42,7 +42,7 @@ def install_assets(asset_index: AssetIndex, callbacks: ProgressCallbacks) -> Non
     assets = _Assets.parse_file(asset_index_path)
 
     thread_pool = ThreadPool()
-    results = []
+    results: list[AsyncResult] = []
     for _, asset_info in assets.objects.items():
         asset_path = path.join(
             __ASSETS_DIR__, "objects", asset_info.hash[:2], asset_info.hash
