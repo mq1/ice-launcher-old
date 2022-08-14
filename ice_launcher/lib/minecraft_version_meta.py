@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from . import ProgressCallbacks, dirs, download_file
 from .minecraft_assets import AssetIndex, install_assets
+from .minecraft_libraries import Library, install_libraries
 from .minecraft_versions import MinecraftVersionInfo
 
 __VERSIONS_PATH__ = path.join(dirs.user_data_dir, "versions")
@@ -15,6 +16,7 @@ __VERSIONS_PATH__ = path.join(dirs.user_data_dir, "versions")
 
 class MinecraftVersionMeta(BaseModel):
     assetIndex: AssetIndex
+    libraries: list[Library]
 
 
 def install_version(
@@ -31,6 +33,14 @@ def install_version(
 
     version_meta = MinecraftVersionMeta.parse_file(version_meta_path)
 
+    assets_total_size = version_meta.assetIndex.size + version_meta.assetIndex.totalSize
+    libraries_total_size = sum(
+        library.downloads.artifact.size for library in version_meta.libraries
+    )
+    callbacks.set_max(assets_total_size + libraries_total_size)
+
     callbacks.set_status("Installing assets")
-    callbacks.set_max(version_meta.assetIndex.size + version_meta.assetIndex.totalSize)
     install_assets(version_meta.assetIndex, callbacks)
+
+    callbacks.set_status("Installing libraries")
+    install_libraries(version_meta.libraries, callbacks)

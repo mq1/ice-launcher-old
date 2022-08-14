@@ -10,7 +10,7 @@ from pydantic import BaseModel, HttpUrl
 from . import ProgressCallbacks, __version__, dirs, download_file
 
 __ASSETS_BASE_URL__ = "https://resources.download.minecraft.net"
-__ASSETS_DIR__: str = path.join(dirs.user_data_dir, "assets")
+__ASSETS_DIR__ = path.join(dirs.user_data_dir, "assets")
 
 
 class _ObjectInfo(BaseModel):
