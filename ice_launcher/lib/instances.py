@@ -2,22 +2,17 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import json
-import subprocess
 from enum import Enum
 from os import listdir, makedirs, path
 from os import rename as mv
 from shutil import rmtree
-from threading import Thread
-from typing import Any
 
 import tomli
 import tomli_w
 from pydantic import BaseModel
 
-from . import ProgressCallbacks, __version__, accounts, dirs, launcher_config
-from .minecraft_version_meta import install_version
-from .minecraft_versions import MinecraftVersionInfo
+from . import ProgressCallbacks, __version__, dirs
+from .minecraft_versions import MinecraftVersionInfo, install_version
 
 __INSTANCES_DIR__: str = path.join(dirs.user_data_dir, "instances")
 
