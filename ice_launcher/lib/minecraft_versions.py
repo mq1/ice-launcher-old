@@ -10,13 +10,13 @@ from pydantic import BaseModel, HttpUrl
 from . import ProgressCallbacks, dirs, download_file, http_client
 from .minecraft_assets import install_assets
 from .minecraft_libraries import install_libraries
-from .minecraft_version_meta import MinecraftVersionMeta
+from .minecraft_version_meta import MinecraftVersionMeta, install_client
 
 __VERSION_MANIFEST_URL__ = (
     "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 )
 
-__VERSIONS_PATH__ = path.join(dirs.user_data_dir, "versions")
+__VERSION_MANIFESTS_PATH__ = path.join(dirs.user_data_dir, "versions")
 
 
 class _TypeEnum(str, Enum):
@@ -53,7 +53,9 @@ def fetch_manifest() -> MinecraftVersionManifest:
 def install_version(
     minecraft_version: MinecraftVersionInfo, callbacks: ProgressCallbacks
 ) -> None:
-    version_meta_path = path.join(__VERSIONS_PATH__, f"{minecraft_version.id}.json")
+    version_meta_path = path.join(
+        __VERSION_MANIFESTS_PATH__, f"{minecraft_version.id}.json"
+    )
     download_file(
         url=minecraft_version.url,
         dest=version_meta_path,
@@ -68,10 +70,15 @@ def install_version(
     libraries_total_size = sum(
         library.downloads.artifact.size for library in version_meta.libraries
     )
-    callbacks.set_max(assets_total_size + libraries_total_size)
+    callbacks.set_max(
+        assets_total_size + libraries_total_size + version_meta.downloads.client.size
+    )
 
     callbacks.set_status("Installing assets")
     install_assets(version_meta.assetIndex, callbacks)
 
     callbacks.set_status("Installing libraries")
     install_libraries(version_meta.libraries, callbacks)
+
+    callbacks.set_status("Installing client")
+    install_client(minecraft_version.id, version_meta.downloads.client, callbacks)
