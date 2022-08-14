@@ -44,10 +44,7 @@ def download_file(
         sha1 = hashlib.sha1()
 
         with open(dest, "rb") as f:
-            while True:
-                chunk = f.read(65536)  # Read 64kb chunks.
-                if not chunk:
-                    break
+            while chunk := f.read(65536):  # Read 64kb chunks.
                 sha1.update(chunk)
 
         if sha1.hexdigest() == sha1hash:
