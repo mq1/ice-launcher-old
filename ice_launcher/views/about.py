@@ -9,7 +9,7 @@ from tkinter import PhotoImage
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
 
-from ice_launcher.lib import __version__
+from ice_launcher.lib import __version__, dirs
 
 
 class About(CTkFrame):
@@ -42,8 +42,15 @@ class About(CTkFrame):
         links_bar = CTkFrame(master=self)
         links_bar.grid(row=100, column=0, pady=0, padx=0, sticky="swe")
 
+        open_launcher_dir_button = CTkButton(
+            master=links_bar,
+            text="Open Ice Launcher Directory 🗃️",
+            command=lambda: webbrowser.open(f"file:///{dirs.user_data_dir}"),
+        )
+        open_launcher_dir_button.grid(row=0, column=0, pady=10, padx=10, sticky="nsw")
+
         # empty column as spacing
-        links_bar.grid_columnconfigure(0, weight=1)
+        links_bar.grid_columnconfigure(1, weight=1)
 
         license_button = CTkButton(
             master=links_bar,
@@ -52,11 +59,11 @@ class About(CTkFrame):
                 "https://github.com/mq1/ice-launcher/blob/main/LICENSE.txt"
             ),
         )
-        license_button.grid(row=0, column=1, pady=10, padx=10)
+        license_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")
 
         source_code_button = CTkButton(
             master=links_bar,
             text="Source Code ↗️",
             command=lambda: webbrowser.open("https://github.com/mq1/ice-launcher"),
         )
-        source_code_button.grid(row=0, column=2, pady=10, padx=10, sticky="nse")
+        source_code_button.grid(row=0, column=3, pady=10, padx=10, sticky="nse")
