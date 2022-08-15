@@ -10,6 +10,7 @@ from pydantic import BaseModel, HttpUrl
 from . import ProgressCallbacks, dirs, download_file, http_client
 from .minecraft_assets import install_assets
 from .minecraft_libraries import install_libraries
+from .minecraft_runtime import install_runtime
 from .minecraft_version_meta import MinecraftVersionMeta, install_client
 
 __VERSION_MANIFEST_URL__ = (
@@ -66,19 +67,7 @@ def install_version(
 
     version_meta = MinecraftVersionMeta.parse_file(version_meta_path)
 
-    assets_total_size = version_meta.assetIndex.size + version_meta.assetIndex.totalSize
-    libraries_total_size = sum(
-        library.downloads.artifact.size for library in version_meta.libraries
-    )
-    callbacks.set_max(
-        assets_total_size + libraries_total_size + version_meta.downloads.client.size
-    )
-
-    callbacks.set_status("Installing assets")
     install_assets(version_meta.assetIndex, callbacks)
-
-    callbacks.set_status("Installing libraries")
     install_libraries(version_meta.libraries, callbacks)
-
-    callbacks.set_status("Installing client")
     install_client(minecraft_version.id, version_meta.downloads.client, callbacks)
+    install_runtime(version_meta.javaVersion.component, callbacks)

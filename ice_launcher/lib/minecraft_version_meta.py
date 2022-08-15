@@ -23,15 +23,24 @@ class _Downloads(BaseModel):
     client: _Artifact
 
 
+class _JavaVersion(BaseModel):
+    component: str
+
+
 class MinecraftVersionMeta(BaseModel):
     assetIndex: AssetIndex
     downloads: _Downloads
+    javaVersion: _JavaVersion
     libraries: list[Library]
 
 
 def install_client(
     version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks
 ) -> None:
+    callbacks.reset()
+    callbacks.set_status("Installing client")
+    callbacks.set_max(artifact.size)
+
     client_path = path.join(__VERSIONS_PATH__, f"{version_id}.jar")
     download_file(
         url=artifact.url,

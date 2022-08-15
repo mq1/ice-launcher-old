@@ -89,10 +89,16 @@ class NewInstance(CTkFrame):
         def set_max(value: int) -> None:
             self.max_progress = value
 
+        def reset() -> None:
+            self.current_value = 0
+            self.max_progress = 0
+            self.progress_bar.set(0)
+
         callbacks = ProgressCallbacks(
             set_max=set_max,
             increment_value_by=increment_value_by,
             set_status=set_status,
+            reset=reset,
         )
 
         def new_instance():

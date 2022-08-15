@@ -4,6 +4,7 @@
 
 
 import hashlib
+import lzma
 from os import makedirs, path
 from typing import Callable, Optional
 
@@ -30,26 +31,31 @@ class ProgressCallbacks(BaseModel):
     set_max: Callable[[int], None]
     increment_value_by: Callable[[int], None]
     set_status: Callable[[str], None]
+    reset: Callable[[], None]
 
 
 def download_file(
     url: str,
     dest: str,
     total_size: Optional[int],
-    sha1hash: str,
+    sha1hash: Optional[str],
     callbacks: Optional[ProgressCallbacks],
+    is_lzma: bool = False,
 ) -> None:
     # If the file already exists, we check if the hash matches.
     if path.exists(dest):
-        sha1 = hashlib.sha1()
+        if sha1hash:
+            sha1 = hashlib.sha1()
 
-        with open(dest, "rb") as f:
-            while chunk := f.read(65536):  # Read 64kb chunks.
-                sha1.update(chunk)
+            with open(dest, "rb") as f:
+                while chunk := f.read(65536):  # Read 64kb chunks.
+                    sha1.update(chunk)
 
-        if sha1.hexdigest() == sha1hash:
-            if callbacks and total_size:
-                callbacks.increment_value_by(total_size)
+            if sha1.hexdigest() == sha1hash:
+                if callbacks and total_size:
+                    callbacks.increment_value_by(total_size)
+                return
+        else:
             return
 
     with open(dest, "wb") as file:
@@ -57,4 +63,6 @@ def download_file(
             for chunk in response.iter_bytes(65536):  # 64kb
                 if callbacks:
                     callbacks.increment_value_by(len(chunk))
+                if is_lzma:
+                    chunk = lzma.decompress(chunk)
                 file.write(chunk)

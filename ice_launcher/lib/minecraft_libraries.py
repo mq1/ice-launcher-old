@@ -84,42 +84,49 @@ def is_rule_list_valid(rules: list[_Rule]) -> bool:
 
 
 def install_libraries(libraries: list[Library], callbacks: ProgressCallbacks) -> None:
+    callbacks.reset()
+    callbacks.set_status("Installing libraries")
+    callbacks.set_max(sum(library.downloads.artifact.size for library in libraries))
+
     natives_string = get_natives_string()
-    thread_pool = ThreadPool()
-    results: list[AsyncResult] = []
 
-    for library in libraries:
-        library_path = path.join(__LIBRARIES_DIR__, library.downloads.artifact.path)
+    with ThreadPool() as thread_pool:
+        results: list[AsyncResult] = []
 
-        if library.downloads.rules and not is_rule_list_valid(library.downloads.rules):
-            continue
+        for library in libraries:
+            library_path = path.join(__LIBRARIES_DIR__, library.downloads.artifact.path)
 
-        if "natives" in library.downloads.artifact.path:
-            if natives_string not in library.downloads.artifact.path:
+            if library.downloads.rules and not is_rule_list_valid(
+                library.downloads.rules
+            ):
                 continue
 
-        if (
-            "x86_64" in library.downloads.artifact.path
-            and platform.machine() != "x86_64"
-        ):
-            continue
-        if (
-            "aarch_64" in library.downloads.artifact.path
-            and platform.machine() != "aarch64"
-        ):
-            continue
+            if "natives" in library.downloads.artifact.path:
+                if natives_string not in library.downloads.artifact.path:
+                    continue
 
-        result = thread_pool.apply_async(
-            download_file,
-            (
-                library.downloads.artifact.url,
-                library_path,
-                library.downloads.artifact.size,
-                library.downloads.artifact.sha1,
-                callbacks,
-            ),
-        )
-        results.append(result)
+            if (
+                "x86_64" in library.downloads.artifact.path
+                and platform.machine() != "x86_64"
+            ):
+                continue
+            if (
+                "aarch_64" in library.downloads.artifact.path
+                and platform.machine() != "aarch64"
+            ):
+                continue
 
-    for result in results:
-        result.wait()
+            result = thread_pool.apply_async(
+                download_file,
+                (
+                    library.downloads.artifact.url,
+                    library_path,
+                    library.downloads.artifact.size,
+                    library.downloads.artifact.sha1,
+                    callbacks,
+                ),
+            )
+            results.append(result)
+
+        for result in results:
+            result.wait()
