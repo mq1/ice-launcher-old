@@ -81,10 +81,7 @@ def _get_runtime_platform_string() -> Optional[str]:
                     return "windows-x86"
 
 
-def install_runtime(name: str, callbacks: ProgressCallbacks) -> None:
-    callbacks.reset()
-    callbacks.set_status("Installing runtime")
-
+def get_runtime_meta(name: str) -> RuntimeMeta:
     if not path.exists(__RUNTIME_META_DIR__):
         makedirs(__RUNTIME_META_DIR__)
 
@@ -114,60 +111,70 @@ def install_runtime(name: str, callbacks: ProgressCallbacks) -> None:
     )
     runtime_meta = RuntimeMeta.parse_file(runtime_meta_path)
 
-    # Calculate the total size of the files to download
+    return runtime_meta
+
+
+def get_total_runtime_size(name: str) -> int:
+    runtime_meta = get_runtime_meta(name)
+
     total_size = 0
-    for _, file_info in runtime_meta.files.items():
+    for file_info in runtime_meta.files.values():
         if file_info.type == _FileType.file and file_info.downloads is not None:
             if file_info.downloads.lzma is not None:
                 total_size += file_info.downloads.lzma.size
             else:
                 total_size += file_info.downloads.raw.size
-    callbacks.set_max(total_size)
 
-    with ThreadPool() as thread_pool:
-        results: list[AsyncResult] = []
+    return total_size
 
-        runtime_path = path.join(__RUNTIMES_DIR__, name)
-        makedirs(runtime_path, exist_ok=True)
-        for file_name, file_meta in runtime_meta.files.items():
-            match file_meta.type:
-                case _FileType.file:
-                    if file_meta.downloads is not None:
-                        if file_meta.downloads.lzma is not None:
-                            result = thread_pool.apply_async(
-                                download_file,
-                                args=(
-                                    file_meta.downloads.lzma.url,
-                                    path.join(runtime_path, file_name),
-                                    file_meta.downloads.lzma.size,
-                                    file_meta.downloads.lzma.sha1,
-                                    callbacks,
-                                    True,
-                                ),
-                            )
-                        else:
-                            result = thread_pool.apply_async(
-                                download_file,
-                                args=(
-                                    file_meta.downloads.raw.url,
-                                    path.join(runtime_path, file_name),
-                                    file_meta.downloads.raw.size,
-                                    file_meta.downloads.raw.sha1,
-                                    callbacks,
-                                    False,
-                                ),
-                            )
-                        results.append(result)
-                case _FileType.directory:
-                    makedirs(path.join(runtime_path, file_name), exist_ok=True)
-                case _FileType.link:
-                    if file_meta.target is not None:
-                        symlink(
-                            path.join(runtime_path, file_meta.target),
-                            path.join(runtime_path, file_name),
+
+def install_runtime(
+    name: str, callbacks: ProgressCallbacks, pool: ThreadPool
+) -> list[AsyncResult]:
+    runtime_meta = get_runtime_meta(name)
+    runtime_path = path.join(__RUNTIMES_DIR__, name)
+    makedirs(runtime_path, exist_ok=True)
+
+    results: list[AsyncResult] = []
+    for file_name, file_meta in runtime_meta.files.items():
+        match file_meta.type:
+            case _FileType.file:
+                if file_meta.downloads is not None:
+                    if file_meta.downloads.lzma is not None:
+                        result = pool.apply_async(
+                            download_file,
+                            args=(
+                                file_meta.downloads.lzma.url,
+                                path.join(runtime_path, file_name),
+                                file_meta.downloads.lzma.size,
+                                file_meta.downloads.lzma.sha1,
+                                callbacks,
+                                True,
+                            ),
                         )
-                case _:
-                    raise Exception("Unsupported file type")
+                    else:
+                        result = pool.apply_async(
+                            download_file,
+                            args=(
+                                file_meta.downloads.raw.url,
+                                path.join(runtime_path, file_name),
+                                file_meta.downloads.raw.size,
+                                file_meta.downloads.raw.sha1,
+                                callbacks,
+                                False,
+                            ),
+                        )
+                    results.append(result)
+            case _FileType.directory:
+                makedirs(path.join(runtime_path, file_name), exist_ok=True)
+            case _FileType.link:
+                file_path = path.join(runtime_path, file_name)
+                if file_meta.target is not None and not path.exists(file_path):
+                    symlink(
+                        file_meta.target,
+                        file_path,
+                    )
+            case _:
+                raise Exception("Unsupported file type")
 
-        for result in results:
-            result.wait()
+    return results

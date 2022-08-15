@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from multiprocessing.pool import AsyncResult, ThreadPool
 from os import path
 
 from pydantic import BaseModel, HttpUrl
@@ -35,17 +36,19 @@ class MinecraftVersionMeta(BaseModel):
 
 
 def install_client(
-    version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks
-) -> None:
-    callbacks.reset()
-    callbacks.set_status("Installing client")
-    callbacks.set_max(artifact.size)
-
+    version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks, pool: ThreadPool
+) -> list[AsyncResult]:
     client_path = path.join(__VERSIONS_PATH__, f"{version_id}.jar")
-    download_file(
-        url=artifact.url,
-        dest=client_path,
-        total_size=artifact.size,
-        sha1hash=artifact.sha1,
-        callbacks=callbacks,
+
+    result = pool.apply_async(
+        download_file,
+        (
+            artifact.url,
+            client_path,
+            artifact.size,
+            artifact.sha1,
+            callbacks,
+        ),
     )
+
+    return [result]

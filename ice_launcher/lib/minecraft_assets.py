@@ -30,11 +30,13 @@ class AssetIndex(BaseModel):
     url: HttpUrl
 
 
-def install_assets(asset_index: AssetIndex, callbacks: ProgressCallbacks) -> None:
-    callbacks.reset()
-    callbacks.set_status("Installing assets")
-    callbacks.set_max(asset_index.size + asset_index.totalSize)
+def get_total_assets_size(asset_index: AssetIndex) -> int:
+    return asset_index.size + asset_index.totalSize
 
+
+def install_assets(
+    asset_index: AssetIndex, callbacks: ProgressCallbacks, pool: ThreadPool
+) -> list[AsyncResult]:
     asset_index_path = path.join(__ASSETS_DIR__, "indexes", f"{asset_index.id}.json")
     download_file(
         url=asset_index.url,
@@ -45,18 +47,16 @@ def install_assets(asset_index: AssetIndex, callbacks: ProgressCallbacks) -> Non
     )
     assets = _Assets.parse_file(asset_index_path)
 
-    with ThreadPool() as thread_pool:
-        results: list[AsyncResult] = []
-        for _, asset_info in assets.objects.items():
-            asset_path = path.join(
-                __ASSETS_DIR__, "objects", asset_info.hash[:2], asset_info.hash
-            )
-            asset_url = f"{__ASSETS_BASE_URL__}/{asset_info.hash[:2]}/{asset_info.hash}"
-            result = thread_pool.apply_async(
-                download_file,
-                (asset_url, asset_path, asset_info.size, asset_info.hash, callbacks),
-            )
-            results.append(result)
+    results: list[AsyncResult] = []
+    for asset_info in assets.objects.values():
+        asset_path = path.join(
+            __ASSETS_DIR__, "objects", asset_info.hash[:2], asset_info.hash
+        )
+        asset_url = f"{__ASSETS_BASE_URL__}/{asset_info.hash[:2]}/{asset_info.hash}"
+        result = pool.apply_async(
+            download_file,
+            (asset_url, asset_path, asset_info.size, asset_info.hash, callbacks),
+        )
+        results.append(result)
 
-        for result in results:
-            result.wait()
+    return results

@@ -3,14 +3,15 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from enum import Enum
+from multiprocessing.pool import ThreadPool
 from os import path
 
 from pydantic import BaseModel, HttpUrl
 
 from . import ProgressCallbacks, dirs, download_file, http_client
-from .minecraft_assets import install_assets
-from .minecraft_libraries import install_libraries
-from .minecraft_runtime import install_runtime
+from .minecraft_assets import get_total_assets_size, install_assets
+from .minecraft_libraries import get_total_libraries_size, install_libraries
+from .minecraft_runtime import get_total_runtime_size, install_runtime
 from .minecraft_version_meta import MinecraftVersionMeta, install_client
 
 __VERSION_MANIFEST_URL__ = (
@@ -67,7 +68,22 @@ def install_version(
 
     version_meta = MinecraftVersionMeta.parse_file(version_meta_path)
 
-    install_assets(version_meta.assetIndex, callbacks)
-    install_libraries(version_meta.libraries, callbacks)
-    install_client(minecraft_version.id, version_meta.downloads.client, callbacks)
-    install_runtime(version_meta.javaVersion.component, callbacks)
+    total_size = (
+        get_total_assets_size(version_meta.assetIndex)
+        + get_total_libraries_size(version_meta.libraries)
+        + version_meta.downloads.client.size
+        + get_total_runtime_size(version_meta.javaVersion.component)
+    )
+    callbacks.set_status("Downloading required files")
+    callbacks.set_max(total_size)
+
+    with ThreadPool() as pool:
+        results = install_assets(version_meta.assetIndex, callbacks, pool)
+        results += install_libraries(version_meta.libraries, callbacks, pool)
+        results += install_client(
+            minecraft_version.id, version_meta.downloads.client, callbacks, pool
+        )
+        results += install_runtime(version_meta.javaVersion.component, callbacks, pool)
+
+        for result in results:
+            result.wait()
