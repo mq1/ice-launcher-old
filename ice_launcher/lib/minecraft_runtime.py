@@ -56,7 +56,7 @@ class RuntimeMeta(BaseModel):
     files: dict[str, _File]
 
 
-def _get_runtime_platform_string() -> Optional[str]:
+def _get_runtime_platform_string() -> str:
     """
     Get the name used the identify the platform
     """
@@ -80,6 +80,8 @@ def _get_runtime_platform_string() -> Optional[str]:
                 case "x86":
                     return "windows-x86"
 
+    raise Exception("Unsupported platform")
+
 
 def get_runtime_meta(name: str) -> RuntimeMeta:
     if not path.exists(__RUNTIME_META_DIR__):
@@ -97,8 +99,6 @@ def get_runtime_meta(name: str) -> RuntimeMeta:
         runtime_index = json.load(f)
 
     platform_string = _get_runtime_platform_string()
-    if platform_string is None:
-        raise Exception("Unsupported platform")
 
     runtime = _Runtime.parse_obj(runtime_index[platform_string][name][0])
     runtime_meta_path = path.join(__RUNTIMES_DIR__, f"{name}.json")
@@ -178,3 +178,19 @@ def install_runtime(
                 raise Exception("Unsupported file type")
 
     return results
+
+
+def get_executable_path(name: str) -> str:
+    runtime_dir = path.join(__RUNTIMES_DIR__, name)
+
+    match platform.system():
+        case "Linux":
+            return path.join(runtime_dir, "bin", "java")
+        case "Darwin":
+            return path.join(
+                runtime_dir, "jre.bundle", "Contents", "Home", "bin", "java"
+            )
+        case "Windows":
+            return path.join(runtime_dir, "bin", "java.exe")
+
+    raise Exception("Unsupported platform")
