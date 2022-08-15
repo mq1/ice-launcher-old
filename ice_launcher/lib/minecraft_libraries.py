@@ -87,15 +87,11 @@ def get_total_libraries_size(libraries: list[Library]) -> int:
     return sum(library.downloads.artifact.size for library in libraries)
 
 
-def install_libraries(
-    libraries: list[Library], callbacks: ProgressCallbacks, pool: ThreadPool
-) -> list[AsyncResult]:
+def _get_valid_artifacts(libraries: list[Library]) -> list[_Artifact]:
     natives_string = get_natives_string()
 
-    results: list[AsyncResult] = []
+    valid_artifacts = []
     for library in libraries:
-        library_path = path.join(__LIBRARIES_DIR__, library.downloads.artifact.path)
-
         if library.downloads.rules and not is_rule_list_valid(library.downloads.rules):
             continue
 
@@ -114,16 +110,40 @@ def install_libraries(
         ):
             continue
 
+        valid_artifacts.append(library.downloads.artifact)
+
+    return valid_artifacts
+
+
+def install_libraries(
+    libraries: list[Library], callbacks: ProgressCallbacks, pool: ThreadPool
+) -> list[AsyncResult]:
+    artifacts = _get_valid_artifacts(libraries)
+
+    results: list[AsyncResult] = []
+    for artifact in artifacts:
+        library_path = path.join(__LIBRARIES_DIR__, artifact.path)
+
         result = pool.apply_async(
             download_file,
             (
-                library.downloads.artifact.url,
+                artifact.url,
                 library_path,
-                library.downloads.artifact.size,
-                library.downloads.artifact.sha1,
+                artifact.size,
+                artifact.sha1,
                 callbacks,
             ),
         )
         results.append(result)
 
     return results
+
+
+def get_classpath_string(libraries: list[Library]) -> str:
+    classpath_separator = ";" if platform.system() == "Windows" else ":"
+    artifacts = _get_valid_artifacts(libraries)
+    classpath_string = classpath_separator.join(
+        path.join(__LIBRARIES_DIR__, artifact.path) for artifact in artifacts
+    )
+
+    return classpath_string
