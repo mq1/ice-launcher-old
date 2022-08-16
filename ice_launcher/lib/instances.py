@@ -6,12 +6,23 @@ from enum import Enum
 from os import listdir, makedirs, path
 from os import rename as mv
 from shutil import rmtree
+from subprocess import Popen
+from threading import Thread
+from typing import Callable
 
 import tomli
 import tomli_w
 from pydantic import BaseModel
 
-from . import ProgressCallbacks, __version__, dirs
+from . import (
+    ProgressCallbacks,
+    __version__,
+    accounts,
+    dirs,
+    minecraft_runtime,
+    minecraft_version_meta,
+)
+from .minecraft_rules import is_rule_list_valid
 from .minecraft_versions import MinecraftVersionInfo, install_version
 
 __INSTANCES_DIR__: str = path.join(dirs.user_data_dir, "instances")
@@ -83,3 +94,37 @@ def rename(old_name: str, new_name: str) -> None:
 def delete(instance_name: str) -> None:
     instance_dir = path.join(__INSTANCES_DIR__, instance_name)
     rmtree(instance_dir)
+
+
+def launch(instance_name: str, account_id: str, callback_function: Callable) -> None:
+    print(f"Launching instance {instance_name}")
+
+    print("Refreshing account")
+    account = accounts.refresh_account(account_id)
+    print("Account successfully refreshed")
+
+    instance_info = read_info(instance_name)
+    version_meta = minecraft_version_meta.get_version_meta(
+        instance_info.minecraft_version
+    )
+
+    executable_path = minecraft_runtime.get_executable_path(
+        version_meta.javaVersion.component
+    )
+
+    game_arguments = []
+    for argument in version_meta.arguments.game:
+        if isinstance(argument, str):
+            game_arguments.append(argument)
+        if isinstance(argument, minecraft_version_meta._ComplexArgument):
+            if is_rule_list_valid:
+                game_arguments.append(argument.value)
+
+    def start():
+        process = Popen(
+            [executable_path, *game_arguments],
+            cwd=path.join(__INSTANCES_DIR__, instance_name),
+        )
+        callback_function(process)
+
+    Thread(target=start).start()

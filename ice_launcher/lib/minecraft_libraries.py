@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import platform
-from enum import Enum
 from multiprocessing.pool import AsyncResult, ThreadPool
 from os import path
 from typing import Optional
@@ -11,6 +10,7 @@ from typing import Optional
 from pydantic import BaseModel, HttpUrl
 
 from . import ProgressCallbacks, dirs, download_file
+from .minecraft_rules import Rule, is_rule_list_valid
 
 __LIBRARIES_DIR__ = path.join(dirs.user_data_dir, "libraries")
 
@@ -22,28 +22,9 @@ class _Artifact(BaseModel):
     url: HttpUrl
 
 
-class _Action(str, Enum):
-    allow = "allow"
-
-
-class _OsName(str, Enum):
-    windows = "windows"
-    linux = "linux"
-    osx = "osx"
-
-
-class _Os(BaseModel):
-    name: _OsName
-
-
-class _Rule(BaseModel):
-    action: _Action
-    os: _Os
-
-
 class _Downloads(BaseModel):
     artifact: _Artifact
-    rules: Optional[list[_Rule]]
+    rules: Optional[list[Rule]]
 
 
 class Library(BaseModel):
@@ -71,16 +52,6 @@ def get_natives_string() -> str:
                     return "natives-windows-x86"
 
     raise Exception("Unsupported platform")
-
-
-def is_rule_list_valid(rules: list[_Rule]) -> bool:
-    os_name = platform.system().lower().replace("darwin", "osx")
-
-    for rule in rules:
-        if rule.action == _Action.allow and rule.os.name == os_name:
-            return True
-
-    return False
 
 
 def get_total_libraries_size(libraries: list[Library]) -> int:
