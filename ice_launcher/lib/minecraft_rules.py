@@ -4,6 +4,7 @@
 
 import platform
 from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -22,16 +23,25 @@ class _Os(BaseModel):
     name: _OsName
 
 
+class _Feature(str, Enum):
+    is_demo_user = "is_demo_user"
+    has_custom_resolution = "has_custom_resolution"
+
+
 class Rule(BaseModel):
     action: _Action
-    os: _Os
+    os: Optional[_Os]
+    features: Optional[dict[_Feature, bool]]
 
 
 def is_rule_list_valid(rules: list[Rule]) -> bool:
     os_name = platform.system().lower().replace("darwin", "osx")
 
     for rule in rules:
-        if rule.action == _Action.allow and rule.os.name == os_name:
-            return True
+        if rule.os:
+            if rule.action == _Action.allow and rule.os.name == os_name:
+                return True
+        elif rule.features:
+            return False
 
     return False

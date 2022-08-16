@@ -17,7 +17,7 @@ __VERSIONS_PATH__ = path.join(dirs.user_data_dir, "versions")
 
 class _ComplexArgument(BaseModel):
     rules: list[Rule]
-    value: str
+    value: str | list[str]
 
 
 class _Arguments(BaseModel):

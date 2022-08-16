@@ -114,11 +114,37 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
 
     game_arguments = []
     for argument in version_meta.arguments.game:
-        if isinstance(argument, str):
-            game_arguments.append(argument)
         if isinstance(argument, minecraft_version_meta._ComplexArgument):
             if is_rule_list_valid:
-                game_arguments.append(argument.value)
+                argument = argument.value
+
+        if argument:
+            match argument:
+                case "${auth_player_name}":
+                    argument = account.minecraft_username
+                case "${version_name}":
+                    argument = instance_info.minecraft_version
+                case "${game_directory}":
+                    argument = path.join(__INSTANCES_DIR__, instance_name)
+                case "${assets_root}":
+                    argument = path.join(dirs.user_data_dir, "assets")
+                case "${assets_index_name}":
+                    argument = version_meta.assetIndex.id
+                case "${auth_uuid}":
+                    argument = account_id
+                case "${auth_access_token}":
+                    argument = account.minecraft_access_token
+                case "${clientid}":
+                    argument = f"ice-launcher/{__version__}"
+                case "${auth_xuid}":
+                    argument = "0"
+                case "${user_type}":
+                    argument = "mojang"
+                case "${version_type}":
+                    argument = instance_info.instance_type
+
+            
+            game_arguments.append(argument)
 
     def start():
         process = Popen(
