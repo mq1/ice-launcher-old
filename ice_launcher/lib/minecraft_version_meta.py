@@ -22,7 +22,6 @@ class _ComplexArgument(BaseModel):
 
 class _Arguments(BaseModel):
     game: list[str] | _ComplexArgument
-    jvm: list[str] | _ComplexArgument
 
 
 class _Artifact(BaseModel):
@@ -45,6 +44,7 @@ class MinecraftVersionMeta(BaseModel):
     downloads: _Downloads
     javaVersion: _JavaVersion
     libraries: list[Library]
+    mainClass: str
 
 
 def get_version_meta(version_id: str) -> MinecraftVersionMeta:

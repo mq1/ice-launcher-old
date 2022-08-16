@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import platform
 from enum import Enum
 from os import listdir, makedirs, path
 from os import rename as mv
@@ -22,6 +23,7 @@ from . import (
     minecraft_runtime,
     minecraft_version_meta,
 )
+from .minecraft_libraries import get_classpath_string
 from .minecraft_rules import is_rule_list_valid
 from .minecraft_versions import MinecraftVersionInfo, install_version
 
@@ -117,6 +119,8 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
         if isinstance(argument, minecraft_version_meta._ComplexArgument):
             if is_rule_list_valid:
                 argument = argument.value
+            else:
+                argument = None
 
         if argument:
             match argument:
@@ -145,9 +149,31 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
 
             game_arguments.append(argument)
 
+    jvm_arguments = []
+    if platform.system() == "Darwin":
+        jvm_arguments.append("-XstartOnFirstThread")
+    elif platform.system() == "Windows":
+        jvm_arguments.append(
+            "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump"
+        )
+        if platform.release() == "10":
+            jvm_arguments.append("-Dos.name=Windows 10")
+            jvm_arguments.append("-Dos.version=10.0")
+    if platform.machine() in ["x86", "i386", "i686"]:
+        jvm_arguments.append("-Xss1M")
+
+    jvm_arguments.append(
+        "-Djava.library.path=" + path.join(dirs.user_data_dir, "natives")
+    )
+    jvm_arguments.append("-Dminecraft.launcher.brand=ice-launcher")
+    jvm_arguments.append(f"-Dminecraft.launcher.version={__version__}")
+
     def start():
         process = Popen(
-            [executable_path, *game_arguments],
+            [executable_path]
+            + jvm_arguments
+            + game_arguments
+            + [version_meta.mainClass],
             cwd=path.join(__INSTANCES_DIR__, instance_name),
         )
         callback_function(process)
