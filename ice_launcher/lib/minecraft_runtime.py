@@ -91,7 +91,6 @@ def get_runtime_meta(name: str) -> RuntimeMeta:
     download_file(
         url=__RUNTIME_INDEX_URL__,
         dest=runtime_index_path,
-        total_size=None,
         sha1hash=None,
         callbacks=None,
     )
@@ -105,7 +104,6 @@ def get_runtime_meta(name: str) -> RuntimeMeta:
     download_file(
         url=runtime.manifest.url,
         dest=runtime_meta_path,
-        total_size=None,
         sha1hash=runtime.manifest.sha1,
         callbacks=None,
     )
@@ -146,7 +144,6 @@ def install_runtime(
                             args=(
                                 file_meta.downloads.lzma.url,
                                 path.join(runtime_path, file_name),
-                                file_meta.downloads.lzma.size,
                                 file_meta.downloads.lzma.sha1,
                                 callbacks,
                                 True,
@@ -158,7 +155,6 @@ def install_runtime(
                             args=(
                                 file_meta.downloads.raw.url,
                                 path.join(runtime_path, file_name),
-                                file_meta.downloads.raw.size,
                                 file_meta.downloads.raw.sha1,
                                 callbacks,
                                 False,

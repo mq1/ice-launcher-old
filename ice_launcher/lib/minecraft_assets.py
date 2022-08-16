@@ -41,7 +41,6 @@ def install_assets(
     download_file(
         url=asset_index.url,
         dest=asset_index_path,
-        total_size=asset_index.size,
         sha1hash=asset_index.sha1,
         callbacks=callbacks,
     )
@@ -55,7 +54,7 @@ def install_assets(
         asset_url = f"{__ASSETS_BASE_URL__}/{asset_info.hash[:2]}/{asset_info.hash}"
         result = pool.apply_async(
             download_file,
-            (asset_url, asset_path, asset_info.size, asset_info.hash, callbacks),
+            (asset_url, asset_path, asset_info.hash, callbacks),
         )
         results.append(result)
 

@@ -37,7 +37,6 @@ class ProgressCallbacks(BaseModel):
 def download_file(
     url: str,
     dest: str,
-    total_size: Optional[int],
     sha1hash: Optional[str],
     callbacks: Optional[ProgressCallbacks],
     is_lzma: bool = False,
@@ -52,8 +51,9 @@ def download_file(
                     sha1.update(chunk)
 
             if sha1.hexdigest() == sha1hash:
-                if callbacks and total_size:
-                    callbacks.increment_value_by(total_size)
+                if callbacks:
+                    file_size = path.getsize(dest)
+                    callbacks.increment_value_by(file_size)
                 return
         else:
             return

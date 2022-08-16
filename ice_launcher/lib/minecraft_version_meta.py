@@ -64,7 +64,6 @@ def install_client(
         (
             artifact.url,
             client_path,
-            artifact.size,
             artifact.sha1,
             callbacks,
         ),

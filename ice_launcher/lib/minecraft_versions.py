@@ -61,7 +61,6 @@ def install_version(
     download_file(
         url=minecraft_version.url,
         dest=version_meta_path,
-        total_size=None,
         sha1hash=minecraft_version.sha1,
         callbacks=None,
     )

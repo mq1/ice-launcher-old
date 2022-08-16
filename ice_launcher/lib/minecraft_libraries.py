@@ -100,7 +100,6 @@ def install_libraries(
             (
                 artifact.url,
                 library_path,
-                artifact.size,
                 artifact.sha1,
                 callbacks,
             ),
