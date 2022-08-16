@@ -143,7 +143,6 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
                 case "${version_type}":
                     argument = instance_info.instance_type
 
-            
             game_arguments.append(argument)
 
     def start():
