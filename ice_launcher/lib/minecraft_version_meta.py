@@ -21,7 +21,7 @@ class _ComplexArgument(BaseModel):
 
 
 class _Arguments(BaseModel):
-    game: list[str] | _ComplexArgument
+    game: list[str | _ComplexArgument]
 
 
 class _Artifact(BaseModel):

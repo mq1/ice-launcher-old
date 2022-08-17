@@ -4,7 +4,7 @@
 
 from enum import Enum
 from multiprocessing.pool import ThreadPool
-from os import path
+from os import makedirs, path
 
 from pydantic import BaseModel, HttpUrl
 
@@ -55,6 +55,8 @@ def fetch_manifest() -> MinecraftVersionManifest:
 def install_version(
     minecraft_version: MinecraftVersionInfo, callbacks: ProgressCallbacks
 ) -> None:
+    makedirs(__VERSION_MANIFESTS_PATH__, exist_ok=True)
+
     version_meta_path = path.join(
         __VERSION_MANIFESTS_PATH__, f"{minecraft_version.id}.json"
     )

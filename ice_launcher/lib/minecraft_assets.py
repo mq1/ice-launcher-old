@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from multiprocessing.pool import AsyncResult, ThreadPool
-from os import path
+from os import makedirs, path
 
 from pydantic import BaseModel, HttpUrl
 
@@ -37,6 +37,10 @@ def get_total_assets_size(asset_index: AssetIndex) -> int:
 def install_assets(
     asset_index: AssetIndex, callbacks: ProgressCallbacks, pool: ThreadPool
 ) -> list[AsyncResult]:
+    makedirs(__ASSETS_DIR__, exist_ok=True)
+    makedirs(path.join(__ASSETS_DIR__, "indexes"), exist_ok=True)
+    makedirs(path.join(__ASSETS_DIR__, "objects"), exist_ok=True)
+
     asset_index_path = path.join(__ASSETS_DIR__, "indexes", f"{asset_index.id}.json")
     download_file(
         url=asset_index.url,

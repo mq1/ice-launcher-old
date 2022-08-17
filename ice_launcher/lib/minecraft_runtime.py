@@ -147,6 +147,7 @@ def install_runtime(
                                 file_meta.downloads.lzma.sha1,
                                 callbacks,
                                 True,
+                                file_meta.executable,
                             ),
                         )
                     else:
@@ -158,6 +159,7 @@ def install_runtime(
                                 file_meta.downloads.raw.sha1,
                                 callbacks,
                                 False,
+                                file_meta.executable,
                             ),
                         )
                     results.append(result)

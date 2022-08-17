@@ -117,7 +117,7 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     game_arguments = []
     for argument in version_meta.arguments.game:
         if isinstance(argument, minecraft_version_meta._ComplexArgument):
-            if is_rule_list_valid:
+            if is_rule_list_valid(argument.rules):
                 argument = argument.value
             else:
                 argument = None
@@ -145,7 +145,7 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
                 case "${user_type}":
                     argument = "mojang"
                 case "${version_type}":
-                    argument = instance_info.instance_type
+                    argument = instance_info.instance_type.value
 
             game_arguments.append(argument)
 
@@ -167,15 +167,18 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     )
     jvm_arguments.append("-Dminecraft.launcher.brand=ice-launcher")
     jvm_arguments.append(f"-Dminecraft.launcher.version={__version__}")
+    jvm_arguments.append("-cp")
+    jvm_arguments.append(get_classpath_string(version_meta.libraries))
+
+    command = [
+        executable_path,
+        *jvm_arguments,
+        version_meta.mainClass,
+        *game_arguments,
+    ]
 
     def start():
-        process = Popen(
-            [executable_path]
-            + jvm_arguments
-            + game_arguments
-            + [version_meta.mainClass],
-            cwd=path.join(__INSTANCES_DIR__, instance_name),
-        )
+        process = Popen(command, cwd=path.join(__INSTANCES_DIR__, instance_name))
         callback_function(process)
 
     Thread(target=start).start()

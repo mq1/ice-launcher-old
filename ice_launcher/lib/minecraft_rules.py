@@ -38,10 +38,10 @@ def is_rule_list_valid(rules: list[Rule]) -> bool:
     os_name = platform.system().lower().replace("darwin", "osx")
 
     for rule in rules:
+        if rule.features:
+            return False
         if rule.os:
             if rule.action == _Action.allow and rule.os.name == os_name:
                 return True
-        elif rule.features:
-            return False
 
     return False

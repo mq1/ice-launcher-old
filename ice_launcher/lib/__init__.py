@@ -5,7 +5,9 @@
 
 import hashlib
 import lzma
-from os import makedirs, path
+import os
+import stat
+from os import chmod, makedirs, path
 from typing import Callable, Optional
 
 import httpx
@@ -40,6 +42,7 @@ def download_file(
     sha1hash: Optional[str],
     callbacks: Optional[ProgressCallbacks],
     is_lzma: bool = False,
+    set_executable: bool = False,
 ) -> None:
     # If the file already exists, we check if the hash matches.
     if path.exists(dest):
@@ -66,3 +69,7 @@ def download_file(
                 if is_lzma:
                     chunk = lzma.decompress(chunk)
                 file.write(chunk)
+
+    if set_executable:
+        st = os.stat(dest)
+        chmod(dest, st.st_mode | stat.S_IEXEC)
