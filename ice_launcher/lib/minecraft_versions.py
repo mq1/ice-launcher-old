@@ -11,7 +11,6 @@ from pydantic import BaseModel, HttpUrl
 from . import ProgressCallbacks, dirs, download_file, http_client
 from .minecraft_assets import get_total_assets_size, install_assets
 from .minecraft_libraries import get_total_libraries_size, install_libraries
-from .minecraft_runtime import get_total_runtime_size, install_runtime
 from .minecraft_version_meta import MinecraftVersionMeta, install_client
 
 __VERSION_MANIFEST_URL__ = (
@@ -73,7 +72,6 @@ def install_version(
         get_total_assets_size(version_meta.assetIndex)
         + get_total_libraries_size(version_meta.libraries)
         + version_meta.downloads.client.size
-        + get_total_runtime_size(version_meta.javaVersion.component)
     )
     callbacks.set_status("Downloading required files")
     callbacks.set_max(total_size)
@@ -84,7 +82,6 @@ def install_version(
         results += install_client(
             minecraft_version.id, version_meta.downloads.client, callbacks, pool
         )
-        results += install_runtime(version_meta.javaVersion.component, callbacks, pool)
 
         for result in results:
             result.wait()

@@ -7,7 +7,7 @@ import hashlib
 import lzma
 import os
 import stat
-from os import chmod, makedirs, path
+from os import chmod, makedirs, path, remove
 from typing import Callable, Optional
 
 import httpx
@@ -26,7 +26,7 @@ if not path.exists(dirs.user_data_dir):
 headers = {
     "user-agent": f"ice-launcher/{__version__}",
 }
-http_client = httpx.Client(headers=headers)
+http_client = httpx.Client(headers=headers, follow_redirects=True)
 
 
 class ProgressCallbacks(BaseModel):
@@ -44,6 +44,8 @@ def download_file(
     is_lzma: bool = False,
     set_executable: bool = False,
 ) -> None:
+    print("Downloading file from", url, "to", dest)
+
     # If the file already exists, we check if the hash matches.
     if path.exists(dest):
         if sha1hash:
@@ -58,8 +60,8 @@ def download_file(
                     file_size = path.getsize(dest)
                     callbacks.increment_value_by(file_size)
                 return
-        else:
-            return
+
+        remove(dest)
 
     with open(dest, "wb") as file:
         with http_client.stream("GET", url) as response:

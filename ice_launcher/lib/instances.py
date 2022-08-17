@@ -20,7 +20,7 @@ from . import (
     __version__,
     accounts,
     dirs,
-    minecraft_runtime,
+    jre_manager,
     minecraft_version_meta,
 )
 from .minecraft_libraries import get_classpath_string
@@ -40,12 +40,11 @@ class InstanceInfo(BaseModel):
     config_version: int = 1
     instance_type: InstanceType = InstanceType.vanilla
     minecraft_version: str = ""
+    jre_version: str = "latest"
 
 
 def list() -> list[str]:
-    # check if instances folder exists
-    if not path.exists(__INSTANCES_DIR__):
-        makedirs(__INSTANCES_DIR__)
+    makedirs(__INSTANCES_DIR__, exist_ok=True)
 
     list = [
         x
@@ -110,9 +109,16 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
         instance_info.minecraft_version
     )
 
-    executable_path = minecraft_runtime.get_executable_path(
-        version_meta.javaVersion.component
-    )
+    jre_version = instance_info.jre_version
+    if jre_version == "latest":
+        jre_version = jre_manager.get_latest_release()
+
+    is_updated, latest_semver = jre_manager.is_updated(jre_version)
+    if not is_updated:
+        print("Updating JRE")
+        jre_manager.update(jre_version)
+
+    java_path = jre_manager.get_java_path(latest_semver)
 
     game_arguments = []
     for argument in version_meta.arguments.game:
@@ -171,7 +177,7 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     jvm_arguments.append(get_classpath_string(version_meta.libraries))
 
     command = [
-        executable_path,
+        java_path,
         *jvm_arguments,
         version_meta.mainClass,
         *game_arguments,
