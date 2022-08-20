@@ -5,6 +5,7 @@
 import platform
 from os import listdir, makedirs, path, remove
 from shutil import rmtree, unpack_archive
+from typing import Final
 
 import httpx
 from packaging import version
@@ -12,8 +13,8 @@ from pydantic import BaseModel, HttpUrl
 
 from . import dirs, download_file, headers
 
-__ENDPOINT__ = "https://api.adoptium.net"
-__JRE_DIR__ = path.join(dirs.user_data_dir, "jre")
+ADOPTIUM_API_ENDPOINT: Final[str] = "https://api.adoptium.net"
+JRES_DIR: Final[str] = path.join(dirs.user_data_dir, "jre")
 
 
 class _Package(BaseModel):
@@ -38,7 +39,7 @@ class _Assets(BaseModel):
 
 def fetch_latest_java_version() -> str:
     path = "/v3/info/available_releases"
-    response = httpx.get(f"{__ENDPOINT__}{path}", headers=headers)
+    response = httpx.get(f"{ADOPTIUM_API_ENDPOINT}{path}", headers=headers)
     latest_release = response.json()["most_recent_feature_release"]
 
     return latest_release
@@ -76,7 +77,7 @@ def _get_assets_info(java_version: str) -> _Assets:
     }
 
     response = httpx.get(
-        f"{__ENDPOINT__}{url_path}",
+        f"{ADOPTIUM_API_ENDPOINT}{url_path}",
         headers=headers | {"Accept": "application/json"},
         params=params,
     )
@@ -86,12 +87,12 @@ def _get_assets_info(java_version: str) -> _Assets:
 
 
 def is_updated(java_version: str) -> bool:
-    makedirs(__JRE_DIR__, exist_ok=True)
+    makedirs(JRES_DIR, exist_ok=True)
 
     assets_info = _get_assets_info(java_version)
 
     current_semver = [
-        dir for dir in listdir(__JRE_DIR__) if path.isdir(path.join(__JRE_DIR__, dir))
+        dir for dir in listdir(JRES_DIR) if path.isdir(path.join(JRES_DIR, dir))
     ]
     if len(current_semver) == 0:
         return False
@@ -105,28 +106,28 @@ def is_updated(java_version: str) -> bool:
 
 
 def update(java_version: str) -> None:
-    makedirs(__JRE_DIR__, exist_ok=True)
+    makedirs(JRES_DIR, exist_ok=True)
 
     # To be deleted
-    previous_files = listdir(__JRE_DIR__)
+    previous_files = listdir(JRES_DIR)
 
     assets_info = _get_assets_info(java_version)
     download_url = assets_info.binary.package.link
 
     extension = "zip" if platform.system() == "Windows" else "tar.gz"
-    download_path = path.join(__JRE_DIR__, f"{assets_info.version.semver}.{extension}")
+    download_path = path.join(JRES_DIR, f"{assets_info.version.semver}.{extension}")
 
     download_file(
         url=download_url,
         dest=download_path,
     )
 
-    unpack_archive(download_path, __JRE_DIR__)
+    unpack_archive(download_path, JRES_DIR)
     remove(download_path)
 
     # Delete previous files
     for file in previous_files:
-        file_path = path.join(__JRE_DIR__, file)
+        file_path = path.join(JRES_DIR, file)
         if path.isdir(file_path):
             rmtree(file_path)
 
@@ -135,19 +136,19 @@ def update(java_version: str) -> None:
 
 
 def get_java_path(version: str) -> str:
-    makedirs(__JRE_DIR__, exist_ok=True)
+    makedirs(JRES_DIR, exist_ok=True)
 
     available_jres = [
-        dir for dir in listdir(__JRE_DIR__) if path.isdir(path.join(__JRE_DIR__, dir))
+        dir for dir in listdir(JRES_DIR) if path.isdir(path.join(JRES_DIR, dir))
     ]
 
     current_jre = [dir for dir in available_jres if dir.startswith(f"jdk-{version}")][0]
 
     if platform.system() == "Windows":
-        return path.join("jre", current_jre, "bin", "java.exe")
+        return path.join(JRES_DIR, current_jre, "bin", "java.exe")
     if platform.system() == "Darwin":
-        return path.join("jre", current_jre, "Contents", "Home", "bin", "java")
+        return path.join(JRES_DIR, current_jre, "Contents", "Home", "bin", "java")
     if platform.system() == "Linux":
-        return path.join("jre", current_jre, "bin", "java")
+        return path.join(JRES_DIR, current_jre, "bin", "java")
 
     raise Exception("JRE not found")

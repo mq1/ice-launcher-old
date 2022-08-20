@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import Optional
+from typing import Final, Optional
 
 import httpx
 import packaging.version
@@ -10,7 +10,9 @@ from pydantic import BaseModel
 
 from . import __version__, headers
 
-__LATEST_RELEASE_URL__ = "https://api.github.com/repos/mq1/ice-launcher/releases/latest"
+LATEST_RELEASE_URL: Final[
+    str
+] = "https://api.github.com/repos/mq1/ice-launcher/releases/latest"
 
 
 class _ReleaseInfo(BaseModel):
@@ -20,7 +22,7 @@ class _ReleaseInfo(BaseModel):
 def _get_latest_release() -> str:
     """Get the latest release of the launcher."""
 
-    response = httpx.get(__LATEST_RELEASE_URL__, headers=headers)
+    response = httpx.get(LATEST_RELEASE_URL, headers=headers)
     release_info = _ReleaseInfo.parse_raw(response.content)
 
     return release_info.tag_name

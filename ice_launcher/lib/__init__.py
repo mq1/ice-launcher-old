@@ -8,7 +8,7 @@ import lzma
 import os
 import stat
 from os import chmod, makedirs, path, remove
-from typing import Callable, Optional
+from typing import Callable, Final, Optional
 
 import httpx
 from appdirs import AppDirs
@@ -18,9 +18,9 @@ dirs: AppDirs = AppDirs("ice-launcher", "mq1.eu")
 makedirs(dirs.user_data_dir, exist_ok=True)
 
 
-__version__ = "0.0.16"
-__CLIENT_ID__ = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
-__VERSIONS_DIR__ = path.join(dirs.user_data_dir, "versions")
+__version__: Final[str] = "0.0.16"
+CLIENT_ID: Final[str] = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
+VERSIONS_DIR: Final[str] = path.join(dirs.user_data_dir, "versions")
 
 
 headers = {

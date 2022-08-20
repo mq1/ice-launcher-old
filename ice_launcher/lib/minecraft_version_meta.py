@@ -4,11 +4,10 @@
 
 from multiprocessing.pool import AsyncResult, ThreadPool
 from os import path
-from typing import Coroutine
 
 from pydantic import BaseModel, HttpUrl
 
-from . import __VERSIONS_DIR__, ProgressCallbacks, download_file
+from . import VERSIONS_DIR, ProgressCallbacks, download_file
 from .minecraft_assets import AssetIndex
 from .minecraft_libraries import Library
 from .minecraft_rules import Rule
@@ -47,7 +46,7 @@ class MinecraftVersionMeta(BaseModel):
 
 
 def get_version_meta(version_id: str) -> MinecraftVersionMeta:
-    version_meta_path = path.join(__VERSIONS_DIR__, f"{version_id}.json")
+    version_meta_path = path.join(VERSIONS_DIR, f"{version_id}.json")
     version_meta = MinecraftVersionMeta.parse_file(version_meta_path)
 
     return version_meta
@@ -56,7 +55,7 @@ def get_version_meta(version_id: str) -> MinecraftVersionMeta:
 def install_client(
     version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks, pool: ThreadPool
 ) -> list[AsyncResult]:
-    client_path = path.join(__VERSIONS_DIR__, f"{version_id}.jar")
+    client_path = path.join(VERSIONS_DIR, f"{version_id}.jar")
 
     result = pool.apply_async(
         download_file,

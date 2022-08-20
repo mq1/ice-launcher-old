@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from os import path
+from typing import Final
 
 import tomli
 import tomli_w
@@ -10,7 +11,7 @@ from pydantic import BaseModel
 
 from . import dirs
 
-__config_path__: str = path.join(dirs.user_data_dir, "config.toml")
+CONFIG_PATH: Final[str] = path.join(dirs.user_data_dir, "config.toml")
 
 
 class Config(BaseModel):
@@ -21,15 +22,15 @@ class Config(BaseModel):
 
 
 def write(config: Config) -> None:
-    with open(__config_path__, "wb") as f:
+    with open(CONFIG_PATH, "wb") as f:
         tomli_w.dump(config.dict(), f)
 
 
 def read() -> Config:
-    if not path.exists(__config_path__):
+    if not path.exists(CONFIG_PATH):
         return Config()
 
-    with open(__config_path__, "rb") as f:
+    with open(CONFIG_PATH, "rb") as f:
         config = Config.parse_obj(tomli.load(f))
 
     # Writes the config file in case it is outdated.

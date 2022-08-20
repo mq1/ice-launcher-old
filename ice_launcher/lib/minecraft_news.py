@@ -3,16 +3,16 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from enum import Enum
-from typing import Optional
+from typing import Final, Optional
 
 import httpx
 from pydantic import BaseModel
 
 from . import headers
 
-__NEWS_URL__ = (
-    "https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid"
-)
+MINECRAFT_NEWS_URL: Final[
+    str
+] = "https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid"
 
 http_client = httpx.Client(headers=headers)
 
@@ -82,7 +82,7 @@ def fetch(page_size: int = 20) -> Articles:
     """
 
     parameters = {"pageSize": page_size}
-    response = http_client.get(__NEWS_URL__, params=parameters)
+    response = http_client.get(MINECRAFT_NEWS_URL, params=parameters)
     articles = Articles.parse_raw(response.content)
 
     return articles

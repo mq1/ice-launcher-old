@@ -6,15 +6,15 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from os import path
 from threading import Thread
-from typing import Any, Optional
+from typing import Any, Final, Optional
 
 import tomli
 import tomli_w
 from pydantic import BaseModel
 
-from . import __CLIENT_ID__, dirs, msa
+from . import dirs, msa
 
-__accounts_file__: str = path.join(dirs.user_data_dir, "accounts.toml")
+ACCOUNTS_FILE_PATH: Final[str] = path.join(dirs.user_data_dir, "accounts.toml")
 
 
 class Document(BaseModel):
@@ -24,15 +24,15 @@ class Document(BaseModel):
 
 
 def _write_document(doc: Document) -> None:
-    with open(__accounts_file__, "wb") as f:
+    with open(ACCOUNTS_FILE_PATH, "wb") as f:
         tomli_w.dump(doc.dict(), f)
 
 
 def _read_document() -> Document:
-    if not path.exists(__accounts_file__):
+    if not path.exists(ACCOUNTS_FILE_PATH):
         return Document()
 
-    with open(__accounts_file__, "rb") as f:
+    with open(ACCOUNTS_FILE_PATH, "rb") as f:
         doc = Document.parse_obj(tomli.load(f))
 
     # Writes the document file in case it is outdated.

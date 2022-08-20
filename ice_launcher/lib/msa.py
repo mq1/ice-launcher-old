@@ -6,25 +6,32 @@ import secrets
 from base64 import urlsafe_b64encode
 from enum import Enum
 from hashlib import sha256
+from typing import Final
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 from pydantic import BaseModel
 
-from . import __CLIENT_ID__, headers
+from . import CLIENT_ID, headers
 
-__MSA_AUTHORIZATION_ENDPOINT__ = (
-    "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize"
-)
-__MSA_TOKEN_ENDPOINT__ = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
-__XBOXLIVE_AUTH_ENDPOINT__ = "https://user.auth.xboxlive.com/user/authenticate"
-__XSTS_AUTHORIZATION_ENDPOINT__ = "https://xsts.auth.xboxlive.com/xsts/authorize"
-__MINECRAFT_AUTH_ENDPOINT__ = (
-    "https://api.minecraftservices.com/authentication/login_with_xbox"
-)
-__MINECRAFT_PROFILE_ENDPOINT__ = "https://api.minecraftservices.com/minecraft/profile"
-__SCOPE__ = "XboxLive.signin offline_access"
-__REDIRECT_URI__: str = "http://localhost:3003"
+MSA_AUTHORIZATION_ENDPOINT: Final[
+    str
+] = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize"
+MSA_TOKEN_ENDPOINT: Final[
+    str
+] = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
+XBOXLIVE_AUTH_ENDPOINT: Final[str] = "https://user.auth.xboxlive.com/user/authenticate"
+XSTS_AUTHORIZATION_ENDPOINT: Final[
+    str
+] = "https://xsts.auth.xboxlive.com/xsts/authorize"
+MINECRAFT_AUTH_ENDPOINT: Final[
+    str
+] = "https://api.minecraftservices.com/authentication/login_with_xbox"
+MINECRAFT_PROFILE_ENDPOINT: Final[
+    str
+] = "https://api.minecraftservices.com/minecraft/profile"
+SCOPE: Final[str] = "XboxLive.signin offline_access"
+REDIRECT_URI: Final[str] = "http://localhost:3003"
 
 
 class _CodeChallengeMethod(str, Enum):
@@ -115,21 +122,17 @@ def get_login_data() -> _LoginData:
     state = _generate_state()
 
     data = {
-        "client_id": __CLIENT_ID__,
+        "client_id": CLIENT_ID,
         "response_type": "code",
-        "redirect_uri": __REDIRECT_URI__,
+        "redirect_uri": REDIRECT_URI,
         "response_mode": "query",
-        "scope": __SCOPE__,
+        "scope": SCOPE,
         "state": state,
         "code_challenge": pkce_data.code_challenge,
         "code_challenge_method": pkce_data.code_challenge_method.value,
     }
 
-    uri = (
-        urlparse(__MSA_AUTHORIZATION_ENDPOINT__)
-        ._replace(query=urlencode(data))
-        .geturl()
-    )
+    uri = urlparse(MSA_AUTHORIZATION_ENDPOINT)._replace(query=urlencode(data)).geturl()
 
     return _LoginData(uri=uri, state=state, code_verifier=pkce_data.code_verifier)
 
@@ -150,7 +153,7 @@ def _get_minecraft_account_data(msa_token: _OAuth2Token) -> AccountEntry:
         "RelyingParty": "http://auth.xboxlive.com",
         "TokenType": "JWT",
     }
-    response = http_client.post(__XBOXLIVE_AUTH_ENDPOINT__, json=data)
+    response = http_client.post(XBOXLIVE_AUTH_ENDPOINT, json=data)
     xbl_response = _XBLResponse.parse_raw(response.content)
 
     # Authenticate with XSTS
@@ -159,19 +162,19 @@ def _get_minecraft_account_data(msa_token: _OAuth2Token) -> AccountEntry:
         "RelyingParty": "rp://api.minecraftservices.com/",
         "TokenType": "JWT",
     }
-    response = http_client.post(__XSTS_AUTHORIZATION_ENDPOINT__, json=data)
+    response = http_client.post(XSTS_AUTHORIZATION_ENDPOINT, json=data)
     xsts_response = _XSTSResponse.parse_raw(response.content)
 
     # Authenticate with Minecraft
     data = {
         "identityToken": f"XBL3.0 x={xbl_response.DisplayClaims.xui[0].uhs};{xsts_response.Token}"
     }
-    response = http_client.post(__MINECRAFT_AUTH_ENDPOINT__, json=data)
+    response = http_client.post(MINECRAFT_AUTH_ENDPOINT, json=data)
     minecraft_response = _MinecraftResponse.parse_raw(response.content)
 
     # Get Minecraft profile
     http_client.headers["Authorization"] = f"Bearer {minecraft_response.access_token}"
-    response = http_client.get(__MINECRAFT_PROFILE_ENDPOINT__)
+    response = http_client.get(MINECRAFT_PROFILE_ENDPOINT)
     minecraft_profile = _MinecraftProfile.parse_raw(response.content)
 
     account = Account(
@@ -197,14 +200,14 @@ def login(authorization_response: str, state: str, code_verifier: str) -> Accoun
     assert query["state"][0] == state
 
     data = {
-        "client_id": __CLIENT_ID__,
-        "scope": __SCOPE__,
+        "client_id": CLIENT_ID,
+        "scope": SCOPE,
         "code": query["code"][0],
-        "redirect_uri": __REDIRECT_URI__,
+        "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
         "code_verifier": code_verifier,
     }
-    response = http_client.post(__MSA_TOKEN_ENDPOINT__, data=data)
+    response = http_client.post(MSA_TOKEN_ENDPOINT, data=data)
     msa_token = _OAuth2Token.parse_raw(response.content)
     account_entry = _get_minecraft_account_data(msa_token)
 
@@ -221,13 +224,13 @@ def refresh(account: Account) -> Account:
     )
 
     data = {
-        "client_id": __CLIENT_ID__,
-        "scope": __SCOPE__,
+        "client_id": CLIENT_ID,
+        "scope": SCOPE,
         "refresh_token": account.microsoft_refresh_token,
         "grant_type": "refresh_token",
     }
 
-    response = http_client.post(__MSA_TOKEN_ENDPOINT__, data=data)
+    response = http_client.post(MSA_TOKEN_ENDPOINT, data=data)
     msa_token = _OAuth2Token.parse_raw(response.content)
     account_entry = _get_minecraft_account_data(msa_token)
 

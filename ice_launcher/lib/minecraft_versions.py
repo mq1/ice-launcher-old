@@ -5,6 +5,7 @@
 from enum import Enum
 from multiprocessing.pool import ThreadPool
 from os import makedirs, path
+from typing import Final
 
 import httpx
 from pydantic import BaseModel, HttpUrl
@@ -14,11 +15,10 @@ from .minecraft_assets import get_total_assets_size, install_assets
 from .minecraft_libraries import get_total_libraries_size, install_libraries
 from .minecraft_version_meta import MinecraftVersionMeta, install_client
 
-__VERSION_MANIFEST_URL__ = (
-    "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
-)
-
-__VERSION_MANIFESTS_PATH__ = path.join(dirs.user_data_dir, "versions")
+VERSION_MANIFEST_URL: Final[
+    str
+] = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+VERSION_MANIFESTS_DIR: Final[str] = path.join(dirs.user_data_dir, "versions")
 
 
 class _TypeEnum(str, Enum):
@@ -46,7 +46,7 @@ class MinecraftVersionManifest(BaseModel):
 
 
 def fetch_manifest() -> MinecraftVersionManifest:
-    response = httpx.get(__VERSION_MANIFEST_URL__, headers=headers)
+    response = httpx.get(VERSION_MANIFEST_URL, headers=headers)
     manifest = MinecraftVersionManifest.parse_raw(response.content)
 
     return manifest
@@ -55,11 +55,9 @@ def fetch_manifest() -> MinecraftVersionManifest:
 def install_version(
     minecraft_version: MinecraftVersionInfo, callbacks: ProgressCallbacks
 ) -> None:
-    makedirs(__VERSION_MANIFESTS_PATH__, exist_ok=True)
+    makedirs(VERSION_MANIFESTS_DIR, exist_ok=True)
 
-    version_meta_path = path.join(
-        __VERSION_MANIFESTS_PATH__, f"{minecraft_version.id}.json"
-    )
+    version_meta_path = path.join(VERSION_MANIFESTS_DIR, f"{minecraft_version.id}.json")
     download_file(
         url=minecraft_version.url,
         dest=version_meta_path,

@@ -6,14 +6,14 @@ import platform
 from multiprocessing.pool import AsyncResult, ThreadPool
 from os import makedirs, path
 from pathlib import Path
-from typing import Optional
+from typing import Final, Optional
 
 from pydantic import BaseModel, HttpUrl
 
-from . import __VERSIONS_DIR__, ProgressCallbacks, dirs, download_file
+from . import VERSIONS_DIR, ProgressCallbacks, dirs, download_file
 from .minecraft_rules import Rule, is_rule_list_valid
 
-__LIBRARIES_DIR__ = path.join(dirs.user_data_dir, "libraries")
+LIBRARIES_DIR: Final[str] = path.join(dirs.user_data_dir, "libraries")
 
 
 class _Artifact(BaseModel):
@@ -94,7 +94,7 @@ def install_libraries(
 
     results = []
     for artifact in artifacts:
-        library_path = path.join(__LIBRARIES_DIR__, artifact.path)
+        library_path = path.join(LIBRARIES_DIR, artifact.path)
         parent_dir = Path(library_path).parent.absolute()
         makedirs(parent_dir, exist_ok=True)
 
@@ -116,9 +116,9 @@ def get_classpath_string(libraries: list[Library], minecraft_version: str) -> st
     classpath_separator = ";" if platform.system() == "Windows" else ":"
     artifacts = _get_valid_artifacts(libraries)
 
-    jars = [path.join("libraries", artifact.path) for artifact in artifacts]
+    jars = [path.join(LIBRARIES_DIR, artifact.path) for artifact in artifacts]
 
-    jars.append(path.join("versions", f"{minecraft_version}.jar"))
+    jars.append(path.join(VERSIONS_DIR, f"{minecraft_version}.jar"))
 
     classpath_string = classpath_separator.join(jars)
 

@@ -9,7 +9,7 @@ from os import rename as mv
 from shutil import rmtree
 from subprocess import Popen
 from threading import Thread
-from typing import Callable
+from typing import Callable, Final
 
 import tomli
 import tomli_w
@@ -27,7 +27,7 @@ from .minecraft_libraries import get_classpath_string
 from .minecraft_rules import is_rule_list_valid
 from .minecraft_versions import MinecraftVersionInfo, install_version
 
-__INSTANCES_DIR__: str = path.join(dirs.user_data_dir, "instances")
+INSTANCES_DIR: Final[str] = path.join(dirs.user_data_dir, "instances")
 
 # flags from https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
 optimized_jvm_flags = [
@@ -79,12 +79,12 @@ class InstanceInfo(BaseModel):
 
 
 def list() -> list[str]:
-    makedirs(__INSTANCES_DIR__, exist_ok=True)
+    makedirs(INSTANCES_DIR, exist_ok=True)
 
     list = [
-        x
-        for x in listdir(__INSTANCES_DIR__)
-        if path.isdir(path.join(__INSTANCES_DIR__, x))
+        instance_dir
+        for instance_dir in listdir(INSTANCES_DIR)
+        if path.isdir(path.join(INSTANCES_DIR, instance_dir))
     ]
 
     return list
@@ -97,7 +97,7 @@ def new(
 ) -> None:
     print(f"Creating instance {instance_name}")
 
-    instance_dir = path.join(__INSTANCES_DIR__, instance_name)
+    instance_dir = path.join(INSTANCES_DIR, instance_name)
     makedirs(instance_dir)
     instance_info = InstanceInfo(minecraft_version=minecraft_version.id)
     _write_info(instance_name, instance_info)
@@ -108,12 +108,12 @@ def new(
 
 
 def _write_info(instance_name: str, instance_info: InstanceInfo) -> None:
-    with open(path.join(__INSTANCES_DIR__, instance_name, "instance.toml"), "wb") as f:
+    with open(path.join(INSTANCES_DIR, instance_name, "instance.toml"), "wb") as f:
         tomli_w.dump(instance_info.dict(), f)
 
 
 def read_info(instance_name: str) -> InstanceInfo:
-    with open(path.join(__INSTANCES_DIR__, instance_name, "instance.toml"), "rb") as f:
+    with open(path.join(INSTANCES_DIR, instance_name, "instance.toml"), "rb") as f:
         info = InstanceInfo.parse_obj(tomli.load(f))
 
     # Writes the document file in case it is outdated.
@@ -123,13 +123,13 @@ def read_info(instance_name: str) -> InstanceInfo:
 
 
 def rename(old_name: str, new_name: str) -> None:
-    old_dir = path.join(__INSTANCES_DIR__, old_name)
-    new_dir = path.join(__INSTANCES_DIR__, new_name)
+    old_dir = path.join(INSTANCES_DIR, old_name)
+    new_dir = path.join(INSTANCES_DIR, new_name)
     mv(old_dir, new_dir)
 
 
 def delete(instance_name: str) -> None:
-    instance_dir = path.join(__INSTANCES_DIR__, instance_name)
+    instance_dir = path.join(INSTANCES_DIR, instance_name)
     rmtree(instance_dir)
 
 
