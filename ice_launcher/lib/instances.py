@@ -29,6 +29,41 @@ from .minecraft_versions import MinecraftVersionInfo, install_version
 
 __INSTANCES_DIR__: str = path.join(dirs.user_data_dir, "instances")
 
+# flags from https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
+optimized_jvm_flags = [
+    "-server",
+    "-XX:+UseG1GC",
+    "-XX:+ParallelRefProcEnabled",
+    "-XX:MaxGCPauseMillis=50",
+    "-XX:+UnlockExperimentalVMOptions",
+    "-XX:+UnlockDiagnosticVMOptions",
+    "-XX:+AlwaysPreTouch",
+    "-XX:G1NewSizePercent=30",
+    "-XX:G1MaxNewSizePercent=40",
+    "-XX:G1HeapRegionSize=8M",
+    "-XX:G1ReservePercent=20",
+    "-XX:G1HeapWastePercent=5",
+    "-XX:G1MixedGCCountTarget=4",
+    "-XX:InitiatingHeapOccupancyPercent=15",
+    "-XX:G1MixedGCLiveThresholdPercent=90",
+    "-XX:G1RSetUpdatingPauseTimePercent=5",
+    "-XX:SurvivorRatio=32",
+    "-Dsun.rmi.dgc.server.gcInterval=2147483646",
+    "-XX:+PerfDisableSharedMem",
+    "-XX:MaxTenuringThreshold=1",
+    "-XX:+UseStringDeduplication",
+    "-XX:+UseFastUnorderedTimeStamps",
+    "-XX:AllocatePrefetchStyle=1",
+    "-XX:+OmitStackTraceInFastThrow",
+    "-XX:ThreadPriorityPolicy=1",
+    "-XX:+UseNUMA",
+    "-XX:-DontCompileHugeMethods",
+    "-XX:+UseVectorCmov",
+    "-Djdk.nio.maxCachedBufferSize=262144",
+    "-Dgraal.CompilerConfiguration=community",
+    "-Dgraal.SpeculativeGuardMovement=true",
+]
+
 
 class InstanceType(str, Enum):
     vanilla = "vanilla"
@@ -181,6 +216,7 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     command = [
         java_path,
         *jvm_arguments,
+        *optimized_jvm_flags,
         version_meta.mainClass,
         *game_arguments,
     ]
