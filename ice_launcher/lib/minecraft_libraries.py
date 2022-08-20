@@ -6,14 +6,12 @@ import platform
 from multiprocessing.pool import AsyncResult, ThreadPool
 from os import makedirs, path
 from pathlib import Path
-from typing import Final, Optional
+from typing import Optional
 
 from pydantic import BaseModel, HttpUrl
 
-from . import VERSIONS_DIR, ProgressCallbacks, dirs, download_file
+from . import LIBRARIES_DIR, ProgressCallbacks, download_file
 from .minecraft_rules import Rule, is_rule_list_valid
-
-LIBRARIES_DIR: Final[str] = path.join(dirs.user_data_dir, "libraries")
 
 
 class _Artifact(BaseModel):
@@ -59,7 +57,7 @@ def get_total_libraries_size(libraries: list[Library]) -> int:
     return sum(library.downloads.artifact.size for library in libraries)
 
 
-def _get_valid_artifacts(libraries: list[Library]) -> list[_Artifact]:
+def get_valid_artifacts(libraries: list[Library]) -> list[_Artifact]:
     natives_string = get_natives_string()
 
     valid_artifacts = []
@@ -90,7 +88,7 @@ def _get_valid_artifacts(libraries: list[Library]) -> list[_Artifact]:
 def install_libraries(
     libraries: list[Library], callbacks: ProgressCallbacks, pool: ThreadPool
 ) -> list[AsyncResult]:
-    artifacts = _get_valid_artifacts(libraries)
+    artifacts = get_valid_artifacts(libraries)
 
     results = []
     for artifact in artifacts:
@@ -110,16 +108,3 @@ def install_libraries(
         results.append(result)
 
     return results
-
-
-def get_classpath_string(libraries: list[Library], minecraft_version: str) -> str:
-    classpath_separator = ";" if platform.system() == "Windows" else ":"
-    artifacts = _get_valid_artifacts(libraries)
-
-    jars = [path.join(LIBRARIES_DIR, artifact.path) for artifact in artifacts]
-
-    jars.append(path.join(VERSIONS_DIR, f"{minecraft_version}.jar"))
-
-    classpath_string = classpath_separator.join(jars)
-
-    return classpath_string

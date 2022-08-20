@@ -25,8 +25,8 @@ from . import (
     jre_manager,
     minecraft_version_meta,
 )
-from .minecraft_libraries import get_classpath_string
 from .minecraft_rules import is_rule_list_valid
+from .minecraft_version_meta import get_classpath_string
 from .minecraft_versions import MinecraftVersionInfo, install_version
 
 INSTANCES_DIR: Final[str] = path.join(dirs.user_data_dir, "instances")

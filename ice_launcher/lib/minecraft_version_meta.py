@@ -2,14 +2,15 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import platform
 from multiprocessing.pool import AsyncResult, ThreadPool
 from os import path
 
 from pydantic import BaseModel, HttpUrl
 
-from . import VERSIONS_DIR, ProgressCallbacks, download_file
+from . import LIBRARIES_DIR, VERSIONS_DIR, ProgressCallbacks, download_file
 from .minecraft_assets import AssetIndex
-from .minecraft_libraries import Library
+from .minecraft_libraries import Library, get_valid_artifacts
 from .minecraft_rules import Rule
 
 
@@ -46,7 +47,7 @@ class MinecraftVersionMeta(BaseModel):
 
 
 def get_version_meta(version_id: str) -> MinecraftVersionMeta:
-    version_meta_path = path.join(VERSIONS_DIR, f"{version_id}.json")
+    version_meta_path = path.join(VERSIONS_DIR, version_id, "meta.json")
     version_meta = MinecraftVersionMeta.parse_file(version_meta_path)
 
     return version_meta
@@ -55,7 +56,7 @@ def get_version_meta(version_id: str) -> MinecraftVersionMeta:
 def install_client(
     version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks, pool: ThreadPool
 ) -> list[AsyncResult]:
-    client_path = path.join(VERSIONS_DIR, f"{version_id}.jar")
+    client_path = path.join(VERSIONS_DIR, version_id, "client.jar")
 
     result = pool.apply_async(
         download_file,
@@ -68,3 +69,19 @@ def install_client(
     )
 
     return [result]
+
+
+def get_client_path(version_id: str) -> str:
+    return path.join(VERSIONS_DIR, version_id, "client.jar")
+
+
+def get_classpath_string(libraries: list[Library], minecraft_version: str) -> str:
+    classpath_separator = ";" if platform.system() == "Windows" else ":"
+    artifacts = get_valid_artifacts(libraries)
+
+    jars = [path.join(LIBRARIES_DIR, artifact.path) for artifact in artifacts]
+    jars.append(get_client_path(minecraft_version))
+
+    classpath_string = classpath_separator.join(jars)
+
+    return classpath_string

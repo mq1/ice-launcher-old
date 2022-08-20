@@ -21,6 +21,7 @@ makedirs(dirs.user_data_dir, exist_ok=True)
 __version__: Final[str] = "0.0.16"
 CLIENT_ID: Final[str] = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
 VERSIONS_DIR: Final[str] = path.join(dirs.user_data_dir, "versions")
+LIBRARIES_DIR: Final[str] = path.join(dirs.user_data_dir, "libraries")
 
 
 headers = {
