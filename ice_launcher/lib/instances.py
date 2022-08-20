@@ -15,6 +15,8 @@ import tomli
 import tomli_w
 from pydantic import BaseModel
 
+from ice_launcher.lib.minecraft_assets import ASSETS_DIR
+
 from . import (
     ProgressCallbacks,
     __version__,
@@ -172,9 +174,9 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
                 case "${version_name}":
                     argument = instance_info.minecraft_version
                 case "${game_directory}":
-                    argument = path.join("instances", instance_name)
+                    argument = path.join(INSTANCES_DIR, instance_name)
                 case "${assets_root}":
-                    argument = "assets"
+                    argument = ASSETS_DIR
                 case "${assets_index_name}":
                     argument = version_meta.assetIndex.id
                 case "${auth_uuid}":
@@ -223,7 +225,7 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
 
     def start():
         print(command)
-        process = Popen(command, cwd=dirs.user_data_dir)
+        process = Popen(command, cwd=path.join(INSTANCES_DIR, instance_name))
         callback_function(process)
 
     Thread(target=start).start()
