@@ -2,17 +2,15 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from multiprocessing.pool import AsyncResult, ThreadPool
 from os import path
+from typing import Coroutine
 
 from pydantic import BaseModel, HttpUrl
 
-from . import ProgressCallbacks, dirs, download_file
+from . import __VERSIONS_DIR__, ProgressCallbacks, download_file
 from .minecraft_assets import AssetIndex
 from .minecraft_libraries import Library
 from .minecraft_rules import Rule
-
-__VERSIONS_PATH__ = path.join(dirs.user_data_dir, "versions")
 
 
 class _ComplexArgument(BaseModel):
@@ -48,25 +46,20 @@ class MinecraftVersionMeta(BaseModel):
 
 
 def get_version_meta(version_id: str) -> MinecraftVersionMeta:
-    version_meta_path = path.join(__VERSIONS_PATH__, f"{version_id}.json")
+    version_meta_path = path.join(__VERSIONS_DIR__, f"{version_id}.json")
     version_meta = MinecraftVersionMeta.parse_file(version_meta_path)
 
     return version_meta
 
 
-def install_client(
-    version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks, pool: ThreadPool
-) -> list[AsyncResult]:
-    client_path = path.join(__VERSIONS_PATH__, f"{version_id}.jar")
+async def install_client(
+    version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks
+) -> None:
+    client_path = path.join(__VERSIONS_DIR__, f"{version_id}.jar")
 
-    result = pool.apply_async(
-        download_file,
-        (
-            artifact.url,
-            client_path,
-            artifact.sha1,
-            callbacks,
-        ),
+    await download_file(
+        url=artifact.url,
+        dest=client_path,
+        sha1hash=artifact.sha1,
+        callbacks=callbacks,
     )
-
-    return [result]

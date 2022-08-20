@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import asyncio
 import platform
 from enum import Enum
 from os import listdir, makedirs, path
@@ -66,8 +67,8 @@ def new(
     makedirs(instance_dir)
     instance_info = InstanceInfo(minecraft_version=minecraft_version.id)
     _write_info(instance_name, instance_info)
-    install_version(minecraft_version, callbacks)
 
+    asyncio.run(install_version(minecraft_version, callbacks))
     print("Done")
 
 
@@ -100,9 +101,10 @@ def delete(instance_name: str) -> None:
 def launch(instance_name: str, account_id: str, callback_function: Callable) -> None:
     print(f"Launching instance {instance_name}")
 
-    print("Refreshing account")
-    account = accounts.refresh_account(account_id)
-    print("Account successfully refreshed")
+    #print("Refreshing account")
+    #account = accounts.refresh_account(account_id)
+    #print("Account successfully refreshed")
+    account = accounts.get_accounts()[account_id]
 
     instance_info = read_info(instance_name)
     version_meta = minecraft_version_meta.get_version_meta(
@@ -111,14 +113,14 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
 
     jre_version = instance_info.jre_version
     if jre_version == "latest":
-        jre_version = jre_manager.get_latest_release()
+        jre_version = jre_manager.fetch_latest_java_version()
 
-    is_updated, latest_semver = jre_manager.is_updated(jre_version)
+    is_updated = jre_manager.is_updated(jre_version)
     if not is_updated:
         print("Updating JRE")
-        jre_manager.update(jre_version)
+        asyncio.run(jre_manager.update(jre_version))
 
-    java_path = jre_manager.get_java_path(latest_semver)
+    java_path = jre_manager.get_java_path(jre_version)
 
     game_arguments = []
     for argument in version_meta.arguments.game:
@@ -174,7 +176,9 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     jvm_arguments.append("-Dminecraft.launcher.brand=ice-launcher")
     jvm_arguments.append(f"-Dminecraft.launcher.version={__version__}")
     jvm_arguments.append("-cp")
-    jvm_arguments.append(get_classpath_string(version_meta.libraries))
+    jvm_arguments.append(
+        get_classpath_string(version_meta.libraries, instance_info.minecraft_version)
+    )
 
     command = [
         java_path,

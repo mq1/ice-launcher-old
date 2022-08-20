@@ -35,7 +35,7 @@ class _Assets(BaseModel):
     version: _Version
 
 
-def get_latest_release() -> str:
+def fetch_latest_java_version() -> str:
     path = "/v3/info/available_releases"
     response = http_client.get(f"{__ENDPOINT__}{path}")
     latest_release = response.json()["most_recent_feature_release"]
@@ -65,8 +65,8 @@ def _get_os() -> str:
     raise Exception("Unsupported OS")
 
 
-def _get_assets_info(release: str) -> _Assets:
-    url_path = f"/v3/assets/latest/{release}/hotspot"
+def _get_assets_info(java_version: str) -> _Assets:
+    url_path = f"/v3/assets/latest/{java_version}/hotspot"
     params = {
         "architecture": _get_architecture(),
         "image_type": "jre",
@@ -84,44 +84,40 @@ def _get_assets_info(release: str) -> _Assets:
     return _Assets.parse_obj(assets_info_list[0])
 
 
-def is_updated(release: str) -> tuple[bool, str]:
+def is_updated(java_version: str) -> bool:
     makedirs(__JRE_DIR__, exist_ok=True)
 
-    assets_info = _get_assets_info(release)
+    assets_info = _get_assets_info(java_version)
 
     current_semver = [
         dir for dir in listdir(__JRE_DIR__) if path.isdir(path.join(__JRE_DIR__, dir))
     ]
     if len(current_semver) == 0:
-        return False, assets_info.version.semver
+        return False
 
     current_semver = version.parse(
         current_semver[0].replace("jdk-", "").replace("-jre", "")
     )
     latest_semver = version.parse(assets_info.version.semver)
 
-    return current_semver >= latest_semver, assets_info.version.semver
+    return current_semver >= latest_semver
 
 
-def update(release: str) -> None:
+async def update(java_version: str) -> None:
     makedirs(__JRE_DIR__, exist_ok=True)
 
     # To be deleted
     previous_files = listdir(__JRE_DIR__)
 
-    assets_info = _get_assets_info(release)
+    assets_info = _get_assets_info(java_version)
     download_url = assets_info.binary.package.link
 
     extension = "zip" if platform.system() == "Windows" else "tar.gz"
     download_path = path.join(__JRE_DIR__, f"{assets_info.version.semver}.{extension}")
 
-    download_file(
+    await download_file(
         url=download_url,
         dest=download_path,
-        sha1hash=None,
-        callbacks=None,
-        is_lzma=False,
-        set_executable=False,
     )
 
     unpack_archive(download_path, __JRE_DIR__)
@@ -137,16 +133,24 @@ def update(release: str) -> None:
             remove(file_path)
 
 
-def get_java_path(semver: str) -> str:
+def get_java_path(version: str) -> str:
     makedirs(__JRE_DIR__, exist_ok=True)
 
+    available_jres = [
+        dir for dir in listdir(__JRE_DIR__) if path.isdir(path.join(__JRE_DIR__, dir))
+    ]
+
+    current_jre = [
+        dir for dir in available_jres if dir.startswith(f"jdk-{version}")
+    ][0]
+
     if platform.system() == "Windows":
-        return path.join(__JRE_DIR__, f"jdk-{semver}-jre", "bin", "java.exe")
+        return path.join(__JRE_DIR__, current_jre, "bin", "java.exe")
     if platform.system() == "Darwin":
         return path.join(
-            __JRE_DIR__, f"jdk-{semver}-jre", "Contents", "Home", "bin", "java"
+            __JRE_DIR__, current_jre, "Contents", "Home", "bin", "java"
         )
     if platform.system() == "Linux":
-        return path.join(__JRE_DIR__, f"jdk-{semver}-jre", "bin", "java")
+        return path.join(__JRE_DIR__, current_jre, "bin", "java")
 
-    raise Exception("Unsupported OS")
+    raise Exception("JRE not found")

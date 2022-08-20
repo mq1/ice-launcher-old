@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import asyncio
 from enum import Enum
-from multiprocessing.pool import ThreadPool
 from os import makedirs, path
 
 from pydantic import BaseModel, HttpUrl
@@ -51,7 +51,7 @@ def fetch_manifest() -> MinecraftVersionManifest:
     return manifest
 
 
-def install_version(
+async def install_version(
     minecraft_version: MinecraftVersionInfo, callbacks: ProgressCallbacks
 ) -> None:
     makedirs(__VERSION_MANIFESTS_PATH__, exist_ok=True)
@@ -59,7 +59,7 @@ def install_version(
     version_meta_path = path.join(
         __VERSION_MANIFESTS_PATH__, f"{minecraft_version.id}.json"
     )
-    download_file(
+    await download_file(
         url=minecraft_version.url,
         dest=version_meta_path,
         sha1hash=minecraft_version.sha1,
@@ -76,12 +76,8 @@ def install_version(
     callbacks.set_status("Downloading required files")
     callbacks.set_max(total_size)
 
-    with ThreadPool() as pool:
-        results = install_assets(version_meta.assetIndex, callbacks, pool)
-        results += install_libraries(version_meta.libraries, callbacks, pool)
-        results += install_client(
-            minecraft_version.id, version_meta.downloads.client, callbacks, pool
-        )
-
-        for result in results:
-            result.wait()
+    await asyncio.gather(
+        install_assets(version_meta.assetIndex, callbacks),
+        install_libraries(version_meta.libraries, callbacks),
+        install_client(minecraft_version.id, version_meta.downloads.client, callbacks),
+    )

@@ -2,14 +2,15 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import asyncio
 import platform
-from multiprocessing.pool import AsyncResult, ThreadPool
-from os import path
+from os import makedirs, path
 from typing import Optional
+from pathlib import Path
 
 from pydantic import BaseModel, HttpUrl
 
-from . import ProgressCallbacks, dirs, download_file
+from . import __VERSIONS_DIR__, ProgressCallbacks, dirs, download_file
 from .minecraft_rules import Rule, is_rule_list_valid
 
 __LIBRARIES_DIR__ = path.join(dirs.user_data_dir, "libraries")
@@ -86,34 +87,36 @@ def _get_valid_artifacts(libraries: list[Library]) -> list[_Artifact]:
     return valid_artifacts
 
 
-def install_libraries(
-    libraries: list[Library], callbacks: ProgressCallbacks, pool: ThreadPool
-) -> list[AsyncResult]:
+async def install_libraries(
+    libraries: list[Library], callbacks: ProgressCallbacks
+) -> None:
     artifacts = _get_valid_artifacts(libraries)
 
-    results: list[AsyncResult] = []
+    coroutines = []
     for artifact in artifacts:
         library_path = path.join(__LIBRARIES_DIR__, artifact.path)
+        parent_dir = Path(library_path).parent.absolute()
+        makedirs(parent_dir, exist_ok=True)
 
-        result = pool.apply_async(
-            download_file,
-            (
-                artifact.url,
-                library_path,
-                artifact.sha1,
-                callbacks,
-            ),
+        coroutine = download_file(
+            url=artifact.url,
+            dest=library_path,
+            sha1hash=artifact.sha1,
+            callbacks=callbacks,
         )
-        results.append(result)
+        coroutines.append(coroutine)
 
-    return results
+    await asyncio.gather(*coroutines)
 
 
-def get_classpath_string(libraries: list[Library]) -> str:
+def get_classpath_string(libraries: list[Library], minecraft_version: str) -> str:
     classpath_separator = ";" if platform.system() == "Windows" else ":"
     artifacts = _get_valid_artifacts(libraries)
-    classpath_string = classpath_separator.join(
-        path.join(__LIBRARIES_DIR__, artifact.path) for artifact in artifacts
-    )
+
+    jars = [path.join(__LIBRARIES_DIR__, artifact.path) for artifact in artifacts]
+
+    jars.append(path.join(__VERSIONS_DIR__, f"{minecraft_version}.jar"))
+
+    classpath_string = classpath_separator.join(jars)
 
     return classpath_string
