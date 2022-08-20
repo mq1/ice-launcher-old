@@ -5,13 +5,16 @@
 from enum import Enum
 from typing import Optional
 
+import httpx
 from pydantic import BaseModel
 
-from . import http_client
+from . import headers
 
 __NEWS_URL__ = (
     "https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid"
 )
+
+http_client = httpx.Client(headers=headers)
 
 
 class _ArticleLang(str, Enum):

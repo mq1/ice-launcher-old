@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import asyncio
 import platform
+from multiprocessing.pool import AsyncResult, ThreadPool
 from os import makedirs, path
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 from pydantic import BaseModel, HttpUrl
 
@@ -87,35 +87,38 @@ def _get_valid_artifacts(libraries: list[Library]) -> list[_Artifact]:
     return valid_artifacts
 
 
-async def install_libraries(
-    libraries: list[Library], callbacks: ProgressCallbacks
-) -> None:
+def install_libraries(
+    libraries: list[Library], callbacks: ProgressCallbacks, pool: ThreadPool
+) -> list[AsyncResult]:
     artifacts = _get_valid_artifacts(libraries)
 
-    coroutines = []
+    results = []
     for artifact in artifacts:
         library_path = path.join(__LIBRARIES_DIR__, artifact.path)
         parent_dir = Path(library_path).parent.absolute()
         makedirs(parent_dir, exist_ok=True)
 
-        coroutine = download_file(
-            url=artifact.url,
-            dest=library_path,
-            sha1hash=artifact.sha1,
-            callbacks=callbacks,
+        result = pool.apply_async(
+            download_file,
+            (
+                artifact.url,
+                library_path,
+                artifact.sha1,
+                callbacks,
+            ),
         )
-        coroutines.append(coroutine)
+        results.append(result)
 
-    await asyncio.gather(*coroutines)
+    return results
 
 
 def get_classpath_string(libraries: list[Library], minecraft_version: str) -> str:
     classpath_separator = ";" if platform.system() == "Windows" else ":"
     artifacts = _get_valid_artifacts(libraries)
 
-    jars = [path.join(__LIBRARIES_DIR__, artifact.path) for artifact in artifacts]
+    jars = [path.join("libraries", artifact.path) for artifact in artifacts]
 
-    jars.append(path.join(__VERSIONS_DIR__, f"{minecraft_version}.jar"))
+    jars.append(path.join("versions", f"{minecraft_version}.jar"))
 
     classpath_string = classpath_separator.join(jars)
 

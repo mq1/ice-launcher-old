@@ -4,10 +4,11 @@
 
 from typing import Optional
 
+import httpx
 import packaging.version
 from pydantic import BaseModel
 
-from . import __version__, http_client
+from . import __version__, headers
 
 __LATEST_RELEASE_URL__ = "https://api.github.com/repos/mq1/ice-launcher/releases/latest"
 
@@ -19,7 +20,7 @@ class _ReleaseInfo(BaseModel):
 def _get_latest_release() -> str:
     """Get the latest release of the launcher."""
 
-    response = http_client.get(__LATEST_RELEASE_URL__)
+    response = httpx.get(__LATEST_RELEASE_URL__, headers=headers)
     release_info = _ReleaseInfo.parse_raw(response.content)
 
     return release_info.tag_name

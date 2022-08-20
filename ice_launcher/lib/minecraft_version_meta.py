@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from multiprocessing.pool import AsyncResult, ThreadPool
 from os import path
 from typing import Coroutine
 
@@ -52,14 +53,19 @@ def get_version_meta(version_id: str) -> MinecraftVersionMeta:
     return version_meta
 
 
-async def install_client(
-    version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks
-) -> None:
+def install_client(
+    version_id: str, artifact: _Artifact, callbacks: ProgressCallbacks, pool: ThreadPool
+) -> list[AsyncResult]:
     client_path = path.join(__VERSIONS_DIR__, f"{version_id}.jar")
 
-    await download_file(
-        url=artifact.url,
-        dest=client_path,
-        sha1hash=artifact.sha1,
-        callbacks=callbacks,
+    result = pool.apply_async(
+        download_file,
+        (
+            artifact.url,
+            client_path,
+            artifact.sha1,
+            callbacks,
+        ),
     )
+
+    return [result]

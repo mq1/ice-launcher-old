@@ -8,7 +8,7 @@ import lzma
 import os
 import stat
 from os import chmod, makedirs, path, remove
-from typing import Callable, Optional, TypedDict
+from typing import Callable, Optional
 
 import httpx
 from appdirs import AppDirs
@@ -26,7 +26,6 @@ __VERSIONS_DIR__ = path.join(dirs.user_data_dir, "versions")
 headers = {
     "user-agent": f"ice-launcher/{__version__}",
 }
-http_client = httpx.Client(headers=headers, follow_redirects=True)
 
 
 class ProgressCallbacks(BaseModel):
@@ -36,7 +35,7 @@ class ProgressCallbacks(BaseModel):
     reset: Callable[[], None]
 
 
-async def download_file(
+def download_file(
     url: str,
     dest: str,
     sha1hash: Optional[str] = None,
@@ -59,27 +58,25 @@ async def download_file(
                 if callbacks:
                     file_size = path.getsize(dest)
                     callbacks.increment_value_by(file_size)
-                
+
                 print(f"{dest} Hash matches, skipping download.")
                 return
 
+        print(f"{dest} Hash does not match, redownloading.")
         remove(dest)
 
     print("Downloading file from", url, "to", dest)
 
     with open(dest, "wb") as file:
-        async with httpx.AsyncClient(follow_redirects=True) as client:
-            async with client.stream("GET", url) as response:
-                response.raise_for_status()
+        with httpx.stream("GET", url, headers=headers) as response:
+            for chunk in response.iter_bytes(65536):  # Read 64kb chunks.
+                if callbacks:
+                    callbacks.increment_value_by(len(chunk))
 
-                async for chunk in response.aiter_bytes(65536):  # Read 64kb chunks.
-                    if callbacks:
-                        callbacks.increment_value_by(len(chunk))
+                if is_lzma:
+                    chunk = lzma.decompress(chunk)
 
-                    if is_lzma:
-                        chunk = lzma.decompress(chunk)
-
-                    file.write(chunk)
+                file.write(chunk)
 
     print(f"Downloaded {dest}")
 

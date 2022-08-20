@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import asyncio
 import platform
 from enum import Enum
 from os import listdir, makedirs, path
@@ -68,7 +67,8 @@ def new(
     instance_info = InstanceInfo(minecraft_version=minecraft_version.id)
     _write_info(instance_name, instance_info)
 
-    asyncio.run(install_version(minecraft_version, callbacks))
+    install_version(minecraft_version, callbacks)
+
     print("Done")
 
 
@@ -101,9 +101,9 @@ def delete(instance_name: str) -> None:
 def launch(instance_name: str, account_id: str, callback_function: Callable) -> None:
     print(f"Launching instance {instance_name}")
 
-    #print("Refreshing account")
-    #account = accounts.refresh_account(account_id)
-    #print("Account successfully refreshed")
+    # print("Refreshing account")
+    # account = accounts.refresh_account(account_id)
+    # print("Account successfully refreshed")
     account = accounts.get_accounts()[account_id]
 
     instance_info = read_info(instance_name)
@@ -118,7 +118,7 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     is_updated = jre_manager.is_updated(jre_version)
     if not is_updated:
         print("Updating JRE")
-        asyncio.run(jre_manager.update(jre_version))
+        jre_manager.update(jre_version)
 
     java_path = jre_manager.get_java_path(jre_version)
 
@@ -137,9 +137,9 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
                 case "${version_name}":
                     argument = instance_info.minecraft_version
                 case "${game_directory}":
-                    argument = path.join(__INSTANCES_DIR__, instance_name)
+                    argument = path.join("instances", instance_name)
                 case "${assets_root}":
-                    argument = path.join(dirs.user_data_dir, "assets")
+                    argument = "assets"
                 case "${assets_index_name}":
                     argument = version_meta.assetIndex.id
                 case "${auth_uuid}":
@@ -170,9 +170,7 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     if platform.machine() in ["x86", "i386", "i686"]:
         jvm_arguments.append("-Xss1M")
 
-    jvm_arguments.append(
-        "-Djava.library.path=" + path.join(dirs.user_data_dir, "natives")
-    )
+    jvm_arguments.append("-Djava.library.path=natives")
     jvm_arguments.append("-Dminecraft.launcher.brand=ice-launcher")
     jvm_arguments.append(f"-Dminecraft.launcher.version={__version__}")
     jvm_arguments.append("-cp")
@@ -188,7 +186,8 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     ]
 
     def start():
-        process = Popen(command, cwd=path.join(__INSTANCES_DIR__, instance_name))
+        print(command)
+        process = Popen(command, cwd=dirs.user_data_dir)
         callback_function(process)
 
     Thread(target=start).start()

@@ -6,10 +6,11 @@ import platform
 from os import listdir, makedirs, path, remove
 from shutil import rmtree, unpack_archive
 
+import httpx
 from packaging import version
 from pydantic import BaseModel, HttpUrl
 
-from . import dirs, download_file, http_client
+from . import dirs, download_file, headers
 
 __ENDPOINT__ = "https://api.adoptium.net"
 __JRE_DIR__ = path.join(dirs.user_data_dir, "jre")
@@ -37,7 +38,7 @@ class _Assets(BaseModel):
 
 def fetch_latest_java_version() -> str:
     path = "/v3/info/available_releases"
-    response = http_client.get(f"{__ENDPOINT__}{path}")
+    response = httpx.get(f"{__ENDPOINT__}{path}", headers=headers)
     latest_release = response.json()["most_recent_feature_release"]
 
     return latest_release
@@ -74,9 +75,9 @@ def _get_assets_info(java_version: str) -> _Assets:
         "vendor": "eclipse",
     }
 
-    response = http_client.get(
+    response = httpx.get(
         f"{__ENDPOINT__}{url_path}",
-        headers={"Accept": "application/json"},
+        headers=headers | {"Accept": "application/json"},
         params=params,
     )
     assets_info_list = response.json()
@@ -103,7 +104,7 @@ def is_updated(java_version: str) -> bool:
     return current_semver >= latest_semver
 
 
-async def update(java_version: str) -> None:
+def update(java_version: str) -> None:
     makedirs(__JRE_DIR__, exist_ok=True)
 
     # To be deleted
@@ -115,7 +116,7 @@ async def update(java_version: str) -> None:
     extension = "zip" if platform.system() == "Windows" else "tar.gz"
     download_path = path.join(__JRE_DIR__, f"{assets_info.version.semver}.{extension}")
 
-    await download_file(
+    download_file(
         url=download_url,
         dest=download_path,
     )
@@ -140,17 +141,13 @@ def get_java_path(version: str) -> str:
         dir for dir in listdir(__JRE_DIR__) if path.isdir(path.join(__JRE_DIR__, dir))
     ]
 
-    current_jre = [
-        dir for dir in available_jres if dir.startswith(f"jdk-{version}")
-    ][0]
+    current_jre = [dir for dir in available_jres if dir.startswith(f"jdk-{version}")][0]
 
     if platform.system() == "Windows":
-        return path.join(__JRE_DIR__, current_jre, "bin", "java.exe")
+        return path.join("jre", current_jre, "bin", "java.exe")
     if platform.system() == "Darwin":
-        return path.join(
-            __JRE_DIR__, current_jre, "Contents", "Home", "bin", "java"
-        )
+        return path.join("jre", current_jre, "Contents", "Home", "bin", "java")
     if platform.system() == "Linux":
-        return path.join(__JRE_DIR__, current_jre, "bin", "java")
+        return path.join("jre", current_jre, "bin", "java")
 
     raise Exception("JRE not found")
