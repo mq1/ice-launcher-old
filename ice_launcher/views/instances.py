@@ -7,6 +7,7 @@ from tkinter import ttk
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
 
+from ice_launcher import views
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
 from ice_launcher.lib import accounts, instances
@@ -51,19 +52,21 @@ class Instances(CTkFrame):
         self.update_instance_list()
 
     def add_new_instance(self) -> None:
-        self.master.open_view("new_instance")  # type: ignore
+        self.master.open_page(None, views.NewInstance(master=self.master))  # type: ignore
 
     def edit_instance(self, instance_name: str) -> None:
-        self.master.views["edit_instance"].update_instance(instance_name)  # type: ignore
-        self.master.open_view("edit_instance", options={"instance_name": instance_name})  # type: ignore
+        self.master.open_page(None, views.EditInstance(master=self.master, instance_name=instance_name))  # type: ignore
 
     def launch_instance(self, instance_name: str) -> None:
-        self.master.open_view("logs")  # type: ignore
+        self.master.open_page(None, views.Logs(master=self.master))  # type: ignore
 
         def show_logs(process: Popen):
-            self.master.views["logs"].update_logs(process)  # type: ignore
+            self.master.current_page.update_logs(process)  # type: ignore
 
-        instances.launch(instance_name, self.selected_account[0], show_logs)  # type: ignore
+        if self.selected_account is not None:
+            instances.launch(
+                instance_name, self.selected_account.minecraft_id, show_logs
+            )
 
     def update_selected_account(self) -> None:
         self.selected_account = accounts.get_active_account()
@@ -71,18 +74,19 @@ class Instances(CTkFrame):
         if self.selected_account is None:
             account_name = "You need to select an account first"
         else:
-            account_name = f"Account: {self.selected_account[1]['name']}"
+            account_name = (
+                f"Account: {self.selected_account.account.minecraft_username}"
+            )
 
         self.account_label.configure(text=account_name)
 
     def add_instance_to_list(self, index: int, instance_name: str) -> None:
-        instance_emoji = "⛏"
-
-        info = instances.get_info(instance_name)
-        match info["instance_type"]:
-            case instances.InstanceType.FABRIC:
+        match instances.read_info(instance_name).instance_type:
+            case instances.InstanceType.vanilla:
+                instance_emoji = "🍦"
+            case instances.InstanceType.fabric:
                 instance_emoji = "🧵"
-            case instances.InstanceType.FORGE:
+            case instances.InstanceType.forge:
                 instance_emoji = "⚒️"
 
         label = CTkLabel(

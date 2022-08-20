@@ -2,144 +2,228 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import json
+import platform
 import subprocess
 from enum import Enum
 from os import listdir, makedirs, path
 from os import rename as mv
 from shutil import rmtree
+from subprocess import Popen
 from threading import Thread
-from typing import Any, List, TypedDict, cast
+from typing import Callable
 
 import tomli
 import tomli_w
-from minecraft_launcher_lib.command import get_minecraft_command
-from minecraft_launcher_lib.install import install_minecraft_version
-from minecraft_launcher_lib.runtime import get_executable_path
-from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
+from pydantic import BaseModel
 
-from ice_launcher import __version__
+from . import (
+    ASSETS_DIR,
+    INSTANCES_DIR,
+    ProgressCallbacks,
+    __version__,
+    accounts,
+    jre_manager,
+    minecraft_version_meta,
+)
+from .minecraft_rules import is_rule_list_valid
+from .minecraft_version_meta import get_classpath_string
+from .minecraft_versions import MinecraftVersionInfo, install_version
 
-from . import accounts, config, dirs
-
-__instances_dir__: str = path.join(dirs.user_data_dir, "instances")
+# flags from https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
+optimized_jvm_flags = [
+    "-server",
+    "-XX:+UseG1GC",
+    "-XX:+ParallelRefProcEnabled",
+    "-XX:MaxGCPauseMillis=50",
+    "-XX:+UnlockExperimentalVMOptions",
+    "-XX:+UnlockDiagnosticVMOptions",
+    "-XX:+AlwaysPreTouch",
+    "-XX:G1NewSizePercent=30",
+    "-XX:G1MaxNewSizePercent=40",
+    "-XX:G1HeapRegionSize=8M",
+    "-XX:G1ReservePercent=20",
+    "-XX:G1HeapWastePercent=5",
+    "-XX:G1MixedGCCountTarget=4",
+    "-XX:InitiatingHeapOccupancyPercent=15",
+    "-XX:G1MixedGCLiveThresholdPercent=90",
+    "-XX:G1RSetUpdatingPauseTimePercent=5",
+    "-XX:SurvivorRatio=32",
+    "-Dsun.rmi.dgc.server.gcInterval=2147483646",
+    "-XX:+PerfDisableSharedMem",
+    "-XX:MaxTenuringThreshold=1",
+    "-XX:+UseStringDeduplication",
+    "-XX:+UseFastUnorderedTimeStamps",
+    "-XX:AllocatePrefetchStyle=1",
+    "-XX:+OmitStackTraceInFastThrow",
+    "-XX:ThreadPriorityPolicy=1",
+    "-XX:+UseNUMA",
+    "-XX:-DontCompileHugeMethods",
+    "-XX:+UseVectorCmov",
+    "-Djdk.nio.maxCachedBufferSize=262144",
+    "-Dgraal.CompilerConfiguration=community",
+    "-Dgraal.SpeculativeGuardMovement=true",
+]
 
 
 class InstanceType(str, Enum):
-    VANILLA = "vanilla"
-    FABRIC = "fabric"
-    FORGE = "forge"
+    vanilla = "vanilla"
+    fabric = "fabric"
+    forge = "forge"
 
 
-class InstanceInfo(TypedDict):
-    config_version: int
-    instance_type: InstanceType
-    minecraft_version: str
+class InstanceInfo(BaseModel):
+    config_version: int = 1
+    instance_type: InstanceType = InstanceType.vanilla
+    minecraft_version: str = ""
+    jre_version: str = "latest"
 
 
-def list() -> List[str]:
-    # check if instances folder exists
-    if not path.exists(__instances_dir__):
-        makedirs(__instances_dir__)
+def list() -> list[str]:
+    makedirs(INSTANCES_DIR, exist_ok=True)
 
-    list = listdir(__instances_dir__)
-    if ".DS_Store" in list:
-        list.remove(".DS_Store")
+    list = [
+        instance_dir
+        for instance_dir in listdir(INSTANCES_DIR)
+        if path.isdir(path.join(INSTANCES_DIR, instance_dir))
+    ]
 
     return list
 
 
-def _default_instance_info() -> InstanceInfo:
-    return {
-        "config_version": 1,
-        "instance_type": InstanceType.VANILLA,
-        "minecraft_version": "",
-    }
-
-
-def new(instance_name: str, minecraft_version: str, callback: CallbackDict) -> None:
+def new(
+    instance_name: str,
+    minecraft_version: MinecraftVersionInfo,
+    callbacks: ProgressCallbacks,
+) -> None:
     print(f"Creating instance {instance_name}")
-    instance_dir = path.join(__instances_dir__, instance_name)
+
+    instance_dir = path.join(INSTANCES_DIR, instance_name)
     makedirs(instance_dir)
-    instance_info = _default_instance_info()
-    instance_info["minecraft_version"] = minecraft_version
-    write_info(instance_name, instance_info)
-    install_minecraft_version(minecraft_version, dirs.user_data_dir, callback)
+    instance_info = InstanceInfo(minecraft_version=minecraft_version.id)
+    _write_info(instance_name, instance_info)
+
+    install_version(minecraft_version, callbacks)
+
     print("Done")
 
 
-def write_info(instance_name: str, instance_info: InstanceInfo) -> None:
-    with open(path.join(__instances_dir__, instance_name, "instance.toml"), "wb") as f:
-        tomli_w.dump(cast(dict[str, Any], instance_info), f)
+def _write_info(instance_name: str, instance_info: InstanceInfo) -> None:
+    with open(path.join(INSTANCES_DIR, instance_name, "instance.toml"), "wb") as f:
+        tomli_w.dump(instance_info.dict(), f)
 
 
-def get_info(instance_name: str) -> InstanceInfo:
-    with open(path.join(__instances_dir__, instance_name, "instance.toml"), "rb") as f:
-        info = cast(InstanceInfo, tomli.load(f))
+def read_info(instance_name: str) -> InstanceInfo:
+    with open(path.join(INSTANCES_DIR, instance_name, "instance.toml"), "rb") as f:
+        info = InstanceInfo.parse_obj(tomli.load(f))
 
-    # Update old config with new values
-    for key, value in _default_instance_info().items():
-        if key not in info:
-            info[key] = value
+    # Writes the document file in case it is outdated.
+    _write_info(instance_name, info)
 
-    write_info(instance_name, info)
     return info
 
 
 def rename(old_name: str, new_name: str) -> None:
-    old_dir = path.join(__instances_dir__, old_name)
-    new_dir = path.join(__instances_dir__, new_name)
+    old_dir = path.join(INSTANCES_DIR, old_name)
+    new_dir = path.join(INSTANCES_DIR, new_name)
     mv(old_dir, new_dir)
 
 
 def delete(instance_name: str) -> None:
-    instance_dir = path.join(__instances_dir__, instance_name)
+    instance_dir = path.join(INSTANCES_DIR, instance_name)
     rmtree(instance_dir)
 
 
-def launch(instance_name: str, account_id: str, callback_function: Any) -> None:
-    conf = config.read()
+def launch(instance_name: str, account_id: str, callback_function: Callable) -> None:
+    print(f"Launching instance {instance_name}")
 
     print("Refreshing account")
     account = accounts.refresh_account(account_id)
     print("Account successfully refreshed")
 
-    instance_info = get_info(instance_name)
-
-    with open(
-        path.join(
-            dirs.user_data_dir,
-            "versions",
-            instance_info["minecraft_version"],
-            f"{instance_info['minecraft_version']}.json",
-        ),
-        "r",
-    ) as f:
-        version_json: dict = json.load(f)
-
-    jvm_version = version_json["javaVersion"]["component"]
-    java_executable = get_executable_path(jvm_version, dirs.user_data_dir)
-    if java_executable is None:
-        java_executable = "java"
-
-    options: MinecraftOptions = {
-        "username": account["name"],
-        "uuid": account_id,
-        "token": account["access_token"],
-        "executablePath": java_executable,
-        "jvmArguments": [f"-Xmx{conf['jvm_memory']}", f"-Xms{conf['jvm_memory']}"]
-        + conf["jvm_options"],
-        "launcherName": "Ice Launcher",
-        "launcherVersion": __version__,
-        "gameDirectory": path.join(__instances_dir__, instance_name),
-    }
-
-    minecraft_command = get_minecraft_command(
-        instance_info["minecraft_version"], dirs.user_data_dir, options
+    instance_info = read_info(instance_name)
+    version_meta = minecraft_version_meta.get_version_meta(
+        instance_info.minecraft_version
     )
 
+    jre_version = instance_info.jre_version
+    if jre_version == "latest":
+        jre_version = jre_manager.fetch_latest_java_version()
+
+    is_updated = jre_manager.is_updated(jre_version)
+    if not is_updated:
+        print("Updating JRE")
+        jre_manager.update(jre_version)
+
+    java_path = jre_manager.get_java_path(jre_version)
+
+    game_arguments = []
+    for argument in version_meta.arguments.game:
+        if isinstance(argument, minecraft_version_meta._ComplexArgument):
+            if is_rule_list_valid(argument.rules):
+                argument = argument.value
+            else:
+                argument = None
+
+        if argument:
+            match argument:
+                case "${auth_player_name}":
+                    argument = account.minecraft_username
+                case "${version_name}":
+                    argument = instance_info.minecraft_version
+                case "${game_directory}":
+                    argument = path.join(INSTANCES_DIR, instance_name)
+                case "${assets_root}":
+                    argument = ASSETS_DIR
+                case "${assets_index_name}":
+                    argument = version_meta.assetIndex.id
+                case "${auth_uuid}":
+                    argument = account_id
+                case "${auth_access_token}":
+                    argument = account.minecraft_access_token
+                case "${clientid}":
+                    argument = f"ice-launcher/{__version__}"
+                case "${auth_xuid}":
+                    argument = "0"
+                case "${user_type}":
+                    argument = "mojang"
+                case "${version_type}":
+                    argument = instance_info.instance_type.value
+
+            game_arguments.append(argument)
+
+    jvm_arguments = []
+    if platform.system() == "Darwin":
+        jvm_arguments.append("-XstartOnFirstThread")
+    elif platform.system() == "Windows":
+        jvm_arguments.append(
+            "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump"
+        )
+        if platform.release() == "10":
+            jvm_arguments.append("-Dos.name=Windows 10")
+            jvm_arguments.append("-Dos.version=10.0")
+    if platform.machine() in ["x86", "i386", "i686"]:
+        jvm_arguments.append("-Xss1M")
+
+    jvm_arguments.append("-Djava.library.path=natives")
+    jvm_arguments.append("-Dminecraft.launcher.brand=ice-launcher")
+    jvm_arguments.append(f"-Dminecraft.launcher.version={__version__}")
+    jvm_arguments.append("-cp")
+    jvm_arguments.append(
+        get_classpath_string(version_meta.libraries, instance_info.minecraft_version)
+    )
+
+    command = [
+        java_path,
+        *jvm_arguments,
+        *optimized_jvm_flags,
+        version_meta.mainClass,
+        *game_arguments,
+    ]
+
     def start():
-        p = subprocess.Popen(minecraft_command, stdout=subprocess.PIPE)
-        callback_function(p)
+        process = Popen(
+            command, cwd=path.join(INSTANCES_DIR, instance_name), stdout=subprocess.PIPE
+        )
+        callback_function(process)
 
     Thread(target=start).start()

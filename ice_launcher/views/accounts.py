@@ -8,7 +8,7 @@ from customtkinter import CTkButton, CTkFrame, CTkLabel
 
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
-from ice_launcher.lib import accounts
+from ice_launcher.lib import accounts, msa
 
 
 class Accounts(CTkFrame):
@@ -38,13 +38,11 @@ class Accounts(CTkFrame):
         self.update_accounts_list()
 
     def add_account(self) -> None:
-        accounts.login_account(self.add_account_to_list)
+        accounts.login_account(self.update_accounts_list)
 
     def select_account(self, account_id: str) -> None:
         accounts.set_active_account(account_id)
         self.update_accounts_list()
-        self.master.views["instances"].update_selected_account()  # type: ignore
-        self.master.views["instances"].update_instance_list()  # type: ignore
 
     def remove_account(self, account_id: str) -> None:
         if messagebox.askyesno(
@@ -54,13 +52,13 @@ class Accounts(CTkFrame):
             self.update_accounts_list()
 
     def add_account_to_list(
-        self, index: int, account_id: str, account: accounts.CompleteLoginResponse
+        self, index: int, account_id: str, account: msa.Account
     ) -> None:
         emoji = "✅" if accounts.is_active_account(account_id) else "👤"
 
         label = CTkLabel(
             master=self.accounts_list.content,
-            text=f"{emoji} {account['name']}",
+            text=f"{emoji} {account.minecraft_username}",
             anchor="w",
         )
         label.grid(row=index, column=0, pady=10, padx=0, sticky="nsw")

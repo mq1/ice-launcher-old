@@ -2,4 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-__version__ = "0.0.16"
+from . import lib
+
+__version__ = lib.__version__

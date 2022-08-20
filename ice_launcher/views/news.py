@@ -7,15 +7,14 @@ from threading import Thread
 from tkinter import ttk
 
 from customtkinter import CTkButton, CTkFrame, CTkLabel
-from minecraft_launcher_lib.types import Article, Articles
-from minecraft_launcher_lib.utils import get_minecraft_news
 
 from ice_launcher.components.heading import Heading
 from ice_launcher.components.scrollable_frame import ScrollableFrame
+from ice_launcher.lib import minecraft_news
 
 
 class News(CTkFrame):
-    articles: Articles
+    articles: minecraft_news.Articles
 
     def __init__(self, master) -> None:
         super().__init__(master=master)
@@ -32,12 +31,12 @@ class News(CTkFrame):
         Thread(target=self.update_news).start()
 
     def update_news(self) -> None:
-        articles = get_minecraft_news()["article_grid"]
+        news = minecraft_news.fetch()
 
-        for index, article in enumerate(articles):
+        for index, article in enumerate(news.article_grid):
             label = CTkLabel(
                 master=self.news_frame.content,
-                text=article["default_tile"]["title"],
+                text=article.default_tile.title,
                 anchor="w",
             )
             label.grid(row=index * 2, column=0, pady=10, padx=0, sticky="nw")
@@ -45,7 +44,7 @@ class News(CTkFrame):
                 master=self.news_frame.content,
                 text="Open ↗️",
                 width=0,
-                command=lambda: self.open_article(article),
+                command=lambda: self.open_article_url(article.article_url),
             )
             open_button.grid(row=index * 2, column=1, pady=10, padx=(0, 10), sticky="e")
             separator = ttk.Separator(self.news_frame.content, orient="horizontal")
@@ -58,6 +57,6 @@ class News(CTkFrame):
                 sticky="ew",
             )
 
-    def open_article(self, article: Article) -> None:
-        url = f"https://www.minecraft.net{article['article_url']}"
+    def open_article_url(self, url: str) -> None:
+        url = f"https://www.minecraft.net{url}"
         webbrowser.open(url)
