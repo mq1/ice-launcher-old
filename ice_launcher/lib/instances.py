@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import platform
+import subprocess
 from enum import Enum
 from os import listdir, makedirs, path
 from os import rename as mv
@@ -135,10 +136,9 @@ def delete(instance_name: str) -> None:
 def launch(instance_name: str, account_id: str, callback_function: Callable) -> None:
     print(f"Launching instance {instance_name}")
 
-    # print("Refreshing account")
-    # account = accounts.refresh_account(account_id)
-    # print("Account successfully refreshed")
-    account = accounts.get_accounts()[account_id]
+    print("Refreshing account")
+    account = accounts.refresh_account(account_id)
+    print("Account successfully refreshed")
 
     instance_info = read_info(instance_name)
     version_meta = minecraft_version_meta.get_version_meta(
@@ -221,8 +221,9 @@ def launch(instance_name: str, account_id: str, callback_function: Callable) -> 
     ]
 
     def start():
-        print(command)
-        process = Popen(command, cwd=path.join(INSTANCES_DIR, instance_name))
+        process = Popen(
+            command, cwd=path.join(INSTANCES_DIR, instance_name), stdout=subprocess.PIPE
+        )
         callback_function(process)
 
     Thread(target=start).start()
