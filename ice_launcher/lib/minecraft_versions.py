@@ -10,7 +10,7 @@ from typing import Final
 import httpx
 from pydantic import BaseModel, HttpUrl
 
-from . import ProgressCallbacks, dirs, download_file, headers
+from . import VERSION_MANIFESTS_DIR, ProgressCallbacks, download_file, headers
 from .minecraft_assets import get_total_assets_size, install_assets
 from .minecraft_libraries import get_total_libraries_size, install_libraries
 from .minecraft_version_meta import MinecraftVersionMeta, install_client
@@ -18,7 +18,6 @@ from .minecraft_version_meta import MinecraftVersionMeta, install_client
 VERSION_MANIFEST_URL: Final[
     str
 ] = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
-VERSION_MANIFESTS_DIR: Final[str] = path.join(dirs.user_data_dir, "versions")
 
 
 class _TypeEnum(str, Enum):

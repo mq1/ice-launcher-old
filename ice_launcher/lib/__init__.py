@@ -22,6 +22,12 @@ __version__: Final[str] = "0.0.16"
 CLIENT_ID: Final[str] = "0018ddff-bd2f-4cc6-b220-66f6a4462a5c"
 VERSIONS_DIR: Final[str] = path.join(dirs.user_data_dir, "versions")
 LIBRARIES_DIR: Final[str] = path.join(dirs.user_data_dir, "libraries")
+ASSETS_DIR: Final[str] = path.join(dirs.user_data_dir, "assets")
+JRES_DIR: Final[str] = path.join(dirs.user_data_dir, "jre")
+CONFIG_PATH: Final[str] = path.join(dirs.user_data_dir, "config.toml")
+VERSION_MANIFESTS_DIR: Final[str] = path.join(dirs.user_data_dir, "versions")
+ACCOUNTS_FILE_PATH: Final[str] = path.join(dirs.user_data_dir, "accounts.toml")
+INSTANCES_DIR: Final[str] = path.join(dirs.user_data_dir, "instances")
 
 
 headers = {

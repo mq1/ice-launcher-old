@@ -9,27 +9,24 @@ from os import rename as mv
 from shutil import rmtree
 from subprocess import Popen
 from threading import Thread
-from typing import Callable, Final
+from typing import Callable
 
 import tomli
 import tomli_w
 from pydantic import BaseModel
 
-from ice_launcher.lib.minecraft_assets import ASSETS_DIR
-
 from . import (
+    ASSETS_DIR,
+    INSTANCES_DIR,
     ProgressCallbacks,
     __version__,
     accounts,
-    dirs,
     jre_manager,
     minecraft_version_meta,
 )
 from .minecraft_rules import is_rule_list_valid
 from .minecraft_version_meta import get_classpath_string
 from .minecraft_versions import MinecraftVersionInfo, install_version
-
-INSTANCES_DIR: Final[str] = path.join(dirs.user_data_dir, "instances")
 
 # flags from https://github.com/brucethemoose/Minecraft-Performance-Flags-Benchmarks
 optimized_jvm_flags = [

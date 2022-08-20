@@ -3,15 +3,12 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from os import path
-from typing import Final
 
 import tomli
 import tomli_w
 from pydantic import BaseModel
 
-from . import dirs
-
-CONFIG_PATH: Final[str] = path.join(dirs.user_data_dir, "config.toml")
+from . import CONFIG_PATH
 
 
 class Config(BaseModel):

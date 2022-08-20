@@ -11,10 +11,9 @@ import httpx
 from packaging import version
 from pydantic import BaseModel, HttpUrl
 
-from . import dirs, download_file, headers
+from . import JRES_DIR, download_file, headers
 
 ADOPTIUM_API_ENDPOINT: Final[str] = "https://api.adoptium.net"
-JRES_DIR: Final[str] = path.join(dirs.user_data_dir, "jre")
 
 
 class _Package(BaseModel):

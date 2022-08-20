@@ -6,15 +6,13 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from os import path
 from threading import Thread
-from typing import Any, Final, Optional
+from typing import Any, Optional
 
 import tomli
 import tomli_w
 from pydantic import BaseModel
 
-from . import dirs, msa
-
-ACCOUNTS_FILE_PATH: Final[str] = path.join(dirs.user_data_dir, "accounts.toml")
+from . import ACCOUNTS_FILE_PATH, msa
 
 
 class Document(BaseModel):

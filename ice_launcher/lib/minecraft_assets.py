@@ -9,10 +9,9 @@ from typing import Final
 
 from pydantic import BaseModel, HttpUrl
 
-from . import ProgressCallbacks, __version__, dirs, download_file
+from . import ASSETS_DIR, ProgressCallbacks, __version__, download_file
 
 ASSETS_DOWNLOAD_ENDPOINT: Final[str] = "https://resources.download.minecraft.net"
-ASSETS_DIR: Final[str] = path.join(dirs.user_data_dir, "assets")
 
 
 class _ObjectInfo(BaseModel):
