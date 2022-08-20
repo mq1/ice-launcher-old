@@ -11,7 +11,7 @@
 
 -----
 
-An unofficial WIP launcher for Minecraft
+An unofficial WIP launcher for Minecraft 1.19+
 
 As of now, this launcher is considered a technical preview and every release breaks everything from the previous install
 
